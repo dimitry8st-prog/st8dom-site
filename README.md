@@ -94,6 +94,10 @@ gunicorn wsgi:app --bind 0.0.0.0:8000
 
 Готовый образ: `Dockerfile`, `Procfile`, `fly.toml`, `render.yaml`.
 
+Исходный код: https://github.com/dimitry8st-prog/st8dom-site
+
+Один клик на Render: https://render.com/deploy?repo=https://github.com/dimitry8st-prog/st8dom-site
+
 Fly.io:
 
 ```bash
