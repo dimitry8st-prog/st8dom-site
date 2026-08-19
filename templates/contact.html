@@ -1,0 +1,20 @@
+{% from "macros/form.html" import render_inquiry_form %}
+{% extends "base.html" %}
+{% block title %}Обсудить задачу — Дмитрий Степанов{% endblock %}
+{% block description %}Опишите процесс, который хотите автоматизировать. Заявка приходит напрямую, без Telegram-канала.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('contact') }}{% endblock %}
+{% block og_title %}Форма заявки — AI-аудит, MVP, внедрение{% endblock %}
+{% block og_description %}Имя, email, тема и описание задачи. Ответ в рабочее время.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero" style="border-bottom:none;padding-bottom:24px">
+    <p class="eyebrow">// заявка</p>
+    <h1>Обсудить задачу</h1>
+    <p class="hero-sub">Коротко опишите процесс — отвечу лично на email или в Telegram @dimitry8st. Канал Dmitry-prompt для обращения не используется.</p>
+    <p class="trust-line">Прямой контакт · Работа по договору · Демо перед внедрением</p>
+  </section>
+  {{ render_inquiry_form(form) }}
+  <p class="pricing-note" style="padding-bottom:64px">Если удобнее мессенджер — <a href="{{ telegram_url }}" data-track="telegram_click">напишите в личный Telegram</a>.</p>
+</div>
+{% endblock %}

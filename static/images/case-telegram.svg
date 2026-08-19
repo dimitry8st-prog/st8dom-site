@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360" role="img" aria-label="!E5<0 Telegram-1>B0">
+  <rect width="560" height="360" fill="#131C2E"/>
+  <rect x="0" y="0" width="560" height="360" fill="url(#g)" opacity=".5"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B82F6" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity=".12"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="70" width="140" height="88" rx="16" fill="#1a2235" stroke="#2AABEE" stroke-width="2"/>
+  <text x="118" y="122" text-anchor="middle" fill="#E2E8F0" font-family="JetBrains Mono, monospace" font-size="14">Telegram</text>
+  <rect x="228" y="70" width="140" height="88" rx="16" fill="#1a2235" stroke="#818CF8" stroke-width="2"/>
+  <text x="298" y="122" text-anchor="middle" fill="#E2E8F0" font-family="JetBrains Mono, monospace" font-size="14">FAQ</text>
+  <rect x="408" y="70" width="104" height="88" rx="16" fill="#1a2235" stroke="#34D399" stroke-width="2"/>
+  <text x="460" y="122" text-anchor="middle" fill="#E2E8F0" font-family="JetBrains Mono, monospace" font-size="13">G5;>25:</text>
+  <path d="M188 114h40M368 114h40" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="120" y="210" width="320" height="72" rx="14" fill="#0B0F1A" stroke="#1E2D45"/>
+  <text x="280" y="252" text-anchor="middle" fill="#94A3B8" font-family="Inter, sans-serif" font-size="15">MA:0;0F8O ?@8 =87:>9 C25@5==>AB8</text>
+</svg>

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Ошибка сервера — st8dom.ru{% endblock %}
+{% block robots %}noindex{% endblock %}
+{% block canonical %}{{ site_url }}/500{% endblock %}
+
+{% block content %}
+<div class="container" style="padding:80px 24px">
+  <p class="eyebrow">// 500</p>
+  <h1>Сервер не ответил</h1>
+  <p class="hero-sub">Попробуйте обновить страницу или напишите на почту. Заявка при этом могла не сохраниться.</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">На главную</a>
+</div>
+{% endblock %}

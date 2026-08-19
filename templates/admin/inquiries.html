@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Заявки — админка{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('admin_inquiries') }}{% endblock %}
+
+{% block content %}
+<div class="container container--wide" style="padding:40px 24px 80px">
+  <div class="admin-toolbar">
+    <div>
+      <p class="eyebrow">// заявки</p>
+      <h1>Обращения</h1>
+      <p class="lead">Непрочитанных: {{ unread_count }}</p>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='all') }}">Все</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='unread') }}">Непрочитанные</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='read') }}">Прочитанные</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_logout') }}">Выйти</a>
+    </div>
+  </div>
+
+  {% if not inquiries %}
+    <p class="lead">Заявок пока нет.</p>
+  {% else %}
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Имя</th>
+          <th>Контакт</th>
+          <th>Тема</th>
+          <th>Сообщение</th>
+          <th>Статус</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in inquiries %}
+        <tr class="{{ 'is-unread' if not item.is_read else '' }}">
+          <td>{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+          <td>
+            <strong>{{ item.name }}</strong>
+            {% if item.company %}<div class="contact-label">{{ item.company }}</div>{% endif %}
+          </td>
+          <td>
+            <a href="mailto:{{ item.email }}">{{ item.email }}</a>
+            {% if item.phone %}<div>{{ item.phone }}</div>{% endif %}
+          </td>
+          <td>{{ item.topic }}</td>
+          <td>{{ item.message }}</td>
+          <td>{{ 'прочитано' if item.is_read else 'новое' }}</td>
+          <td>
+            <div class="row-actions">
+              {% if not item.is_read %}
+              <form method="post" action="{{ url_for('admin_mark_read', inquiry_id=item.id, status=status) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-ghost btn-sm" type="submit">Прочитано</button>
+              </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin_delete', inquiry_id=item.id, status=status) }}" onsubmit="return confirm('Удалить заявку?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-danger btn-sm" type="submit">Удалить</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

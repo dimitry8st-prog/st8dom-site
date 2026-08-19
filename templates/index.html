@@ -1,0 +1,322 @@
+{% from "macros/form.html" import render_inquiry_form %}
+{% extends "base.html" %}
+
+{% block jsonld %}
+{{ super() }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"С чего начинается работа?","acceptedAnswer":{"@type":"Answer","text":"С диагностики процесса: что делается вручную, какие данные есть, где нужен контроль человека. После этого фиксируем границы пилота."}},
+    {"@type":"Question","name":"Сколько занимает разработка MVP?","acceptedAnswer":{"@type":"Answer","text":"Срок зависит от сценария и доступов. Обычно прототип одного приоритетного сценария занимает от двух до шести недель после согласования границ."}},
+    {"@type":"Question","name":"Можно ли подключить решение к существующей CRM?","acceptedAnswer":{"@type":"Answer","text":"Да, если у CRM есть API или вебхуки. На пилоте сначала проверяем сценарий, затем подключаем канал и поля сделки."}},
+    {"@type":"Question","name":"Какие данные передаются AI-модели?","acceptedAnswer":{"@type":"Answer","text":"Только те фрагменты, которые нужны для сценария. Состав данных, хранение и возможность использовать российские модели согласуем до разработки."}},
+    {"@type":"Question","name":"Можно ли использовать российские модели?","acceptedAnswer":{"@type":"Answer","text":"Да. В проектах уже используются GigaChat и контуры с учётом требований к локализации. Выбор модели зависит от задачи и ограничений по данным."}},
+    {"@type":"Question","name":"Что произойдёт, если AI не уверен в ответе?","acceptedAnswer":{"@type":"Answer","text":"Сценарий эскалирует человеку. Критичные действия не выполняются автоматически без подтверждения."}},
+    {"@type":"Question","name":"Кто владеет кодом и данными?","acceptedAnswer":{"@type":"Answer","text":"Права на результат и данные клиента фиксируются в договоре. Исходный код передаётся по согласованному объёму вместе с документацией."}},
+    {"@type":"Question","name":"Что входит в поддержку?","acceptedAnswer":{"@type":"Answer","text":"Сопровождение согласовывается отдельно: инциденты, обновление промптов, мониторинг и обучение. Базовый MVP включает документацию запуска, но не бессрочные доработки."}}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow reveal">AI-архитектор для бизнеса · Нижний Новгород</p>
+        <h1 class="reveal">Проектирую и внедряю AI-системы для поддержки, продаж и внутренних процессов</h1>
+        <p class="hero-sub reveal">
+          Разрабатываю AI-агентов, Telegram-ботов, RAG-системы и backend-автоматизацию.
+          Начинаем с диагностики процесса и собираем проверяемый MVP под конкретную задачу бизнеса.
+        </p>
+        <p class="trust-line reveal">Прямой контакт · Работа по договору · Демо перед внедрением</p>
+        <div class="hero-cta reveal">
+          <a href="{{ url_for('contact') }}" class="btn btn-primary" data-track="hero_cta_click" id="hero-cta">Обсудить задачу</a>
+          <a href="{{ url_for('cases_list') }}" class="btn btn-ghost">Посмотреть кейсы</a>
+        </div>
+      </div>
+      <div class="avatar-wrap reveal">
+        <svg class="avatar-glow" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <radialGradient id="g1" cx="50%" cy="60%" r="55%">
+              <stop offset="0%" stop-color="#3B82F6" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="g2" cx="30%" cy="40%" r="45%">
+              <stop offset="0%" stop-color="#34D399" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="g3" cx="70%" cy="30%" r="40%">
+              <stop offset="0%" stop-color="#818CF8" stop-opacity=".3"/>
+              <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="b1"><feGaussianBlur stdDeviation="18"/></filter>
+            <filter id="b2"><feGaussianBlur stdDeviation="10"/></filter>
+          </defs>
+          <ellipse cx="110" cy="130" rx="95" ry="100" fill="url(#g1)" filter="url(#b1)" style="animation:pulse 3s ease-in-out infinite"/>
+          <ellipse cx="55" cy="185" rx="70" ry="55" fill="url(#g2)" filter="url(#b2)" style="animation:pulse 4s ease-in-out infinite .8s"/>
+          <ellipse cx="165" cy="65" rx="65" ry="50" fill="url(#g3)" filter="url(#b2)" style="animation:pulse 3.5s ease-in-out infinite 1.2s"/>
+        </svg>
+        <canvas id="avatarCanvas" width="400" height="400" data-src="{{ url_for('static', filename='images/avatar.jpg') }}" aria-hidden="true"></canvas>
+        <img class="avatar-img" src="{{ url_for('static', filename='images/avatar.jpg') }}" width="200" height="200" alt="Дмитрий Степанов" style="position:absolute;opacity:0;pointer-events:none">
+        <div class="avatar-status" title="Доступен для проектов"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="services">
+    <div class="s-label reveal"><span>//</span> что делаю</div>
+    <h2 class="reveal">Услуги</h2>
+    <p class="lead reveal">Технологии — средство. Сначала процесс и критерий проверки, затем модель, бот или интеграция.</p>
+    <div class="grid-2">
+      <article class="card reveal" data-d="0">
+        <div class="card-icon" aria-hidden="true">🤖</div>
+        <p class="card-pain">Проблема: однотипные обращения съедают смену оператора</p>
+        <h3>Telegram-боты с ИИ</h3>
+        <p>Результат: бот закрывает типовые вопросы и отдаёт сложные человеку.</p>
+        <p>Первый этап: сценарий поддержки, FAQ и порог эскалации.</p>
+        <div class="card-cta"><a class="btn btn-ghost btn-sm" href="{{ url_for('contact') }}">Обсудить задачу</a></div>
+      </article>
+      <article class="card reveal" data-d="1">
+        <div class="card-icon" aria-hidden="true">📄</div>
+        <p class="card-pain">Проблема: договоры и база знаний разбираются вручную</p>
+        <h3>RAG-системы для документов</h3>
+        <p>Результат: поиск по вашим файлам и структурированный разбор с источниками.</p>
+        <p>Первый этап: набор документов, тестовые вопросы, формат ответа.</p>
+        <div class="card-cta"><a class="btn btn-ghost btn-sm" href="{{ url_for('contact') }}">Обсудить задачу</a></div>
+      </article>
+      <article class="card reveal" data-d="2">
+        <div class="card-icon" aria-hidden="true">⚙️</div>
+        <p class="card-pain">Проблема: данные и заявки живут в разных сервисах</p>
+        <h3>Автоматизация процессов</h3>
+        <p>Результат: связка форм, CRM, таблиц и уведомлений без ручного копирования.</p>
+        <p>Первый этап: карта интеграций и один приоритетный поток.</p>
+        <div class="card-cta"><a class="btn btn-ghost btn-sm" href="{{ url_for('contact') }}">Обсудить задачу</a></div>
+      </article>
+      <article class="card reveal" data-d="3">
+        <div class="card-icon" aria-hidden="true">🎯</div>
+        <p class="card-pain">Проблема: непонятно, где AI даст эффект, а где риск</p>
+        <h3>Консалтинг и аудит</h3>
+        <p>Результат: схема процесса, точки автоматизации и честный план пилота.</p>
+        <p>Первый этап: разбор 1–2 процессов и ограничений по данным.</p>
+        <div class="card-cta"><a class="btn btn-ghost btn-sm" href="{{ url_for('contact') }}">Обсудить задачу</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="s" id="benefits">
+    <div class="s-label reveal"><span>//</span> результат</div>
+    <h2 class="reveal">Что это даёт бизнесу</h2>
+    <p class="lead reveal">Формулировки без неподтверждённых множителей. Эффект измеряем на пилоте.</p>
+    <div class="grid-2">
+      <article class="card reveal" data-d="0">
+        <p class="card-pain">Клиенты пишут одно и то же в директ и почту?</p>
+        <div class="benefit-num">24/7*</div>
+        <h3>Бот закрывает рутину</h3>
+        <p>Автоматизирует повторяющиеся обращения. Доступен круглосуточно при работающей инфраструктуре.</p>
+      </article>
+      <article class="card reveal" data-d="1">
+        <p class="card-pain">Договоры проверяете вручную часами?</p>
+        <div class="benefit-num">пилот</div>
+        <h3>ИИ подсвечивает риски</h3>
+        <p>Может сократить время обработки документа. Точность проверяется на тестовом наборе, не обещается «в 10 раз».</p>
+      </article>
+      <article class="card reveal" data-d="2">
+        <p class="card-pain">Метрики разбросаны по таблицам и кабинетам?</p>
+        <div class="benefit-num">→ 1</div>
+        <h3>Агент собирает отчёт</h3>
+        <p>Сводит KPI из загруженных данных и может прислать дайджест. Источник цифр остаётся у вас.</p>
+      </article>
+      <article class="card reveal" data-d="3">
+        <p class="card-pain">Нужно решение под процесс, а не шаблон?</p>
+        <div class="benefit-num">MVP</div>
+        <h3>Собираю под конкретный кейс</h3>
+        <p>Один приоритетный сценарий, критерии готовности и демо до внедрения.</p>
+      </article>
+    </div>
+    <p class="pricing-note reveal">* Круглосуточная доступность зависит от хостинга, ключей API и мониторинга. Это не гарантия безотказной работы.</p>
+  </section>
+
+  <section class="s" id="process">
+    <div class="s-label reveal"><span>//</span> метод</div>
+    <h2 class="reveal">Как я работаю</h2>
+    <div class="process">
+      <article class="process-item reveal"><div class="process-num">01</div><div><h3>Диагностика процесса</h3><p>Фиксируем пользователя, ручные операции, данные и ограничения. Без этого MVP не запускаю.</p></div></article>
+      <article class="process-item reveal"><div class="process-num">02</div><div><h3>Схема решения и оценка</h3><p>Архитектура, роль человека, риски и стоимость следующего шага — до написания кода.</p></div></article>
+      <article class="process-item reveal"><div class="process-num">03</div><div><h3>MVP или прототип</h3><p>Один приоритетный сценарий, который можно показать и прогнать на реальных примерах.</p></div></article>
+      <article class="process-item reveal"><div class="process-num">04</div><div><h3>Проверка на реальных сценариях</h3><p>Тестовый набор, ошибки, эскалации, время ответа. Результат измеряется на этапе пилота.</p></div></article>
+      <article class="process-item reveal"><div class="process-num">05</div><div><h3>Внедрение, документация и поддержка</h3><p>Интеграции, инструкция запуска, ограничения и порядок сопровождения.</p></div></article>
+    </div>
+  </section>
+
+  <section class="s" id="projects">
+    <div class="s-label reveal"><span>//</span> доказательства</div>
+    <h2 class="reveal">Кейсы</h2>
+    <p class="lead reveal">Рабочие примеры с репозиторием. Демо и учебные MVP не выдаются за внедрение у клиента.</p>
+    <div class="projects-list">
+      {% for case in cases %}
+      <a class="project-card reveal" href="{{ url_for('case_detail', slug=case.slug) }}" data-track="project_open" data-d="{{ loop.index0 }}">
+        <div class="project-thumb">
+          <img src="{{ url_for('static', filename='images/' + case.image) }}" alt="{{ case.image_alt }}" width="88" height="88" loading="lazy">
+        </div>
+        <div>
+          <div class="project-name">{{ case.short_title }} <span class="badge {{ case.badge_class }}">{{ case.badge }}</span></div>
+          <div class="project-desc">{{ case.card_summary }}</div>
+          <div class="project-stack">
+            {% for tag in case.tech[:4] %}<span class="tag">{{ tag }}</span>{% endfor %}
+          </div>
+          <div class="project-status">Статус: {{ case.status }}</div>
+        </div>
+        <div class="arrow">Подробнее</div>
+      </a>
+      {% endfor %}
+    </div>
+    <p style="margin-top:20px"><a class="btn btn-ghost" href="{{ url_for('cases_list') }}">Все кейсы с фильтрами</a></p>
+  </section>
+
+  <section class="s" id="metrics">
+    <div class="s-label reveal"><span>//</span> пилот</div>
+    <h2 class="reveal">Что измеряем на пилоте</h2>
+    <div class="grid-2">
+      <article class="card reveal"><h3>Скорость</h3><p>Время обработки запроса и доля обращений, закрытых без оператора.</p></article>
+      <article class="card reveal"><h3>Нагрузка</h3><p>Число ручных операций и стоимость одной обработки — на ваших данных.</p></article>
+      <article class="card reveal"><h3>Качество</h3><p>Ошибки, эскалации и оценка ответа по заранее собранному тестовому набору.</p></article>
+      <article class="card reveal"><h3>Граница AI</h3><p>Где модель должна молчать и передавать человеку. Это часть приёмки, не «магия».</p></article>
+    </div>
+  </section>
+
+  <section class="s" id="about">
+    <div class="s-label reveal"><span>//</span> обо мне</div>
+    <h2 class="reveal">Дмитрий Степанов</h2>
+    <div class="about-block reveal">
+      <p>Дмитрий Степанов — AI-архитектор и разработчик прикладных AI-систем. Проектирую связку интерфейса, бизнес-логики, моделей, базы знаний и интеграций. Работаю напрямую, объясняю архитектуру и передаю документацию.</p>
+      <p style="margin-top:12px;color:var(--muted)">Нижний Новгород, удалённый формат. Специализация: AI-агенты, Telegram-боты, RAG, n8n/Make, Python/FastAPI. Компетенции подтверждаются открытыми репозиториями, а не списком вымышленных клиентов.</p>
+      <div class="about-links">
+        <a class="btn btn-ghost btn-sm" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">GitHub</a>
+        <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Telegram</a>
+        <a class="btn btn-ghost btn-sm" href="{{ fl_url }}" target="_blank" rel="noopener">FL.ru</a>
+        <a class="btn btn-ghost btn-sm" href="{{ kwork_url }}" target="_blank" rel="noopener">Kwork</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="formats">
+    <div class="s-label reveal"><span>//</span> форматы</div>
+    <h2 class="reveal">Как можно начать</h2>
+    <div class="pricing-grid">
+      <article class="price-card reveal">
+        <h3>AI-аудит</h3>
+        <p class="price-amount">Стоимость определяется после диагностики</p>
+        <ul>
+          <li>анализ процесса;</li>
+          <li>карта автоматизации;</li>
+          <li>риски;</li>
+          <li>рекомендуемый стек;</li>
+          <li>следующий шаг.</li>
+        </ul>
+      </article>
+      <article class="price-card price-card--popular reveal">
+        <h3>MVP</h3>
+        <p class="price-amount">Стоимость определяется после диагностики</p>
+        <ul>
+          <li>один приоритетный сценарий;</li>
+          <li>рабочий прототип;</li>
+          <li>тестирование;</li>
+          <li>документация.</li>
+        </ul>
+      </article>
+      <article class="price-card reveal">
+        <h3>Внедрение</h3>
+        <p class="price-amount">Стоимость определяется после диагностики</p>
+        <ul>
+          <li>интеграции;</li>
+          <li>мониторинг;</li>
+          <li>защита данных;</li>
+          <li>обучение;</li>
+          <li>сопровождение.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="pricing-note">Публичного прайса нет: оценка зависит от доступов, объёма данных и требований к контуру. На FL.ru указаны ориентиры биржи — это не оферта этого сайта.</p>
+  </section>
+
+  <section class="s" id="faq">
+    <div class="s-label reveal"><span>//</span> вопросы</div>
+    <h2 class="reveal">FAQ</h2>
+    <div class="faq">
+      <details class="reveal"><summary>С чего начинается работа?</summary><p>С диагностики процесса: что делается вручную, какие данные есть, где нужен контроль человека. После этого фиксируем границы пилота.</p></details>
+      <details class="reveal"><summary>Сколько занимает разработка MVP?</summary><p>Срок зависит от сценария и доступов. Обычно прототип одного приоритетного сценария занимает от двух до шести недель после согласования границ.</p></details>
+      <details class="reveal"><summary>Можно ли подключить решение к существующей CRM?</summary><p>Да, если у CRM есть API или вебхуки. На пилоте сначала проверяем сценарий, затем подключаем канал и поля сделки.</p></details>
+      <details class="reveal"><summary>Какие данные передаются AI-модели?</summary><p>Только те фрагменты, которые нужны для сценария. Состав данных, хранение и возможность использовать российские модели согласуем до разработки.</p></details>
+      <details class="reveal"><summary>Можно ли использовать российские модели?</summary><p>Да. В проектах уже используются GigaChat и контуры с учётом требований к локализации. Выбор модели зависит от задачи и ограничений по данным.</p></details>
+      <details class="reveal"><summary>Что произойдёт, если AI не уверен в ответе?</summary><p>Сценарий эскалирует человеку. Критичные действия не выполняются автоматически без подтверждения.</p></details>
+      <details class="reveal"><summary>Кто владеет кодом и данными?</summary><p>Права на результат и данные клиента фиксируются в договоре. Исходный код передаётся по согласованному объёму вместе с документацией.</p></details>
+      <details class="reveal"><summary>Что входит в поддержку?</summary><p>Сопровождение согласовывается отдельно: инциденты, обновление промптов, мониторинг и обучение. Базовый MVP включает документацию запуска, но не бессрочные доработки.</p></details>
+    </div>
+  </section>
+
+  <section class="s" id="trust">
+    <div class="s-label reveal"><span>//</span> стек</div>
+    <h2 class="reveal">Чем собираю решения</h2>
+    <div class="trust-badges reveal">
+      <span class="trust-badge">Работаю по договору</span>
+      <span class="trust-badge">Прямой контакт</span>
+      <span class="trust-badge">Демо перед внедрением</span>
+      <span class="trust-badge">Документация и ограничения</span>
+    </div>
+    <div class="stack-grid reveal">
+      <div class="stack-item"><div class="stack-dot" style="background:var(--accent2)"></div>Claude API</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--green)"></div>GigaChat</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--accent)"></div>OpenAI / GPT</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--orange)"></div>Whisper (STT)</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--accent)"></div>Telegram Bot API</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--accent2)"></div>n8n / Make</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--green)"></div>Python · FastAPI</div>
+      <div class="stack-item"><div class="stack-dot" style="background:var(--muted)"></div>React · JavaScript</div>
+    </div>
+  </section>
+
+  <section class="s" id="cta" style="border-bottom:none">
+    <div class="cta-block reveal">
+      <h2>Разберём, что можно автоматизировать</h2>
+      <p>Напишите задачу — отвечу лично. Telegram-канал для рассылки не используется как основной контакт.</p>
+      <div class="cta-btns">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary" data-track="hero_cta_click">Оставить заявку</a>
+        <a href="{{ telegram_url }}" class="btn btn-tg" target="_blank" rel="noopener" data-track="telegram_click">Написать в Telegram</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="contact">
+    <div class="s-label reveal"><span>//</span> контакт</div>
+    <h2 class="reveal">Форма заявки</h2>
+    <p class="lead reveal">Имя, email и описание задачи обязательны. Телефон и компания — по желанию.</p>
+    {{ render_inquiry_form(form) }}
+    <div class="contact-grid" style="margin-top:24px">
+      <a class="contact-item reveal" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">
+        <div class="contact-icon" aria-hidden="true">✈️</div>
+        <div><div class="contact-label">Telegram</div><div class="contact-value">@dimitry8st</div></div>
+      </a>
+      <a class="contact-item reveal" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">
+        <div class="contact-icon" aria-hidden="true">💻</div>
+        <div><div class="contact-label">GitHub</div><div class="contact-value">dimitry8st-prog</div></div>
+      </a>
+      <a class="contact-item reveal" href="{{ fl_url }}" target="_blank" rel="noopener">
+        <div class="contact-icon" aria-hidden="true">🏆</div>
+        <div><div class="contact-label">FL.ru</div><div class="contact-value">Портфолио</div></div>
+      </a>
+      <a class="contact-item reveal" href="{{ kwork_url }}" target="_blank" rel="noopener">
+        <div class="contact-icon" aria-hidden="true">🛒</div>
+        <div><div class="contact-label">Kwork</div><div class="contact-value">Заказать услугу</div></div>
+      </a>
+      <a class="contact-item reveal" href="mailto:{{ email_address }}">
+        <div class="contact-icon" aria-hidden="true">✉️</div>
+        <div><div class="contact-label">Почта</div><div class="contact-value">Написать</div></div>
+      </a>
+    </div>
+  </section>
+</div>
+{% endblock %}

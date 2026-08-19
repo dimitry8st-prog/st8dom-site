@@ -1,0 +1,18 @@
+# Секреты и локальная БД — не коммитить
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.db
+instance/*.db
+logs/*.log
+logs/*.log.*
+.pytest_cache/
+.DS_Store
+st8dom-source.html
+_live.css
+videos/
+node_modules/
+*.docx
+

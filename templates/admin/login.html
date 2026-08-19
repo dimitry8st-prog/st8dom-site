@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Вход в панель заявок{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('admin_login') }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="login-box">
+    <p class="eyebrow">// admin</p>
+    <h1>Панель заявок</h1>
+    <p class="hero-sub">Доступ только для администратора сайта.</p>
+    <form class="form" method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        <label for="username">Логин</label>
+        {{ form.username(id="username", autocomplete="username") }}
+      </div>
+      <div class="field">
+        <label for="password">Пароль</label>
+        {{ form.password(id="password", autocomplete="current-password") }}
+      </div>
+      <button class="btn btn-primary" type="submit">Войти</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

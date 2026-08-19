@@ -1,0 +1,54 @@
+{% macro field_errors(field) %}
+  {% if field.errors %}
+    {% for error in field.errors %}
+      <div class="error" role="alert">{{ error }}</div>
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
+
+{% macro render_inquiry_form(form) %}
+<form class="form reveal" id="inquiry-form" method="post" action="{{ url_for('contact') }}">
+  {{ form.hidden_tag() }}
+  {{ form.website(class="hp", tabindex="-1", autocomplete="off") }}
+  <div class="form-row">
+    <div class="field">
+      <label for="name">{{ form.name.label.text }} <span class="req">*</span></label>
+      {{ form.name(id="name", maxlength="120", required=true, autocomplete="name") }}
+      {{ field_errors(form.name) }}
+    </div>
+    <div class="field">
+      <label for="email">{{ form.email.label.text }} <span class="req">*</span></label>
+      {{ form.email(id="email", maxlength="255", required=true, autocomplete="email", type="email") }}
+      {{ field_errors(form.email) }}
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="field">
+      <label for="phone">{{ form.phone.label.text }}</label>
+      {{ form.phone(id="phone", maxlength="40", autocomplete="tel") }}
+      {{ field_errors(form.phone) }}
+    </div>
+    <div class="field">
+      <label for="company">{{ form.company.label.text }}</label>
+      {{ form.company(id="company", maxlength="160", autocomplete="organization") }}
+    </div>
+  </div>
+  <div class="field">
+    <label for="topic">{{ form.topic.label.text }} <span class="req">*</span></label>
+    {{ form.topic(id="topic", required=true) }}
+    {{ field_errors(form.topic) }}
+  </div>
+  <div class="field">
+    <label for="message">{{ form.message.label.text }} <span class="req">*</span></label>
+    {{ form.message(id="message", required=true, minlength="10", maxlength="4000", placeholder="Какой процесс, какие данные, какой результат нужен") }}
+    {{ field_errors(form.message) }}
+  </div>
+  <label class="consent">
+    {{ form.consent(required=true) }}
+    <span>Согласен на <a href="{{ url_for('consent') }}">обработку персональных данных</a> и принимаю <a href="{{ url_for('privacy') }}">политику конфиденциальности</a>. <span class="req">*</span></span>
+  </label>
+  {{ field_errors(form.consent) }}
+  <button class="btn btn-primary" type="submit">Отправить заявку</button>
+  <p class="form-status" aria-live="polite"></p>
+</form>
+{% endmacro %}

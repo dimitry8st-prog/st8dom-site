@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Кейсы — Дмитрий Степанов{% endblock %}
+{% block description %}Проверяемые кейсы: LegalBot, DocPulse, Telegram-бот поддержки, контур данных витрин, маршрутизация заявок, корпоративный лендинг и AI-ассистент.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('cases_list') }}{% endblock %}
+{% block og_title %}Кейсы AI-систем и автоматизации{% endblock %}
+{% block og_description %}Доказательные кейсы с репозиториями, статусом и ограничениями. Без вымышленных внедрений.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero" style="padding-bottom:32px;border-bottom:none">
+    <p class="eyebrow">// портфолио</p>
+    <h1>Кейсы</h1>
+    <p class="hero-sub">Каждый проект открывается отдельной страницей и ведёт в свой репозиторий, а не в общий профиль GitHub.</p>
+  </section>
+
+  <div class="filters" role="group" aria-label="Фильтр кейсов">
+    {% for value, label in filters %}
+      <button class="filter-btn{% if value == 'all' %} is-active{% endif %}" type="button" data-filter="{{ value }}" aria-pressed="{{ 'true' if value == 'all' else 'false' }}">{{ label }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="projects-list" style="padding-bottom:72px">
+    {% for case in cases %}
+    <a class="project-card" href="{{ url_for('case_detail', slug=case.slug) }}" data-tags="{{ case.filters|join(' ') }}" data-track="project_open">
+      <div class="project-thumb">
+        <img src="{{ url_for('static', filename='images/' + case.image) }}" alt="{{ case.image_alt }}" width="88" height="88" loading="lazy">
+      </div>
+      <div>
+        <div class="project-name">{{ case.title }} <span class="badge {{ case.badge_class }}">{{ case.badge }}</span></div>
+        <div class="project-desc">{{ case.card_summary }}</div>
+        <div class="project-stack">
+          {% for tag in case.tech[:5] %}<span class="tag">{{ tag }}</span>{% endfor %}
+        </div>
+        <div class="project-status">{{ case.type }} · статус: {{ case.status }}</div>
+      </div>
+      <div class="arrow">Подробнее</div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ case.title }} — кейс Дмитрия Степанова{% endblock %}
+{% block description %}{{ case.card_summary }}{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('case_detail', slug=case.slug) }}{% endblock %}
+{% block og_title %}{{ case.title }}{% endblock %}
+{% block og_description %}{{ case.card_summary }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero">
+    <p class="eyebrow"><a href="{{ url_for('cases_list') }}">Кейсы</a> / {{ case.type }}</p>
+    <div class="case-hero">
+      <div>
+        <h1>{{ case.title }}</h1>
+        <p class="hero-sub">{{ case.card_summary }}</p>
+        <p class="trust-line">Статус: {{ case.status }}</p>
+        <div class="hero-cta">
+          {% if case.repo_url %}
+            <a class="btn btn-primary" href="{{ case.repo_url }}" target="_blank" rel="noopener" data-track="github_click">Репозиторий</a>
+          {% endif %}
+          <a class="btn btn-ghost" href="{{ url_for('contact') }}">Обсудить похожее</a>
+        </div>
+      </div>
+      <figure class="case-cover">
+        <img src="{{ url_for('static', filename='images/' + case.image) }}" alt="{{ case.image_alt }}" width="560" height="360">
+      </figure>
+    </div>
+  </section>
+
+  {% if case.video %}
+  <section class="s prose" aria-labelledby="case-video-heading">
+    <h2 id="case-video-heading">Как это выглядит</h2>
+    <div class="case-video">
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        {% if case.video_poster %}poster="{{ url_for('static', filename='video/' + case.video_poster) }}"{% endif %}
+        src="{{ url_for('static', filename='video/' + case.video) }}"
+      >
+        {{ case.video_fallback or 'Демонстрация бота. Если плеер не открывается, откройте репозиторий.' }}
+      </video>
+    </div>
+    {% if case.video_note %}
+    <p class="case-video-note">{{ case.video_note }}</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <section class="s prose">
+    <h2>Проблема</h2>
+    <p>{{ case.problem }}</p>
+    <h2>Реализованное решение</h2>
+    <p>{{ case.solution }}</p>
+    <h2>Моя роль</h2>
+    <p>{{ case.role }}</p>
+    <h2>Архитектура</h2>
+    <p>{{ case.architecture }}</p>
+    <h2>Что работает сейчас</h2>
+    <p>{{ case.now_works }}</p>
+    <h2>Как проверить</h2>
+    <p>{{ case.verification }}</p>
+    <h2>Ограничения и следующие шаги</h2>
+    <p>{{ case.limitations }}</p>
+    <p>{{ case.next_steps }}</p>
+    <h2>Технологии</h2>
+    <p>
+      {% for tag in case.tech %}<span class="tag">{{ tag }}</span> {% endfor %}
+    </p>
+    <div class="case-actions">
+      {% if case.repo_url %}
+        <a class="btn btn-primary" href="{{ case.repo_url }}" target="_blank" rel="noopener">Открыть репозиторий</a>
+      {% endif %}
+      {% if case.demo_url %}
+        <a class="btn btn-ghost" href="{{ case.demo_url }}" target="_blank" rel="noopener">Демо</a>
+      {% endif %}
+      <a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Написать в Telegram</a>
+    </div>
+    {% if case.related_repos %}
+      <h2>Связанные репозитории</h2>
+      <ul>
+        {% for repo in case.related_repos %}
+          <li><a href="{{ repo.url }}" target="_blank" rel="noopener">{{ repo.label }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
+  <section class="s">
+    <h2>Другие кейсы</h2>
+    <div class="projects-list">
+      {% for item in others %}
+      <a class="project-card" href="{{ url_for('case_detail', slug=item.slug) }}" data-track="project_open">
+        <div class="project-thumb">
+          <img src="{{ url_for('static', filename='images/' + item.image) }}" alt="{{ item.image_alt }}" loading="lazy">
+        </div>
+        <div>
+          <div class="project-name">{{ item.short_title }}</div>
+          <div class="project-desc">{{ item.card_summary }}</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
