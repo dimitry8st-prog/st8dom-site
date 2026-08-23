@@ -1,0 +1,198 @@
+{% macro faq_demo_player(case, static_exists) %}
+  {% set poster = 'video/' + case.video_poster %}
+  {% set video_h = 'video/' + case.video %}
+  {% set video_v = 'video/' + case.video_vertical %}
+  {% set captions = 'subtitles/' + case.video_captions %}
+  {% set music = 'audio/' + case.video_audio %}
+  {% set voice = 'audio/' + (case.video_voice or '') %}
+  {% set has_video_h = static_exists(video_h) %}
+  {% set has_video_v = static_exists(video_v) %}
+  {% set has_music = static_exists(music) %}
+  {% set has_voice = case.video_voice and static_exists(voice) %}
+  {% set has_captions = static_exists(captions) %}
+
+  <section class="faq-demo s" aria-labelledby="faq-demo-heading">
+    <h2 id="faq-demo-heading">Как это выглядит</h2>
+    <p class="faq-demo__lead">
+      40 секунд: повторяющиеся вопросы, ответ по базе знаний, квалификация
+      и передача специалисту. Без автовоспроизведения со звуком.
+    </p>
+
+    <div
+      class="faq-reel"
+      data-faq-reel
+      data-duration="40"
+      data-video-src="{% if has_video_h %}{{ url_for('static', filename=video_h) }}{% endif %}"
+      data-video-vertical-src="{% if has_video_v %}{{ url_for('static', filename=video_v) }}{% endif %}"
+      data-audio-src="{% if has_music %}{{ url_for('static', filename=music) }}{% endif %}"
+      data-voice-src="{% if has_voice %}{{ url_for('static', filename=voice) }}{% endif %}"
+      data-captions-src="{% if has_captions %}{{ url_for('static', filename=captions) }}{% endif %}"
+    >
+      <div class="faq-reel__viewport" id="faq-reel-stage">
+        <img
+          class="faq-reel__poster"
+          src="{{ url_for('static', filename=poster) }}"
+          alt="Окно FAQ-ассистента: входящие вопросы клиентов и ответ по базе знаний"
+          width="1920"
+          height="1080"
+          decoding="async"
+        >
+
+        <div class="faq-reel__storyboard" hidden>
+          <article class="faq-scene is-active" data-scene="0" data-start="0" data-end="5">
+            <p class="faq-scene__kicker">Проблема первой линии</p>
+            <h3 class="faq-scene__title">Сотрудники ежедневно отвечают на одни и те же вопросы</h3>
+            <ul class="faq-inbox" aria-label="Повторяющиеся обращения">
+              <li><span>Клиент</span> Сколько длится внедрение?</li>
+              <li><span>Клиент</span> Сколько стоит ассистент?</li>
+              <li><span>Клиент</span> Как быстро получим прототип?</li>
+            </ul>
+          </article>
+
+          <article class="faq-scene" data-scene="1" data-start="5" data-end="12">
+            <p class="faq-scene__kicker">Окно FAQ-ассистента</p>
+            <div class="faq-chat" role="log" aria-label="Диалог с клиентом">
+              <div class="faq-chat__meta">FAQ-ассистент · база знаний компании</div>
+              <p class="faq-bubble faq-bubble--user">Сколько времени занимает внедрение AI-ассистента?</p>
+            </div>
+          </article>
+
+          <article class="faq-scene" data-scene="2" data-start="12" data-end="20">
+            <p class="faq-scene__kicker">Ответ по базе знаний</p>
+            <div class="faq-chat">
+              <p class="faq-bubble faq-bubble--user">Сколько времени занимает внедрение AI-ассистента?</p>
+              <p class="faq-bubble faq-bubble--bot">Первый рабочий прототип можно подготовить за 5–10 рабочих дней. Срок зависит от объёма базы знаний и количества интеграций.</p>
+              <p class="faq-chat__note">Ответ сформирован по базе знаний компании</p>
+            </div>
+          </article>
+
+          <article class="faq-scene" data-scene="3" data-start="20" data-end="29">
+            <p class="faq-scene__kicker">Три функции</p>
+            <ul class="faq-features">
+              <li>
+                <strong>Ответы по документам</strong>
+                <span>Берёт формулировки из проверенных материалов компании</span>
+              </li>
+              <li>
+                <strong>Квалификация обращения</strong>
+                <span>Уточняет детали, прежде чем эскалировать</span>
+              </li>
+              <li>
+                <strong>Передача специалисту</strong>
+                <span>Сложный вопрос уходит человеку вместе с контекстом</span>
+              </li>
+            </ul>
+          </article>
+
+          <article class="faq-scene" data-scene="4" data-start="29" data-end="36">
+            <p class="faq-scene__kicker">Результат</p>
+            <ul class="faq-results">
+              <li>Меньше повторяющихся обращений</li>
+              <li>Быстрее обслуживание клиентов</li>
+              <li>Единый корпоративный стиль ответов</li>
+              <li>Контроль со стороны человека</li>
+            </ul>
+          </article>
+
+          <article class="faq-scene" data-scene="5" data-start="36" data-end="40">
+            <p class="faq-scene__kicker">Цифровой сотрудник первой линии</p>
+            <h3 class="faq-scene__title">FAQ-ассистент — цифровой сотрудник первой линии</h3>
+            <p class="faq-scene__sub">Отвечает. Уточняет. Передаёт специалисту.</p>
+            <p class="faq-scene__cta">Обсудить внедрение</p>
+            <p class="faq-scene__sign">Дмитрий Степанов — AI-архитектор и промпт-инженер</p>
+          </article>
+        </div>
+
+        <video
+          class="faq-reel__video"
+          playsinline
+          preload="none"
+          poster="{{ url_for('static', filename=poster) }}"
+          {% if not has_video_h and not has_video_v %}hidden{% endif %}
+        >
+          {% if has_video_v %}
+            <source src="{{ url_for('static', filename=video_v) }}" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
+          {% endif %}
+          {% if has_video_h %}
+            <source src="{{ url_for('static', filename=video_h) }}" type="video/mp4">
+          {% endif %}
+          {% if has_captions %}
+            <track kind="subtitles" src="{{ url_for('static', filename=captions) }}" srclang="ru" label="Русский" default>
+          {% endif %}
+          Демонстрация FAQ-ассистента. Если видео недоступно, используйте сцены на странице и расшифровку ниже.
+        </video>
+
+        <div class="faq-reel__captions" data-captions aria-live="polite"></div>
+      </div>
+
+      <div class="faq-reel__bar" role="group" aria-label="Управление роликом">
+        <button type="button" class="faq-reel__btn" data-action="play" aria-label="Воспроизвести ролик">
+          Воспроизвести
+        </button>
+        <button type="button" class="faq-reel__btn" data-action="stop" aria-label="Остановить ролик">
+          Стоп
+        </button>
+        <button type="button" class="faq-reel__btn" data-action="mute" aria-label="Выключить звук" aria-pressed="false">
+          Звук
+        </button>
+        <button type="button" class="faq-reel__btn is-active" data-action="captions" aria-label="Субтитры" aria-pressed="true">
+          Субтитры
+        </button>
+        <span class="faq-reel__time" data-time aria-live="off">0:00 / 0:40</span>
+      </div>
+      <div
+        class="faq-reel__progress"
+        role="progressbar"
+        aria-label="Прогресс ролика"
+        aria-valuemin="0"
+        aria-valuemax="40"
+        aria-valuenow="0"
+      >
+        <span data-progress></span>
+      </div>
+    </div>
+
+    {% if case.video_note %}
+      <p class="case-video-note">{{ case.video_note }}</p>
+    {% endif %}
+    {% if not has_video_h %}
+      <p class="case-video-note">
+        Файл MP4 ещё не подключён — на странице играет HTML-демонстрация с тем же сценарием.
+        Как положить ролик и музыку, написано в README.
+      </p>
+    {% endif %}
+
+    <details class="faq-transcript">
+      <summary>Текстовая расшифровка ролика</summary>
+      <div class="faq-transcript__body">
+        <p><strong>Озвучка</strong></p>
+        <p>
+          Сотрудники ежедневно отвечают на одни и те же вопросы. FAQ-ассистент берёт
+          эту работу на себя. Он использует проверенную базу знаний компании, отвечает
+          клиентам в едином корпоративном стиле, уточняет детали и передаёт сложные
+          обращения специалисту. В результате клиенты получают ответы быстрее,
+          а сотрудники занимаются задачами, где действительно нужен человек.
+          FAQ-ассистент — цифровой сотрудник первой линии.
+        </p>
+        <p><strong>Текст на экране</strong></p>
+        <ol>
+          <li>0–5 с. Сотрудники ежедневно отвечают на одни и те же вопросы.</li>
+          <li>5–12 с. Клиент: «Сколько времени занимает внедрение AI-ассистента?»</li>
+          <li>12–20 с. Ответ про прототип за 5–10 рабочих дней. Подпись: ответ по базе знаний компании.</li>
+          <li>20–29 с. Ответы по документам, квалификация обращения, передача специалисту.</li>
+          <li>29–36 с. Меньше повторов, быстрее ответы, единый стиль, контроль человека.</li>
+          <li>36–40 с. FAQ-ассистент — цифровой сотрудник первой линии. Отвечает. Уточняет. Передаёт специалисту. Обсудить внедрение. Дмитрий Степанов — AI-архитектор и промпт-инженер.</li>
+        </ol>
+      </div>
+    </details>
+
+    <div class="faq-demo__cta">
+      <a
+        class="btn btn-primary"
+        href="{{ url_for('contact', topic='faq') }}"
+        data-track="faq_demo_cta"
+      >Обсудить внедрение</a>
+      <a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Написать в Telegram</a>
+    </div>
+  </section>
+{% endmacro %}

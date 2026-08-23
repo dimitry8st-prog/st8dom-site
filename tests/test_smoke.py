@@ -28,6 +28,7 @@ def test_cases_and_details(client):
     slugs = [
         "legalbot",
         "docpulse",
+        "faq-assistant",
         "telegram-bot",
         "online-store-ops",
         "crm-automation",
@@ -49,6 +50,19 @@ def test_cases_and_details(client):
     assert b"docpulse-demo.mp4" in docpulse.data
     assert "не замена врача".encode("utf-8") in docpulse.data
 
+    faq = client.get("/cases/faq-assistant/")
+    assert faq.status_code == 200
+    assert b"Faq_assistants" in faq.data
+    assert "Обсудить внедрение".encode("utf-8") in faq.data
+    assert "Текстовая расшифровка ролика".encode("utf-8") in faq.data
+    assert b"faq-assistant-poster.webp" in faq.data
+    assert b"faq-assistant-ru.vtt" in faq.data
+    assert b"faq-assistant-vo.mp3" in faq.data
+    assert 'aria-label="Воспроизвести ролик"'.encode("utf-8") in faq.data
+    assert b'preload="none"' in faq.data
+    assert b"faq-assistant-demo.mp4" not in faq.data
+    assert b"autoplay" not in faq.data.lower()
+
 
 def test_legal_and_seo(client):
     assert client.get("/privacy/").status_code == 200
@@ -58,7 +72,14 @@ def test_legal_and_seo(client):
     assert b"Sitemap" in robots.data
     sitemap = client.get("/sitemap.xml")
     assert sitemap.status_code == 200
+    assert b"/cases/faq-assistant/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
+
+
+def test_contact_prefills_faq_topic(client):
+    page = client.get("/contact/?topic=faq")
+    assert page.status_code == 200
+    assert 'value="faq" selected'.encode("utf-8") in page.data or b'value="faq"' in page.data
 
 
 def test_contact_validation_and_save(client):

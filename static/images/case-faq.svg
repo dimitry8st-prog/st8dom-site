@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360" role="img" aria-label="!E5<0 FAQ-0AA8AB5=B0">
+  <rect width="560" height="360" fill="#131C2E"/>
+  <defs>
+    <linearGradient id="faqg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e3a8a" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#fb923c" stop-opacity=".12"/>
+    </linearGradient>
+  </defs>
+  <rect width="560" height="360" fill="url(#faqg)"/>
+  <rect x="36" y="48" width="152" height="96" rx="14" fill="#0B0F1A" stroke="#3B82F6" stroke-width="2"/>
+  <text x="112" y="90" text-anchor="middle" fill="#E2E8F0" font-family="JetBrains Mono, monospace" font-size="13">070 7=0=89</text>
+  <text x="112" y="112" text-anchor="middle" fill="#94A3B8" font-family="Inter, sans-serif" font-size="12">4>:C<5=BK</text>
+  <rect x="204" y="48" width="152" height="96" rx="14" fill="#0B0F1A" stroke="#FB923C" stroke-width="2"/>
+  <text x="280" y="90" text-anchor="middle" fill="#E2E8F0" font-family="JetBrains Mono, monospace" font-size="13">FAQ-0AA8AB5=B</text>
+  <text x="280" y="112" text-anchor="middle" fill="#94A3B8" font-family="Inter, sans-serif" font-size="12">?5@20O ;8=8O</text>
+  <rect x="372" y="48" width="152" height="96" rx="14" fill="#0B0F1A" stroke="#34D399" stroke-width="2"/>
+  <text x="448" y="90" text-anchor="middle" fill="#E2E8F0" font-family="JetBrains Mono, monospace" font-size="13">!?5F80;8AB</text>
+  <text x="448" y="112" text-anchor="middle" fill="#94A3B8" font-family="Inter, sans-serif" font-size="12">MA:0;0F8O</text>
+  <path d="M188 96h16M356 96h16" stroke="#64748B" stroke-width="2"/>
+  <rect x="72" y="184" width="416" height="128" rx="16" fill="#0B0F1A" stroke="#1E2D45"/>
+  <rect x="92" y="208" width="220" height="36" rx="10" fill="#1A2235"/>
+  <text x="202" y="231" text-anchor="middle" fill="#E2E8F0" font-family="Inter, sans-serif" font-size="13">2>?@>A :;85=B0</text>
+  <rect x="248" y="256" width="220" height="36" rx="10" fill="#1E3A8A"/>
+  <text x="358" y="279" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="13">>B25B ?> 1075</text>
+</svg>

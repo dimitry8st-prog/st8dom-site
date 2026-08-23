@@ -86,7 +86,7 @@ gunicorn wsgi:app --bind 0.0.0.0:8000
 
 ## Настройка аналитики
 
-События: `hero_cta_click`, `project_open`, `contact_form_start`, `contact_form_submit`, `telegram_click`, `github_click`, `faq_open`.
+События: `hero_cta_click`, `project_open`, `contact_form_start`, `contact_form_submit`, `telegram_click`, `github_click`, `faq_open`, `faq_demo_play`, `faq_demo_pause`, `faq_demo_stop`, `faq_demo_mute`, `faq_demo_cta`, `faq_demo_complete`.
 
 Пока `ANALYTICS_ID` пуст, события копятся в `window.dataLayer`. Подключение счётчика — в `static/js/analytics.js`.
 
@@ -123,6 +123,35 @@ SQLite на бесплатном хосте без диска сбрасывае
 
 Редактируйте словарь в `cases.py`: проблема, решение, роль, статус, репозиторий, ограничения. Не называйте демо промышленным внедрением. Картинки — SVG в `static/images/`. Видео кейса — MP4 в `static/video/` (поле `video`).
 
+## Демо-ролик FAQ-ассистента
+
+Страница кейса: `/cases/faq-assistant/`
+
+Плеер, постер, субтитры и расшифровка уже на сайте. **MP4 и музыка в репозиторий не кладутся как заглушки.** Без них страница показывает HTML-демонстрацию с тем же сценарием (40 секунд), кнопками «Воспроизвести» / «Стоп», переключателем звука и субтитрами.
+
+### Ожидаемые файлы
+
+| Файл | Назначение |
+| --- | --- |
+| `static/video/faq-assistant-demo.mp4` | Горизонталь 1920×1080, H.264, 35–45 с |
+| `static/video/faq-assistant-demo-vertical.mp4` | Вертикаль 1080×1920 |
+| `static/video/faq-assistant-poster.webp` | Постер (уже есть) |
+| `static/audio/bach-prelude-c-major-bwv846.mp3` | Бах, BWV 846, CC0 (Kimiko Ishizaka) |
+| `static/audio/faq-assistant-vo.mp3` | Мужская озвучка диктора (уже есть) |
+| `static/subtitles/faq-assistant-ru.vtt` | Субтитры по фразам диктора (уже есть) |
+
+Как выбрать лицензионную запись Баха — в `static/audio/README.md`. Требования к MP4 — в `static/video/README.md`.
+
+### Текст озвучки
+
+Спокойный мужской голос, 135–145 слов в минуту, короткие паузы между блоками:
+
+«Сотрудники ежедневно отвечают на одни и те же вопросы. FAQ-ассистент берёт эту работу на себя. Он использует проверенную базу знаний компании, отвечает клиентам в едином корпоративном стиле, уточняет детали и передаёт сложные обращения специалисту. В результате клиенты получают ответы быстрее, а сотрудники занимаются задачами, где действительно нужен человек. FAQ-ассистент — цифровой сотрудник первой линии».
+
+Музыка в готовом MP4: 8–12% относительно голоса, на важных репликах 6–8%, появление 1 с, затухание 2 с. Не подкладывайте защищённую современную запись.
+
+Кнопка «Обсудить внедрение» ведёт в форму с темой `faq` или в Telegram @dimitry8st.
+
 ## Чек-лист перед публикацией
 
 - [ ] CTA ведёт в форму или @dimitry8st, не в канал
@@ -142,7 +171,7 @@ cases.py            # содержимое кейсов
 models.py / forms.py
 wsgi.py / Procfile / Dockerfile   # продакшен
 templates/          # Jinja2
-static/             # css, js, images, video
+static/             # css, js, images, video, audio, subtitles
 instance/site.db    # создаётся при запуске
 logs/app.log
 ```

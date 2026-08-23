@@ -1,3 +1,4 @@
+{% from "macros/faq_demo.html" import faq_demo_player %}
 {% extends "base.html" %}
 {% block title %}{{ case.title }} — кейс Дмитрия Степанова{% endblock %}
 {% block description %}{{ case.card_summary }}{% endblock %}
@@ -18,7 +19,11 @@
           {% if case.repo_url %}
             <a class="btn btn-primary" href="{{ case.repo_url }}" target="_blank" rel="noopener" data-track="github_click">Репозиторий</a>
           {% endif %}
-          <a class="btn btn-ghost" href="{{ url_for('contact') }}">Обсудить похожее</a>
+          {% if case.demo_reel %}
+            <a class="btn btn-ghost" href="{{ url_for('contact', topic='faq') }}">Обсудить внедрение</a>
+          {% else %}
+            <a class="btn btn-ghost" href="{{ url_for('contact') }}">Обсудить похожее</a>
+          {% endif %}
         </div>
       </div>
       <figure class="case-cover">
@@ -27,7 +32,9 @@
     </div>
   </section>
 
-  {% if case.video %}
+  {% if case.demo_reel %}
+    {{ faq_demo_player(case, static_exists) }}
+  {% elif case.video %}
   <section class="s prose" aria-labelledby="case-video-heading">
     <h2 id="case-video-heading">Как это выглядит</h2>
     <div class="case-video">
@@ -74,6 +81,9 @@
       {% if case.demo_url %}
         <a class="btn btn-ghost" href="{{ case.demo_url }}" target="_blank" rel="noopener">Демо</a>
       {% endif %}
+      {% if case.demo_reel %}
+        <a class="btn btn-ghost" href="{{ url_for('contact', topic='faq') }}">Обсудить внедрение</a>
+      {% endif %}
       <a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Написать в Telegram</a>
     </div>
     {% if case.related_repos %}
@@ -104,4 +114,10 @@
     </div>
   </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+  {% if case.demo_reel %}
+    <script src="{{ url_for('static', filename='js/faq-demo-player.js') }}" defer></script>
+  {% endif %}
 {% endblock %}

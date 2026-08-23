@@ -29,7 +29,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from cases import FILTERS, get_all_cases, get_case
 from config import BASE_DIR, get_config
 from extensions import csrf, db, login_manager
-from forms import InquiryForm, LoginForm
+from forms import TOPIC_CHOICES, InquiryForm, LoginForm
 from models import AdminUser, Inquiry
 
 logger = logging.getLogger("st8dom")
@@ -129,6 +129,16 @@ def create_app() -> Flask:
     def load_user(user_id: str):
         return db.session.get(AdminUser, int(user_id))
 
+    def static_exists(relpath: str) -> bool:
+        """Проверяет файл в static/ без обхода каталога. Плеер живёт и без MP4."""
+        folder = Path(app.static_folder or "").resolve()
+        path = (folder / relpath).resolve()
+        try:
+            path.relative_to(folder)
+        except ValueError:
+            return False
+        return path.is_file()
+
     @app.context_processor
     def inject_globals():
         return {
@@ -139,6 +149,7 @@ def create_app() -> Flask:
             "fl_url": "https://www.fl.ru/users/dimitry8st/",
             "kwork_url": "https://kwork.ru/user/stepanov_craft",
             "email_address": "dimitry.analytix@gmail.com",
+            "static_exists": static_exists,
         }
 
     @app.route("/")
@@ -176,6 +187,11 @@ def create_app() -> Flask:
     @app.route("/contact/", methods=["GET", "POST"])
     def contact():
         form = InquiryForm()
+        if request.method == "GET":
+            topic = request.args.get("topic", "")
+            allowed = {value for value, _label in TOPIC_CHOICES}
+            if topic in allowed:
+                form.topic.data = topic
         if form.validate_on_submit():
             inquiry = Inquiry(
                 name=form.name.data.strip(),
