@@ -2,7 +2,7 @@
 
 Сайт AI-архитектора для бизнеса: диагностика процесса, MVP, RAG, Telegram-боты и автоматизация. Живой ориентир по содержанию и визуалу — [st8dom.ru](https://st8dom.ru/). Этот репозиторий — Flask-версия с формой заявок, кейсами и админкой.
 
-Главная цель сайта — квалифицированные обращения на аудит, MVP и внедрение. Основной призыв ведёт в форму и в личный Telegram [@dimitry8st](https://t.me/dimitry8st), не в канал.
+Главная цель сайта — квалифицированные обращения на аудит, MVP и внедрение. Основной призыв ведёт в форму и в [чат Telegram](https://t.me/+VNBg4iudNxw2Mzgy).
 
 ## Стек
 
@@ -73,6 +73,9 @@ gunicorn wsgi:app --bind 0.0.0.0:8000
 | `DATABASE_URL` | По умолчанию SQLite `instance/site.db` |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Копия заявки в Telegram |
 | `ANALYTICS_ID` | Точка подключения аналитики |
+| `CHAT_ENABLED` | Виджет FAQ. `0` выключает кнопку и `/chat/` |
+| `OPENAI_API_KEY` / `CLAUDE_API_KEY` | Опционально: формулировка ответа моделью. Без ключа — текст из `data/faqs.json` |
+| `LLM_PROVIDER` | `openai` или `claude` |
 | `FLASK_ENV` | `development` или `production` |
 
 Секреты не должны попадать в шаблоны, статику и git.
@@ -86,9 +89,13 @@ gunicorn wsgi:app --bind 0.0.0.0:8000
 
 ## Настройка аналитики
 
-События: `hero_cta_click`, `project_open`, `contact_form_start`, `contact_form_submit`, `telegram_click`, `github_click`, `faq_open`, `faq_demo_play`, `faq_demo_pause`, `faq_demo_stop`, `faq_demo_mute`, `faq_demo_cta`, `faq_demo_complete`.
+События: `hero_cta_click`, `project_open`, `contact_form_start`, `contact_form_submit`, `telegram_click`, `github_click`, `faq_open`, `faq_demo_play`, `faq_demo_pause`, `faq_demo_stop`, `faq_demo_mute`, `faq_demo_cta`, `faq_demo_complete`, `chat_open`, `chat_send`, `chat_escalate`, `chat_contact_click`, `chat_telegram_click`.
 
 Пока `ANALYTICS_ID` пуст, события копятся в `window.dataLayer`. Подключение счётчика — в `static/js/analytics.js`.
+
+## Виджет FAQ
+
+На публичных страницах — кнопка чата справа внизу. Ответы из `data/faqs.json`. Вопрос вне базы ведёт в форму и в [чат Telegram](https://t.me/+VNBg4iudNxw2Mzgy). Ключ модели не обязателен. Админка виджет не показывает.
 
 ## Деплой
 
@@ -150,11 +157,11 @@ SQLite на бесплатном хосте без диска сбрасывае
 
 Музыка в готовом MP4: 8–12% относительно голоса, на важных репликах 6–8%, появление 1 с, затухание 2 с. Не подкладывайте защищённую современную запись.
 
-Кнопка «Обсудить внедрение» ведёт в форму с темой `faq` или в Telegram @dimitry8st.
+Кнопка «Обсудить внедрение» ведёт в форму с темой `faq` или в [чат Telegram](https://t.me/+VNBg4iudNxw2Mzgy).
 
 ## Чек-лист перед публикацией
 
-- [ ] CTA ведёт в форму или @dimitry8st, не в канал
+- [ ] CTA ведёт в форму или в чат Telegram
 - [ ] У каждого кейса свой репозиторий или честная пометка
 - [ ] Юридические страницы просмотрены владельцем
 - [ ] Сменены `SECRET_KEY` и пароль админа

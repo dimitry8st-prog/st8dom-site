@@ -1,0 +1,55 @@
+<div
+  id="site-chat"
+  class="site-chat"
+  data-chat-url="{{ url_for('chat') }}"
+  data-contact-url="{{ url_for('contact') }}"
+  data-telegram-url="{{ telegram_url }}"
+  data-csrf="{{ csrf_token() }}"
+>
+  <button
+    type="button"
+    class="chat-launcher"
+    id="chat-launcher"
+    aria-expanded="false"
+    aria-controls="chat-widget"
+    aria-label="Открыть ассистента сайта"
+  >
+    <svg class="chat-launcher-icon" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm2 5v2h12V9H6zm0 4v2h8v-2H6z"/>
+    </svg>
+  </button>
+
+  <section
+    class="chat-widget"
+    id="chat-widget"
+    hidden
+    role="dialog"
+    aria-labelledby="chat-title"
+    aria-modal="false"
+  >
+    <header class="chat-header">
+      <div class="chat-header-left">
+        <span class="chat-avatar" aria-hidden="true">DS</span>
+        <div>
+          <p class="chat-title" id="chat-title">Ассистент сайта</p>
+          <p class="chat-subtitle">Отвечаю по материалам st8dom.ru</p>
+        </div>
+      </div>
+      <button type="button" class="chat-close" id="chat-close" aria-label="Закрыть чат">×</button>
+    </header>
+    <div class="chat-messages" id="chat-messages" role="log" aria-live="polite"></div>
+    <form class="chat-footer" id="chat-form">
+      <label class="visually-hidden" for="chat-input">Вопрос ассистенту</label>
+      <input
+        class="chat-input"
+        id="chat-input"
+        name="message"
+        type="text"
+        maxlength="400"
+        autocomplete="off"
+        placeholder="Спросите про услуги, сроки, кейсы"
+      >
+      <button class="chat-send" id="chat-send" type="submit">Отправить</button>
+    </form>
+  </section>
+</div>

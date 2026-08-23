@@ -1,17 +1,7 @@
 """Дымовые проверки маршрутов, формы и админки."""
 
-import pytest
-
 from app import app
 from models import Inquiry
-
-
-@pytest.fixture()
-def client():
-    app.config["TESTING"] = True
-    app.config["WTF_CSRF_ENABLED"] = False
-    with app.test_client() as client:
-        yield client
 
 
 def test_home_ok(client):
@@ -19,7 +9,8 @@ def test_home_ok(client):
     assert response.status_code == 200
     assert "Обсудить задачу".encode("utf-8") in response.data
     assert b"t.me/Dmitryprompt" not in response.data
-    assert b"t.me/dimitry8st" in response.data
+    assert b"t.me/+VNBg4iudNxw2Mzgy" in response.data
+    assert b'id="chat-launcher"' in response.data
 
 
 def test_cases_and_details(client):

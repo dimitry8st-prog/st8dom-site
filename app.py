@@ -18,6 +18,7 @@ from flask import (
     Flask,
     abort,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -26,6 +27,8 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from assistant.answer import MAX_MESSAGE_LEN, answer_question
+from assistant.rate_limit import limiter
 from cases import FILTERS, get_all_cases, get_case
 from config import BASE_DIR, get_config
 from extensions import csrf, db, login_manager
@@ -144,12 +147,13 @@ def create_app() -> Flask:
         return {
             "site_url": app.config["SITE_URL"],
             "analytics_id": app.config.get("ANALYTICS_ID") or "",
-            "telegram_url": "https://t.me/dimitry8st",
+            "telegram_url": "https://t.me/+VNBg4iudNxw2Mzgy",
             "github_url": "https://github.com/dimitry8st-prog",
             "fl_url": "https://www.fl.ru/users/dimitry8st/",
             "kwork_url": "https://kwork.ru/user/stepanov_craft",
             "email_address": "dimitry.analytix@gmail.com",
             "static_exists": static_exists,
+            "chat_enabled": bool(app.config.get("CHAT_ENABLED")),
         }
 
     @app.route("/")
@@ -211,6 +215,25 @@ def create_app() -> Flask:
         if request.method == "POST":
             logger.warning("Форма заявки не прошла валидацию: %s", form.errors)
         return render_template("contact.html", form=form, page_id="contact")
+
+    @app.post("/chat/")
+    def chat():
+        if not app.config.get("CHAT_ENABLED"):
+            return jsonify({"error": "chat_disabled"}), 503
+        client_key = hash_ip(request.headers.get("X-Forwarded-For", request.remote_addr)) or "anon"
+        if not limiter.allow(f"chat:{client_key}"):
+            return jsonify(
+                {
+                    "answer": "Слишком много вопросов подряд. Подождите пару минут или оставьте заявку.",
+                    "escalated": True,
+                    "source": "limit",
+                }
+            ), 429
+        payload = request.get_json(silent=True) or {}
+        message = payload.get("message") if isinstance(payload, dict) else ""
+        result = answer_question(message if isinstance(message, str) else "", app.config)
+        logger.info("Чат: source=%s escalated=%s", result.get("source"), result.get("escalated"))
+        return jsonify(result)
 
     @app.route("/privacy/")
     def privacy():

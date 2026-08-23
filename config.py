@@ -35,6 +35,19 @@ class Config:
     # Опциональная аналитика. Пустое значение = скрипт-заглушка без внешних вызовов.
     ANALYTICS_ID = os.environ.get("ANALYTICS_ID", "")
 
+    # Виджет FAQ. Без ключа модели отвечает текстом из data/faqs.json.
+    CHAT_ENABLED = os.environ.get("CHAT_ENABLED", "1").strip().lower() not in {
+        "0",
+        "false",
+        "off",
+        "no",
+    }
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+    CLAUDE_API_KEY = os.environ.get("CLAUDE_API_KEY", "")
+    LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "openai").strip().lower()
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
+
     LOG_FILE = os.environ.get("LOG_FILE", str(BASE_DIR / "logs" / "app.log"))
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 

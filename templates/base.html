@@ -101,9 +101,15 @@
       <p>© 2026 <span>Степанов Дмитрий</span> · AI-архитектор для бизнеса · Нижний Новгород</p>
     </div>
   </footer>
+  {% if chat_enabled and page_id != 'admin' %}
+    {% include "macros/chat_widget.html" %}
+  {% endif %}
   <script>window.ST8DOM_ANALYTICS_ID = {{ analytics_id|tojson }};</script>
   <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  {% if chat_enabled and page_id != 'admin' %}
+  <script src="{{ url_for('static', filename='js/chat-widget.js') }}" defer></script>
+  {% endif %}
   {% block extra_js %}{% endblock %}
 </body>
 </html>
