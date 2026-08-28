@@ -76,7 +76,7 @@ CASES = [
         "video": "legalbot-demo.mp4",
         "video_poster": "legalbot-demo-poster.png",
         "video_note": (
-            "50 секунд: PDF → извлечение → нормы → черновик DOCX. "
+            "42 секунды: PDF → извлечение → нормы → черновик DOCX. "
             "Результат справочный, решение принимает человек."
         ),
         "next_steps": (
