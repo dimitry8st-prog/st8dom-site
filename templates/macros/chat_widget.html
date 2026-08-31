@@ -14,9 +14,7 @@
     aria-controls="chat-widget"
     aria-label="Открыть ассистента сайта"
   >
-    <svg class="chat-launcher-icon" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm2 5v2h12V9H6zm0 4v2h8v-2H6z"/>
-    </svg>
+    <img class="chat-launcher-mascot" src="{{ url_for('static', filename='images/dis-mascot-orange.jpg') }}" alt="">
   </button>
 
   <section
@@ -29,10 +27,10 @@
   >
     <header class="chat-header">
       <div class="chat-header-left">
-        <span class="chat-avatar" aria-hidden="true">DS</span>
+        <span class="chat-avatar" aria-hidden="true"><img src="{{ url_for('static', filename='images/dis-mascot-orange.jpg') }}" alt=""></span>
         <div>
-          <p class="chat-title" id="chat-title">Ассистент сайта</p>
-          <p class="chat-subtitle">Отвечаю по материалам st8dom.ru</p>
+          <p class="chat-title" id="chat-title">Дис — цифровой помощник</p>
+          <p class="chat-subtitle">Быстро найду нужный маршрут</p>
         </div>
       </div>
       <button type="button" class="chat-close" id="chat-close" aria-label="Закрыть чат">×</button>
