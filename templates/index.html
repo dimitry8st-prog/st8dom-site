@@ -8,6 +8,7 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
+    {"@type":"Question","name":"Сколько стоит начать?","acceptedAnswer":{"@type":"Answer","text":"Ориентиры: экспресс-разбор от 15 000 ₽, AI-аудит от 35 000 ₽, автоматизация от 60 000 ₽, Telegram-бот MVP от 75 000 ₽, RAG от 120 000 ₽, AI-ассистент с интеграциями от 180 000 ₽. Это не публичная оферта. Смету фиксируем до разработки."}},
     {"@type":"Question","name":"С чего начинается работа?","acceptedAnswer":{"@type":"Answer","text":"С диагностики процесса: что делается вручную, какие данные есть, где нужен контроль человека. После этого фиксируем границы пилота."}},
     {"@type":"Question","name":"Сколько занимает разработка MVP?","acceptedAnswer":{"@type":"Answer","text":"Срок зависит от сценария и доступов. Обычно прототип одного приоритетного сценария занимает от двух до шести недель после согласования границ."}},
     {"@type":"Question","name":"Можно ли подключить решение к существующей CRM?","acceptedAnswer":{"@type":"Answer","text":"Да, если у CRM есть API или вебхуки. На пилоте сначала проверяем сценарий, затем подключаем канал и поля сделки."}},
@@ -192,8 +193,8 @@
     <div class="s-label reveal"><span>//</span> обо мне</div>
     <h2 class="reveal">Дмитрий Степанов</h2>
     <div class="about-block reveal">
-      <p>Дмитрий Степанов — AI-архитектор и разработчик прикладных AI-систем. Проектирую связку интерфейса, бизнес-логики, моделей, базы знаний и интеграций. Работаю напрямую, объясняю архитектуру и передаю документацию.</p>
-      <p style="margin-top:12px;color:var(--muted)">Нижний Новгород, удалённый формат. Специализация: AI-агенты, Telegram-боты, RAG, n8n/Make, Python/FastAPI. Компетенции подтверждаются открытыми репозиториями, а не списком вымышленных клиентов.</p>
+      <p>Дмитрий Степанов — AI-архитектор и разработчик прикладных AI-систем. Помогаю бизнесу меньше делать вручную и быстрее отвечать клиентам. Работаю напрямую, объясняю архитектуру и передаю документацию.</p>
+      <p style="margin-top:12px;color:var(--muted)">Нижний Новгород, удалённый формат, работаю по всей России. Специализация: AI-ассистенты, Telegram-боты, RAG, n8n/Make, Python/FastAPI. Компетенции подтверждаются открытыми репозиториями, а не списком вымышленных клиентов.</p>
       <div class="about-links">
         <a class="btn btn-ghost btn-sm" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">GitHub</a>
         <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Telegram</a>
@@ -217,6 +218,7 @@
           <li>варианты решения;</li>
           <li>краткое заключение.</li>
         </ul>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('contact', topic='express') }}">Обсудить</a>
       </article>
       <article class="price-card price-card--popular reveal">
         <h3>AI-аудит</h3>
@@ -227,6 +229,7 @@
           <li>риски и архитектура;</li>
           <li>смета MVP.</li>
         </ul>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('contact', topic='audit') }}">Обсудить</a>
       </article>
       <article class="price-card reveal">
         <h3>Telegram-бот MVP</h3>
@@ -237,6 +240,7 @@
           <li>передача оператору;</li>
           <li>тестирование.</li>
         </ul>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('contact', topic='telegram-bot') }}">Обсудить</a>
       </article>
       <article class="price-card reveal">
         <h3>Автоматизация процесса</h3>
@@ -247,6 +251,7 @@
           <li>уведомления;</li>
           <li>инструкция запуска.</li>
         </ul>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('contact', topic='automation') }}">Обсудить</a>
       </article>
       <article class="price-card reveal">
         <h3>RAG по документам</h3>
@@ -257,6 +262,7 @@
           <li>поиск и проверка;</li>
           <li>тестовый набор.</li>
         </ul>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('contact', topic='rag') }}">Обсудить</a>
       </article>
       <article class="price-card reveal">
         <h3>AI-ассистент с интеграциями</h3>
@@ -267,6 +273,7 @@
           <li>журналирование;</li>
           <li>эскалация человеку.</li>
         </ul>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('contact', topic='assistant') }}">Обсудить</a>
       </article>
     </div>
     <p class="pricing-note">Цены указаны как ориентир и не являются публичной офертой. Итог зависит от числа сценариев, интеграций, объёма документов и требований к хранению данных. Хостинг и использование AI-моделей оплачиваются отдельно.</p>
@@ -276,6 +283,7 @@
     <div class="s-label reveal"><span>//</span> вопросы</div>
     <h2 class="reveal">FAQ</h2>
     <div class="faq">
+      <details class="reveal"><summary>Сколько стоит начать?</summary><p>Ориентиры: экспресс-разбор от 15 000 ₽, AI-аудит от 35 000 ₽, автоматизация от 60 000 ₽, Telegram-бот MVP от 75 000 ₽, RAG от 120 000 ₽, AI-ассистент с интеграциями от 180 000 ₽. Это не публичная оферта. Смету фиксируем до разработки. Хостинг и модели оплачиваются отдельно.</p></details>
       <details class="reveal"><summary>С чего начинается работа?</summary><p>С диагностики процесса: что делается вручную, какие данные есть, где нужен контроль человека. После этого фиксируем границы пилота.</p></details>
       <details class="reveal"><summary>Сколько занимает разработка MVP?</summary><p>Срок зависит от сценария и доступов. Обычно прототип одного приоритетного сценария занимает от двух до шести недель после согласования границ.</p></details>
       <details class="reveal"><summary>Можно ли подключить решение к существующей CRM?</summary><p>Да, если у CRM есть API или вебхуки. На пилоте сначала проверяем сценарий, затем подключаем канал и поля сделки.</p></details>

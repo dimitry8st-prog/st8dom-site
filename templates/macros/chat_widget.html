@@ -12,7 +12,7 @@
     id="chat-launcher"
     aria-expanded="false"
     aria-controls="chat-widget"
-    aria-label="Открыть ассистента сайта"
+    aria-label="Открыть чат с Дисом"
   >
     <img class="chat-launcher-mascot" src="{{ url_for('static', filename='images/dis-mascot-orange.jpg') }}" alt="">
   </button>
@@ -37,7 +37,7 @@
     </header>
     <div class="chat-messages" id="chat-messages" role="log" aria-live="polite"></div>
     <form class="chat-footer" id="chat-form">
-      <label class="visually-hidden" for="chat-input">Вопрос ассистенту</label>
+      <label class="visually-hidden" for="chat-input">Вопрос Дису</label>
       <input
         class="chat-input"
         id="chat-input"
@@ -45,7 +45,7 @@
         type="text"
         maxlength="400"
         autocomplete="off"
-        placeholder="Спросите про услуги, сроки, кейсы"
+        placeholder="Спросите про услуги, цены, кейсы"
       >
       <button class="chat-send" id="chat-send" type="submit">Отправить</button>
     </form>

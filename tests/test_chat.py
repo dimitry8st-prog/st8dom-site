@@ -9,6 +9,8 @@ def test_home_has_widget(client):
     assert page.status_code == 200
     assert b'id="site-chat"' in page.data
     assert b"chat-widget.js" in page.data
+    assert b"dis-mascot-orange.jpg" in page.data
+    assert "Дис — цифровой помощник".encode("utf-8") in page.data
     assert b"t.me/+VNBg4iudNxw2Mzgy" in page.data
 
 
@@ -29,7 +31,15 @@ def test_known_question_from_faq():
 def test_price_question_from_faq():
     result = answer_question("сколько стоит mvp?", {})
     assert result["escalated"] is False
-    assert "прайса нет" in result["answer"].lower()
+    assert "15 000" in result["answer"]
+    assert "оферт" in result["answer"].lower()
+
+
+def test_dis_identity_from_faq():
+    result = answer_question("кто такой дис?", {})
+    assert result["escalated"] is False
+    assert "дис" in result["answer"].lower()
+    assert "помощник" in result["answer"].lower()
 
 
 def test_offtopic_escalates():

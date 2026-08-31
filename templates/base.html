@@ -26,7 +26,7 @@
     "@graph": [
       {
         "@type": "WebSite",
-        "name": "Дмитрий Степанов — AI-архитектор",
+        "name": "Дмитрий Степанов — AI и автоматизация для бизнеса",
         "url": "{{ site_url }}/",
         "inLanguage": "ru-RU"
       },
@@ -51,12 +51,12 @@
       },
       {
         "@type": "ProfessionalService",
-        "name": "Проектирование AI-систем для бизнеса",
+        "name": "AI и автоматизация для бизнеса",
         "url": "{{ site_url }}/",
         "image": "{{ site_url }}{{ url_for('static', filename='images/og-cover.svg') }}",
         "areaServed": "RU",
         "founder": { "@id": "{{ site_url }}/#person" },
-        "description": "Диагностика процесса, MVP, RAG, Telegram-боты, интеграции и сопровождение."
+        "description": "AI-ассистенты, Telegram-боты, RAG и автоматизация процессов. Стартовые форматы от экспресс-разбора до ассистента с интеграциями."
       }
     ]
   }
@@ -99,7 +99,7 @@
         <a href="{{ url_for('consent') }}">Согласие на обработку данных</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
       </div>
-      <p>© 2026 <span>Степанов Дмитрий</span> · AI-архитектор для бизнеса · Нижний Новгород</p>
+      <p>© 2026 <span>Степанов Дмитрий</span> · AI и автоматизация для бизнеса · Нижний Новгород</p>
     </div>
   </footer>
   {% if chat_enabled and page_id != 'admin' %}

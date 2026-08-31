@@ -8,6 +8,10 @@ def test_home_ok(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "Обсудить задачу".encode("utf-8") in response.data
+    assert "Получить разбор задачи".encode("utf-8") in response.data
+    assert "от 15 000".encode("utf-8") in response.data
+    assert "от 180 000".encode("utf-8") in response.data
+    assert b"dis-mascot-orange.jpg" in response.data
     assert b"t.me/Dmitryprompt" not in response.data
     assert b"t.me/+VNBg4iudNxw2Mzgy" in response.data
     assert b'id="chat-launcher"' in response.data
@@ -71,6 +75,12 @@ def test_contact_prefills_faq_topic(client):
     page = client.get("/contact/?topic=faq")
     assert page.status_code == 200
     assert 'value="faq" selected'.encode("utf-8") in page.data or b'value="faq"' in page.data
+
+
+def test_contact_prefills_express_topic(client):
+    page = client.get("/contact/?topic=express")
+    assert page.status_code == 200
+    assert b'value="express"' in page.data
 
 
 def test_contact_validation_and_save(client):
