@@ -32,6 +32,17 @@ class Config:
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
     TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 
+    # Email-доставка заявок. Пароль приложения и другие секреты — только в окружении.
+    INQUIRY_EMAIL = os.environ.get("INQUIRY_EMAIL", "dimitry8st@gmail.com")
+    SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+    SMTP_USERNAME = os.environ.get("SMTP_USERNAME", "")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+    SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USERNAME)
+    SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip().lower() not in {
+        "0", "false", "off", "no"
+    }
+
     # Опциональная аналитика. Пустое значение = скрипт-заглушка без внешних вызовов.
     ANALYTICS_ID = os.environ.get("ANALYTICS_ID", "")
 
