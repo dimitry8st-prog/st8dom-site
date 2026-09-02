@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Дмитрий Степанов — AI-агенты, RAG и автоматизация бизнеса{% endblock %}</title>
-  <meta name="description" content="{% block description %}Проектирование AI-агентов, Telegram-ботов, RAG-систем и автоматизации бизнес-процессов. Диагностика, MVP, интеграция и сопровождение.{% endblock %}">
+  <title>{% block title %}Дмитрий Степанов — AI и автоматизация для бизнеса{% endblock %}</title>
+  <meta name="description" content="{% block description %}AI-ассистенты, Telegram-боты и автоматизация, которые помогают бизнесу меньше делать вручную и быстрее отвечать клиентам.{% endblock %}">
   <link rel="canonical" href="{% block canonical %}{{ site_url }}/{% endblock %}">
   <meta name="robots" content="{% block robots %}index,follow{% endblock %}">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="st8dom.ru">
-  <meta property="og:title" content="{% block og_title %}Дмитрий Степанов — AI-агенты, RAG и автоматизация бизнеса{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Проектирование AI-агентов, Telegram-ботов, RAG-систем и автоматизации бизнес-процессов.{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}Дмитрий Степанов — AI и автоматизация для бизнеса{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Помогаю бизнесу меньше делать вручную и быстрее отвечать клиентам.{% endblock %}">
   <meta property="og:url" content="{{ self.canonical() }}">
   <meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='images/og-cover.svg') }}">
   <meta name="twitter:card" content="summary_large_image">
@@ -26,7 +26,7 @@
     "@graph": [
       {
         "@type": "WebSite",
-        "name": "Дмитрий Степанов — AI-архитектор",
+        "name": "Дмитрий Степанов — AI и автоматизация для бизнеса",
         "url": "{{ site_url }}/",
         "inLanguage": "ru-RU"
       },
@@ -51,12 +51,12 @@
       },
       {
         "@type": "ProfessionalService",
-        "name": "Проектирование AI-систем для бизнеса",
+        "name": "AI и автоматизация для бизнеса",
         "url": "{{ site_url }}/",
         "image": "{{ site_url }}{{ url_for('static', filename='images/og-cover.svg') }}",
         "areaServed": "RU",
         "founder": { "@id": "{{ site_url }}/#person" },
-        "description": "Диагностика процесса, MVP, RAG, Telegram-боты, интеграции и сопровождение."
+        "description": "AI-ассистенты, Telegram-боты, RAG и автоматизация процессов. Стартовые форматы от экспресс-разбора до ассистента с интеграциями."
       }
     ]
   }
@@ -67,12 +67,13 @@
   <a class="skip-link" href="#main">К содержанию</a>
   <nav aria-label="Основная навигация">
     <div class="nav-inner">
-      <a class="nav-logo" href="{{ url_for('index') }}">DS.dev</a>
+      <a class="nav-logo" href="{{ url_for('index') }}"><strong>Дмитрий Степанов</strong><span>AI и автоматизация для бизнеса</span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Открыть меню">☰</button>
       <div class="nav-links" id="site-menu">
         <a href="{{ url_for('index') }}#services" {% if page_id == 'home' %}aria-current="page"{% endif %}>Услуги</a>
         <a href="{{ url_for('cases_list') }}" {% if page_id in ['cases', 'case'] %}aria-current="page"{% endif %}>Кейсы</a>
         <a href="{{ url_for('index') }}#process">Как работаю</a>
+        <a href="{{ url_for('index') }}#formats">Цены</a>
         <a href="{{ url_for('contact') }}" class="nav-cta" {% if page_id == 'contact' %}aria-current="page"{% endif %}>Обсудить задачу</a>
       </div>
     </div>
@@ -98,7 +99,7 @@
         <a href="{{ url_for('consent') }}">Согласие на обработку данных</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
       </div>
-      <p>© 2026 <span>Степанов Дмитрий</span> · AI-архитектор для бизнеса · Нижний Новгород</p>
+      <p>© 2026 <span>Степанов Дмитрий</span> · AI и автоматизация для бизнеса · Нижний Новгород</p>
     </div>
   </footer>
   {% if chat_enabled and page_id != 'admin' %}

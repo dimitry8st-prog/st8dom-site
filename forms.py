@@ -19,10 +19,15 @@ from wtforms.validators import (
 )
 
 TOPIC_CHOICES = [
+    ("express", "Экспресс-разбор"),
     ("audit", "AI-аудит процесса"),
-    ("mvp", "MVP / прототип"),
-    ("integration", "Внедрение и интеграции"),
+    ("automation", "Автоматизация процесса"),
+    ("telegram-bot", "Telegram-бот MVP"),
+    ("rag", "RAG по документам"),
+    ("assistant", "AI-ассистент с интеграциями"),
     ("faq", "FAQ-ассистент / первая линия"),
+    ("mvp", "Другой MVP / прототип"),
+    ("integration", "Внедрение и интеграции"),
     ("support", "Поддержка существующего решения"),
     ("other", "Другое"),
 ]

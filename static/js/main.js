@@ -123,6 +123,14 @@
     });
   }
 
+  document.querySelectorAll(".case-video video").forEach(function (video) {
+    video.addEventListener("play", function onFirstPlay() {
+      if (video.muted) video.muted = false;
+      if (video.volume === 0) video.volume = 1;
+      video.removeEventListener("play", onFirstPlay);
+    });
+  });
+
   const canvas = document.getElementById("avatarCanvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
