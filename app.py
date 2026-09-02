@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
+import smtplib
+from email.message import EmailMessage
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -79,6 +81,58 @@ def ensure_admin(app: Flask) -> None:
     db.session.commit()
     logger.info("Создан администратор по умолчанию: %s", username)
 
+
+
+def notify_email(inquiry: Inquiry, app: Flask) -> bool:
+    """Отправляет заявку владельцу сайта через SMTP; секреты берёт из окружения."""
+    recipient = (app.config.get("INQUIRY_EMAIL") or "").strip()
+    username = (app.config.get("SMTP_USERNAME") or "").strip()
+    password = app.config.get("SMTP_PASSWORD") or ""
+    sender = (app.config.get("SMTP_FROM") or username).strip()
+    if not recipient or not username or not password or not sender:
+        logger.warning(
+            "Email-доставка не настроена — заявка #%s сохранена в БД", inquiry.id
+        )
+        return False
+
+    message = EmailMessage()
+    message["Subject"] = f"Новая заявка с st8dom.ru #{inquiry.id}"
+    message["From"] = sender
+    message["To"] = recipient
+    message["Reply-To"] = inquiry.email
+    message.set_content(
+        "\n".join(
+            [
+                f"Заявка #{inquiry.id}",
+                f"Имя: {inquiry.name}",
+                f"Email: {inquiry.email}",
+                f"Телефон: {inquiry.phone or '—'}",
+                f"Компания: {inquiry.company or '—'}",
+                f"Тема: {inquiry.topic}",
+                "",
+                inquiry.message,
+            ]
+        )
+    )
+
+    try:
+        with smtplib.SMTP(
+            app.config["SMTP_HOST"], app.config["SMTP_PORT"], timeout=10
+        ) as smtp:
+            smtp.ehlo()
+            if app.config.get("SMTP_USE_TLS", True):
+                smtp.starttls()
+                smtp.ehlo()
+            smtp.login(username, password)
+            smtp.send_message(message)
+        logger.info("Заявка #%s отправлена на email владельца", inquiry.id)
+        return True
+    except (OSError, smtplib.SMTPException):
+        logger.exception(
+            "Не удалось отправить заявку #%s на email; копия сохранена в БД",
+            inquiry.id,
+        )
+        return False
 
 def notify_telegram(inquiry: Inquiry, app: Flask) -> None:
     """Опциональная доставка заявки в личный чат. Без токена ничего не вызывает."""
@@ -208,9 +262,17 @@ def create_app() -> Flask:
             )
             db.session.add(inquiry)
             db.session.commit()
-            logger.info("Новая заявка #%s от %s (%s)", inquiry.id, inquiry.name, inquiry.email)
+            logger.info("Новая заявка #%s сохранена", inquiry.id)
+            email_sent = notify_email(inquiry, app)
             notify_telegram(inquiry, app)
-            flash("Заявка отправлена. Отвечу в рабочее время на указанный email.", "success")
+            if email_sent:
+                flash("Заявка отправлена. Отвечу в рабочее время на указанный email.", "success")
+            else:
+                flash(
+                    "Заявка сохранена, но email-уведомление временно недоступно. "
+                    "Я увижу её в панели сайта.",
+                    "info",
+                )
             return redirect(url_for("contact", sent=1))
         if request.method == "POST":
             logger.warning("Форма заявки не прошла валидацию: %s", form.errors)
