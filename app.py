@@ -205,7 +205,7 @@ def create_app() -> Flask:
             "github_url": "https://github.com/dimitry8st-prog",
             "fl_url": "https://www.fl.ru/users/dimitry8st/",
             "kwork_url": "https://kwork.ru/user/stepanov_craft",
-            "email_address": "dimitry.analytix@gmail.com",
+            "email_address": app.config["INQUIRY_EMAIL"],
             "static_exists": static_exists,
             "chat_enabled": bool(app.config.get("CHAT_ENABLED")),
         }
