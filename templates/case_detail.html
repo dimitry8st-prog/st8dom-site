@@ -43,8 +43,11 @@
         playsinline
         preload="metadata"
         {% if case.video_poster %}poster="{{ url_for('static', filename='video/' + case.video_poster) }}"{% endif %}
-        src="{{ url_for('static', filename='video/' + case.video) }}"
       >
+        <source src="{{ url_for('static', filename='video/' + case.video) }}" type="video/mp4">
+        {% if case.video_captions %}
+        <track kind="captions" srclang="ru" label="Русский" default src="{{ url_for('static', filename='subtitles/' + case.video_captions) }}">
+        {% endif %}
         {{ case.video_fallback or 'Демонстрация бота. Если плеер не открывается, откройте репозиторий.' }}
       </video>
     </div>

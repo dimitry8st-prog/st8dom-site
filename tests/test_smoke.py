@@ -19,6 +19,7 @@ def test_cases_and_details(client):
     slugs = [
         "legalbot",
         "docpulse",
+        "ai-nastavnik-360",
         "faq-assistant",
         "telegram-bot",
         "online-store-ops",
@@ -40,6 +41,12 @@ def test_cases_and_details(client):
     assert b"DocPulse" in docpulse.data
     assert b"docpulse-demo.mp4" in docpulse.data
     assert "не замена врача".encode("utf-8") in docpulse.data
+
+    mentor = client.get("/cases/ai-nastavnik-360/")
+    assert b"-AI--360" in mentor.data
+    assert b"ai-nastavnik-360-16x9.mp4" in mentor.data
+    assert b"ai-nastavnik-360-ru.vtt" in mentor.data
+    assert "кадровые решения".encode("utf-8") in mentor.data
 
     faq = client.get("/cases/faq-assistant/")
     assert faq.status_code == 200
@@ -64,6 +71,7 @@ def test_legal_and_seo(client):
     sitemap = client.get("/sitemap.xml")
     assert sitemap.status_code == 200
     assert b"/cases/faq-assistant/" in sitemap.data
+    assert b"/cases/ai-nastavnik-360/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
 
 
