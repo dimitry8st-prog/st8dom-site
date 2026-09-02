@@ -7,30 +7,30 @@
 {% endmacro %}
 
 {% macro render_inquiry_form(form) %}
-<form class="form reveal" id="inquiry-form" method="post" action="{{ url_for('contact') }}">
+<form class="form reveal" id="inquiry-form" method="post" action="{{ url_for('contact') }}" autocomplete="off">
   {{ form.hidden_tag() }}
   {{ form.website(class="hp", tabindex="-1", autocomplete="off") }}
   <div class="form-row">
     <div class="field">
       <label for="name">{{ form.name.label.text }} <span class="req">*</span></label>
-      {{ form.name(id="name", maxlength="120", required=true, autocomplete="name") }}
+      {{ form.name(id="name", maxlength="120", required=true, autocomplete="off") }}
       {{ field_errors(form.name) }}
     </div>
     <div class="field">
       <label for="email">{{ form.email.label.text }} <span class="req">*</span></label>
-      {{ form.email(id="email", maxlength="255", required=true, autocomplete="email", type="email") }}
+      {{ form.email(id="email", maxlength="255", required=true, autocomplete="off", type="email") }}
       {{ field_errors(form.email) }}
     </div>
   </div>
   <div class="form-row">
     <div class="field">
       <label for="phone">{{ form.phone.label.text }}</label>
-      {{ form.phone(id="phone", maxlength="40", autocomplete="tel") }}
+      {{ form.phone(id="phone", maxlength="40", autocomplete="off") }}
       {{ field_errors(form.phone) }}
     </div>
     <div class="field">
       <label for="company">{{ form.company.label.text }}</label>
-      {{ form.company(id="company", maxlength="160", autocomplete="organization") }}
+      {{ form.company(id="company", maxlength="160", autocomplete="off") }}
     </div>
   </div>
   <div class="field">
