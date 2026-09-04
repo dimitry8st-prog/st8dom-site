@@ -24,6 +24,7 @@ def test_cases_and_details(client):
         "legalbot",
         "docpulse",
         "ai-nastavnik-360",
+        "dis-analyst-360",
         "faq-assistant",
         "telegram-bot",
         "online-store-ops",
@@ -52,6 +53,12 @@ def test_cases_and_details(client):
     assert b"ai-nastavnik-360-ru.vtt" in mentor.data
     assert "кадровые решения".encode("utf-8") in mentor.data
 
+    analyst = client.get("/cases/dis-analyst-360/")
+    assert b"-360" in analyst.data
+    assert b"dis-analyst-360-16x9.mp4" in analyst.data
+    assert b"dis-analyst-360-ru.vtt" in analyst.data
+    assert "не облачная BI".encode("utf-8") in analyst.data
+
     faq = client.get("/cases/faq-assistant/")
     assert faq.status_code == 200
     assert b"Faq_assistants" in faq.data
@@ -76,6 +83,7 @@ def test_legal_and_seo(client):
     assert sitemap.status_code == 200
     assert b"/cases/faq-assistant/" in sitemap.data
     assert b"/cases/ai-nastavnik-360/" in sitemap.data
+    assert b"/cases/dis-analyst-360/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
 
 
