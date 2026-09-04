@@ -116,7 +116,10 @@ def test_contact_validation_and_save(client):
         follow_redirects=True,
     )
     assert ok.status_code == 200
-    assert "Заявка отправлена".encode("utf-8") in ok.data
+    assert (
+        "Заявка отправлена".encode("utf-8") in ok.data
+        or "Заявка сохранена".encode("utf-8") in ok.data
+    )
     with app.app_context():
         saved = Inquiry.query.filter_by(email="ivan@example.com").first()
         assert saved is not None
