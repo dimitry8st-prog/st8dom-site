@@ -21,6 +21,7 @@ def test_cases_and_details(client):
     listing = client.get("/cases/")
     assert listing.status_code == 200
     slugs = [
+        "dis-reputatsiya-360",
         "legalbot",
         "docpulse",
         "ai-nastavnik-360",
@@ -36,6 +37,11 @@ def test_cases_and_details(client):
         page = client.get(f"/cases/{slug}/")
         assert page.status_code == 200, slug
         assert "Репозиторий".encode("utf-8") in page.data
+
+    reputatsiya = client.get("/cases/dis-reputatsiya-360/")
+    assert b"-_-360" in reputatsiya.data
+    assert b"dis-reputatsiya-360-16x9.mp4" in reputatsiya.data
+    assert "не служба репутации".encode("utf-8") in reputatsiya.data
 
     legalbot = client.get("/cases/legalbot/")
     assert b"JustBot" in legalbot.data
@@ -84,6 +90,7 @@ def test_legal_and_seo(client):
     assert b"/cases/faq-assistant/" in sitemap.data
     assert b"/cases/ai-nastavnik-360/" in sitemap.data
     assert b"/cases/dis-analyst-360/" in sitemap.data
+    assert b"/cases/dis-reputatsiya-360/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
 
 
