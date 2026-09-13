@@ -32,6 +32,10 @@ def test_cases_and_details(client):
         "crm-automation",
         "corporate-site",
         "ai-support",
+        "redcat-ai",
+        "meeting-360",
+        "lingua-360",
+        "onboardflow-ai",
     ]
     for slug in slugs:
         page = client.get(f"/cases/{slug}/")

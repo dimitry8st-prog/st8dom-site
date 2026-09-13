@@ -799,6 +799,262 @@ CASES = [
             "точности и порог эскалации человеку."
         ),
     },
+    {
+        "slug": "redcat-ai",
+        "title": "RedCat AI: факты с сайта и черновик первого касания",
+        "short_title": "RedCat AI",
+        "type": "Research · email draft",
+        "filters": ["ai-agents", "automation", "backend"],
+        "badge": "B2B · research",
+        "badge_class": "badge-ai",
+        "image": "case-ai.svg",
+        "image_alt": "Схема RedCat AI: сайт компании, факты с цитатами и три черновика письма",
+        "card_summary": (
+            "Сервис читает сайт лида, достаёт проверяемые факты с цитатами "
+            "и пишет три черновика первого письма. Если факта нет — письмо "
+            "не генерируется. Не сендер и не CRM."
+        ),
+        "problem": (
+            "Холодное письмо часто начинается с выдуманного «я заметил, что вы». "
+            "Менеджер тратит время на ресёрч или отправляет шаблон без факта."
+        ),
+        "solution": (
+            "RedCat открывает сайт через Playwright, забирает главную и страницы "
+            "«о компании»/блог, через Gemini извлекает факты только из текста "
+            "страницы, затем GPT-4o пишет три варианта письма. Канцелярит "
+            "и слабое открытие помечаются как needs_review."
+        ),
+        "role": (
+            "Собрал FastAPI, скрейпер, LangGraph-контур, экран проверки "
+            "черновиков и пачку CSV. Автор — Степанов Д.А."
+        ),
+        "architecture": (
+            "URL → Playwright (до 3 страниц) → extractor (Gemini) → "
+            "quality gate → copywriter (GPT-4o) → JSON / UI. n8n дергает "
+            "POST /process_lead."
+        ),
+        "now_works": (
+            "Локальный и Docker-контур: один лид, пачка до 20 URL, карточка "
+            "фактов и копирование черновика. Промышленной рассылки нет."
+        ),
+        "verification": (
+            "Репозиторий github.com/dimitry8st-prog/RedCat-AI: README, "
+            "Docker Compose, /health, отказ без ключа модели."
+        ),
+        "limitations": (
+            "Это не массовый сендер. Письмо не уходит само. "
+            "Антиботы и чистые SPA могут отдать пустой текст. "
+            "Факт должен читаться в HTML страницы."
+        ),
+        "status": "демо / MVP",
+        "tech": [
+            "Python",
+            "FastAPI",
+            "Playwright",
+            "LangGraph",
+            "Gemini",
+            "OpenAI",
+            "n8n",
+        ],
+        "repo_url": "https://github.com/dimitry8st-prog/RedCat-AI",
+        "related_repos": [
+            {
+                "label": "AutoSfera AI — маршрутизация обращений",
+                "url": "https://github.com/dimitry8st-prog/AutoSfera-AI-",
+            }
+        ],
+        "demo_url": None,
+        "next_steps": (
+            "Пилот на 20 реальных URL клиента, человек в петле и выгрузка "
+            "только статусов success / needs_review."
+        ),
+    },
+    {
+        "slug": "meeting-360",
+        "title": "Встреча 360: запись совещания → итог и задачи",
+        "short_title": "Встреча 360",
+        "type": "Telegram · транскрипция",
+        "filters": ["telegram", "ai-agents", "backend"],
+        "badge": "Meetings · AI",
+        "badge_class": "badge-bot",
+        "image": "case-telegram.svg",
+        "image_alt": "Схема Встреча 360: видео в Telegram, расшифровка по спикерам и отчёт",
+        "card_summary": (
+            "В Telegram отправляете видео или аудио встречи — бот возвращает "
+            "расшифровку со спикерами, оценку по 11 критериям, решения, "
+            "задачи и сроки. Учебный MVP, не корпоративный секретарь."
+        ),
+        "problem": (
+            "После совещания запись пересматривают вручную: кто что обещал, "
+            "какие сроки назвали и что осталось без ответа."
+        ),
+        "solution": (
+            "Бот принимает файл, FFmpeg достаёт звук, AssemblyAI делает "
+            "транскрипцию с diarization, OpenAI собирает аудит встречи. "
+            "Результат и .txt-расшифровка уходят в чат, факты пишутся в PostgreSQL."
+        ),
+        "role": (
+            "Спроектировал пайплайн от файла до отчёта, критерии аудита "
+            "и Docker-запуск. Автор — Степанов Д.А."
+        ),
+        "architecture": (
+            "Telegram → FFmpeg (mono MP3 16 кГц) → AssemblyAI Speaker "
+            "Diarization → OpenAI-аудит → PostgreSQL → отчёт в чат."
+        ),
+        "now_works": (
+            "Локальный Docker-контур принимает запись и отдаёт транскрипцию "
+            "и отчёт. Промышленного внедрения у клиента нет."
+        ),
+        "verification": (
+            "Репозиторий github.com/dimitry8st-prog/meeting-360: README, "
+            "Docker, критерии в prompt-audit.md."
+        ),
+        "limitations": (
+            "Нужны ключи AssemblyAI и модели. Качество зависит от записи "
+            "и числа говорящих. Это не протокол для суда и не замена секретаря."
+        ),
+        "status": "демо / MVP",
+        "tech": [
+            "Python",
+            "Telegram Bot API",
+            "FFmpeg",
+            "AssemblyAI",
+            "OpenAI",
+            "PostgreSQL",
+            "Docker",
+        ],
+        "repo_url": "https://github.com/dimitry8st-prog/meeting-360",
+        "related_repos": [
+            {
+                "label": "ДИС Аналитик 360 — разбор таблиц и PDF",
+                "url": "https://github.com/dimitry8st-prog/-360",
+            }
+        ],
+        "demo_url": None,
+        "next_steps": (
+            "Пилот на внутренних встречах, проверка имён спикеров человеком "
+            "и выгрузка задач в трекер."
+        ),
+    },
+    {
+        "slug": "lingua-360",
+        "title": "ДИС Lingua 360: AI-репетитор английского и испанского",
+        "short_title": "ДИС Lingua 360",
+        "type": "Web-кабинет · обучение",
+        "filters": ["ai-agents", "rag", "backend"],
+        "badge": "Lingua · RAG",
+        "badge_class": "badge-rag",
+        "image": "case-mentor360.svg",
+        "image_alt": "Схема ДИС Lingua 360: кабинет, маршрут CEFR и RAG по заметкам",
+        "card_summary": (
+            "Персональный кабинет: английский и испанский, маршрут CEFR, "
+            "цикл «изучи → отработай → примени», RAG по заметкам Obsidian "
+            "и интервальное повторение. Открытый MVP, не языковая школа."
+        ),
+        "problem": (
+            "Репетитор и приложения дают упражнения, но нет одного контура: "
+            "цель, практика, ошибка, повтор через два дня."
+        ),
+        "solution": (
+            "Lingua 360 ведёт отдельный контекст для каждого языка, отвечает "
+            "через OpenAI или демо-режим без ключа, ищет опору в Markdown "
+            "Obsidian и показывает источники. Есть журнал прогресса и "
+            "недельный план 70/30."
+        ),
+        "role": (
+            "Собрал кабинет, учебный цикл, RAG, фонетику по одобренным "
+            "ссылкам и Docker. Автор — Степанов Д.А."
+        ),
+        "architecture": (
+            "Браузер → FastAPI → репетитор (OpenAI / demo) → RAG по Obsidian → "
+            "журнал прогресса. Telegram — заглушка."
+        ),
+        "now_works": (
+            "Локальный кабинет с демо-входом, двумя языками, циклом из "
+            "10 этапов и healthcheck в Docker. Это не курс с преподавателем."
+        ),
+        "verification": (
+            "Репозиторий github.com/dimitry8st-prog/-Lingua-360: README, "
+            "демо-вход, Docker."
+        ),
+        "limitations": (
+            "Не замена преподавателя. Telegram ещё не основной канал. "
+            "Качество ответа зависит от заметок и ключа модели."
+        ),
+        "status": "демо / MVP",
+        "tech": ["Python", "FastAPI", "OpenAI", "RAG", "Obsidian", "Docker"],
+        "repo_url": "https://github.com/dimitry8st-prog/-Lingua-360",
+        "related_repos": [
+            {
+                "label": "AI-наставник 360 — корпоративное обучение",
+                "url": "https://github.com/dimitry8st-prog/-AI--360",
+            }
+        ],
+        "demo_url": None,
+        "next_steps": (
+            "Живой Telegram-канал, пилот на своих занятиях и разбор ошибок "
+            "человеком-методистом."
+        ),
+    },
+    {
+        "slug": "onboardflow-ai",
+        "title": "OnboardFlow AI: онбординг без выдуманных кадровых ответов",
+        "short_title": "OnboardFlow AI",
+        "type": "HR · база знаний",
+        "filters": ["ai-agents", "backend"],
+        "badge": "HR · onboarding",
+        "badge_class": "badge-bot",
+        "image": "case-faq.svg",
+        "image_alt": "Схема OnboardFlow AI: вопрос новичка, CSV-база и эскалация человеку",
+        "card_summary": (
+            "Ассистент адаптации отвечает по контролируемой CSV-базе, "
+            "показывает чек-листы первого дня/недели/месяца и отдаёт "
+            "кадровые и юридические вопросы человеку."
+        ),
+        "problem": (
+            "Новичок спрашивает одно и то же в чатах, а кадровые темы "
+            "опасно отдавать модели без проверки."
+        ),
+        "solution": (
+            "OnboardFlow ищет ответ в локальной базе, подключает OpenAI "
+            "по желанию и всегда эскалирует чувствительные запросы. "
+            "Прогресс чек-листов хранится локально. Контакты в демо вымышлены."
+        ),
+        "role": (
+            "Собрал веб-интерфейс, базу знаний, правила эскалации и пакет "
+            "сдачи в Google Docs / Notion."
+        ),
+        "architecture": (
+            "Браузер → FastAPI → CSV knowledge base → OpenAI optional → "
+            "эскалация HR/юристам. Чек-листы в локальном хранилище."
+        ),
+        "now_works": (
+            "Локальное демо без ключа отвечает по CSV. Это учебный MVP, "
+            "не кадровая система компании."
+        ),
+        "verification": (
+            "Репозиторий github.com/dimitry8st-prog/OnboardFlow_AI: README, "
+            "data/knowledge_base.csv, docs/HANDOVER.md."
+        ),
+        "limitations": (
+            "Не даёт юридических и кадровых решений. База учебная. "
+            "Внедрение в контур 152-ФЗ — отдельный этап."
+        ),
+        "status": "демо / MVP",
+        "tech": ["Python", "FastAPI", "CSV", "OpenAI"],
+        "repo_url": "https://github.com/dimitry8st-prog/OnboardFlow_AI",
+        "related_repos": [
+            {
+                "label": "AI-наставник 360 — курсы в Telegram и web-панели",
+                "url": "https://github.com/dimitry8st-prog/-AI--360",
+            }
+        ],
+        "demo_url": None,
+        "next_steps": (
+            "Подставить базу клиента, согласовать список эскалаций с HR "
+            "и убрать вымышленные контакты."
+        ),
+    },
 ]
 
 
