@@ -9,8 +9,8 @@ CASES = [
         "filters": ["ai-agents", "rag", "automation", "backend"],
         "badge": "Автодилер · AI",
         "badge_class": "badge-ai",
-        "image": "case-autosfera-ai.svg",
-        "image_alt": "Схема AutoSfera AI: клиентский запрос, маршрутизатор, RAG, профильный агент и передача человеку",
+        "image": "case-autosfera-ai.png",
+        "image_alt": "Фирменный маскот ДИС — синий лис AutoSfera AI",
         "card_summary": (
             "Ассистент автодилера распределяет вопросы между продажами, "
             "поддержкой, сервисом и внутренним контуром, ищет факты в базе знаний "
@@ -66,7 +66,12 @@ CASES = [
         "repo_url": "https://github.com/dimitry8st-prog/AutoSfera-AI-",
         "related_repos": [],
         "demo_url": None,
-        "video": None,
+        "video": "autosfera-ai-defense.mp4",
+        "video_poster": "autosfera-ai-defense-poster.png",
+        "video_note": (
+            "Защита проекта, 5 минут 16 секунд: задача, архитектура, база знаний, "
+            "демонстрационные сценарии, результаты, экономика и план развития."
+        ),
         "next_steps": (
             "Провести пилот на согласованной базе дилера, подключить тестовую CRM, "
             "замерить качество RAG и задержку на эталонном наборе, затем пройти "

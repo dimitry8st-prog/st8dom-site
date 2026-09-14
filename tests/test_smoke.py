@@ -47,6 +47,9 @@ def test_cases_and_details(client):
     assert b"AutoSfera-AI-" in autosfera.data
     assert "18 зарегистрированных skills".encode("utf-8") in autosfera.data
     assert "контролируемая beta".encode("utf-8") in autosfera.data
+    assert b"case-autosfera-ai.png" in autosfera.data
+    assert b"autosfera-ai-defense.mp4" in autosfera.data
+    assert b"autosfera-ai-defense-poster.png" in autosfera.data
 
     reputatsiya = client.get("/cases/dis-reputatsiya-360/")
     assert b"-_-360" in reputatsiya.data
