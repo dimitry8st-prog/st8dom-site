@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} — портал ДИС{% endblock %}
+{% block description %}{{ section.description }}{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('direction_detail', slug=slug) }}{% endblock %}
+{% block og_title %}{{ section.title }} — портал ДИС{% endblock %}
+{% block og_description %}{{ section.summary }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero direction-hero">
+    <p class="eyebrow">{{ section.eyebrow }}</p>
+    <h1>{{ section.title }}</h1>
+    <p class="hero-sub">{{ section.summary }}</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#topics">Выбрать тему</a>
+      <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
+    </div>
+  </section>
+
+  <section class="s" id="topics">
+    <div class="s-label"><span>//</span> тематический маршрут</div>
+    <h2>Что будет в разделе</h2>
+    <div class="topic-grid">
+      {% for title, description in section.topics %}
+      <article class="topic-card reveal">
+        <span class="topic-number">0{{ loop.index }}</span>
+        <h3>{{ title }}</h3>
+        <p>{{ description }}</p>
+        <span class="content-status">Материалы готовятся</span>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="s">
+    <div class="s-label"><span>//</span> редакционный стандарт</div>
+    <h2>Как проверяются материалы</h2>
+    <ul class="principles-list">
+      {% for principle in section.principles %}<li>{{ principle }}</li>{% endfor %}
+    </ul>
+    <p class="editorial-notice">{{ section.notice }}</p>
+    {% if section.repo_url %}
+    <p><a class="btn btn-ghost" href="{{ section.repo_url }}" target="_blank" rel="noopener">Открыть Life-OS на GitHub</a></p>
+    {% endif %}
+  </section>
+
+  {% if related_projects %}
+  <section class="s">
+    <div class="s-label"><span>//</span> связанные проекты</div>
+    <h2>Практика по теме</h2>
+    <div class="portal-project-grid">
+      {% for project in related_projects %}
+      <article class="portal-project-card reveal">
+        <p class="project-kind">{{ "Флагман" if project.group == "flagship" else "Проект" }}</p>
+        <h3>{{ project.name }}</h3>
+        <p>{{ project.summary }}</p>
+        <a href="https://github.com/dimitry8st-prog/{{ project.repo }}" target="_blank" rel="noopener">Репозиторий →</a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="portal-next-step">
+    <p>Новые публикации сначала проходят авторскую проверку, затем появляются в тематическом разделе.</p>
+    <a class="btn btn-primary" href="{{ url_for('index') }}#about">Об авторе</a>
+  </section>
+</div>
+{% endblock %}
