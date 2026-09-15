@@ -53,6 +53,9 @@ def test_cases_and_details(client):
     assert b"Zdorowii_magazin" in healthy_store.data
     assert "концепция / техническое задание".encode("utf-8") in healthy_store.data
     assert b"case-healthy-store.webp" in healthy_store.data
+    assert b"case-autosfera-ai.png" in autosfera.data
+    assert b"autosfera-ai-defense.mp4" in autosfera.data
+    assert b"autosfera-ai-defense-poster.png" in autosfera.data
 
     reputatsiya = client.get("/cases/dis-reputatsiya-360/")
     assert b"-_-360" in reputatsiya.data
