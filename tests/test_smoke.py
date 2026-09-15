@@ -123,8 +123,9 @@ def test_portal_directions(client):
 def test_selected_projects_catalog(client):
     page = client.get("/projects/")
     assert page.status_code == 200
-    assert "15 проектов".encode("utf-8") in page.data
-    assert page.data.count(b'class="portal-project-card') == 15
+    assert "14 проектов".encode("utf-8") in page.data
+    assert page.data.count(b'class="portal-project-card') == 14
+    assert b"st8dom-site" not in page.data
     for name in [
         "AutoSfera-AI",
         "Life-OS",
