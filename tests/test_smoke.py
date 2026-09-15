@@ -8,7 +8,9 @@ def test_home_ok(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "Обсудить задачу".encode("utf-8") in response.data
-    assert "Получить разбор задачи".encode("utf-8") in response.data
+    assert "Выбрать направление".encode("utf-8") in response.data
+    assert "Медицина, AI и будущее человека".encode("utf-8") in response.data
+    assert "Дмитрий Степанов".encode("utf-8") in response.data
     assert "от 15 000".encode("utf-8") in response.data
     assert "от 180 000".encode("utf-8") in response.data
     assert b"dis-mascot-orange.jpg" in response.data

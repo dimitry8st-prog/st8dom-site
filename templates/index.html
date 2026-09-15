@@ -27,44 +27,33 @@
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-text">
-        <p class="eyebrow reveal">AI-ассистенты и автоматизация для бизнеса · Работаю по всей России</p>
-        <h1 class="reveal">Помогаю бизнесу меньше делать вручную и быстрее отвечать клиентам</h1>
+        <p class="eyebrow reveal">Единый экспертный портал Дмитрия Степанова</p>
+        <h1 class="reveal">Медицина, AI и будущее человека — в одной системе знаний</h1>
         <p class="hero-sub reveal">
-          Создаю AI-ассистентов, Telegram-ботов и системы работы с документами.
-          Начинаем с одной конкретной задачи, собираем MVP и проверяем результат на реальных запросах.
+          Проверенные медицинские материалы, практическое применение искусственного интеллекта,
+          исследования долголетия, Life‑OS и авторские проекты.
         </p>
-        <p class="trust-line reveal">Личный контакт · Понятная смета · Демо до внедрения · Документация после запуска</p>
+        <p class="trust-line reveal">Клинический опыт · Работа с источниками · Практические AI‑системы · Авторская проверка</p>
         <div class="hero-cta reveal">
-          <a href="{{ url_for('contact') }}" class="btn btn-primary" data-track="hero_cta_click" id="hero-cta">Получить разбор задачи</a>
-          <a href="{{ url_for('cases_list') }}" class="btn btn-ghost">Посмотреть рабочие примеры</a>
+          <a href="#directions" class="btn btn-primary" data-track="hero_cta_click" id="hero-cta">Выбрать направление</a>
+          <a href="{{ url_for('cases_list') }}" class="btn btn-ghost">Смотреть проекты</a>
         </div>
       </div>
-      <div class="avatar-wrap reveal">
-        <svg class="avatar-glow" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <radialGradient id="g1" cx="50%" cy="60%" r="55%">
-              <stop offset="0%" stop-color="#3B82F6" stop-opacity=".55"/>
-              <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0"/>
-            </radialGradient>
-            <radialGradient id="g2" cx="30%" cy="40%" r="45%">
-              <stop offset="0%" stop-color="#34D399" stop-opacity=".22"/>
-              <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0"/>
-            </radialGradient>
-            <radialGradient id="g3" cx="70%" cy="30%" r="40%">
-              <stop offset="0%" stop-color="#818CF8" stop-opacity=".3"/>
-              <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0"/>
-            </radialGradient>
-            <filter id="b1"><feGaussianBlur stdDeviation="18"/></filter>
-            <filter id="b2"><feGaussianBlur stdDeviation="10"/></filter>
-          </defs>
-          <ellipse cx="110" cy="130" rx="95" ry="100" fill="url(#g1)" filter="url(#b1)" style="animation:pulse 3s ease-in-out infinite"/>
-          <ellipse cx="55" cy="185" rx="70" ry="55" fill="url(#g2)" filter="url(#b2)" style="animation:pulse 4s ease-in-out infinite .8s"/>
-          <ellipse cx="165" cy="65" rx="65" ry="50" fill="url(#g3)" filter="url(#b2)" style="animation:pulse 3.5s ease-in-out infinite 1.2s"/>
-        </svg>
-        <canvas id="avatarCanvas" width="400" height="400" data-src="{{ url_for('static', filename='images/avatar.jpg') }}" aria-hidden="true"></canvas>
-        <img class="avatar-img" src="{{ url_for('static', filename='images/avatar.jpg') }}" width="200" height="200" alt="Дмитрий Степанов" style="position:absolute;opacity:0;pointer-events:none">
-        <div class="avatar-status" title="Доступен для проектов"></div>
+      <div class="portal-identity reveal">
+        <img class="portal-mascots" src="{{ url_for('static', filename='images/dis-fox-cat.webp') }}" width="360" height="360" alt="Маскоты портала ДИС: синяя лиса и рыжий кот держатся за лапы">
       </div>
+    </div>
+  </section>
+
+  <section class="s portal-directions" id="directions">
+    <div class="s-label reveal"><span>//</span> основные направления</div>
+    <h2 class="reveal">О чём портал</h2>
+    <p class="lead reveal">Одна площадка связывает клинический опыт, современные технологии и проверенные знания.</p>
+    <div class="direction-grid">
+      <article class="direction-card reveal" id="medicine"><span class="direction-icon" aria-hidden="true">✚</span><h3>Медицина</h3><p>Неврология, нейрохирургия, реабилитация, клинические рекомендации и материалы для пациентов.</p><a href="#">Материалы готовятся →</a></article>
+      <article class="direction-card reveal" id="ai"><span class="direction-icon" aria-hidden="true">AI</span><h3>AI на практике</h3><p>Промпт‑инжиниринг, RAG, AI‑ассистенты, автоматизация и разборы работающих решений.</p><a href="{{ url_for('cases_list') }}">Открыть проекты →</a></article>
+      <article class="direction-card reveal" id="longevity"><span class="direction-icon" aria-hidden="true">∞</span><h3>Долголетие</h3><p>Наука о старении, здоровое долголетие, будущее человека, цифровое наследие и этика.</p><a href="#">Материалы готовятся →</a></article>
+      <article class="direction-card reveal" id="life-os"><span class="direction-icon" aria-hidden="true">OS</span><h3>Life‑OS</h3><p>Система сбора знаний из статей, PDF, видео и заметок с поиском связанных материалов.</p><a href="https://github.com/dimitry8st-prog/Life-Os" target="_blank" rel="noopener">Посмотреть систему →</a></article>
     </div>
   </section>
 
@@ -192,14 +181,20 @@
   <section class="s" id="about">
     <div class="s-label reveal"><span>//</span> обо мне</div>
     <h2 class="reveal">Дмитрий Степанов</h2>
-    <div class="about-block reveal">
-      <p>Дмитрий Степанов — AI-архитектор и разработчик прикладных AI-систем. Помогаю бизнесу меньше делать вручную и быстрее отвечать клиентам. Работаю напрямую, объясняю архитектуру и передаю документацию.</p>
-      <p style="margin-top:12px;color:var(--muted)">Нижний Новгород, удалённый формат, работаю по всей России. Специализация: AI-ассистенты, Telegram-боты, RAG, n8n/Make, Python/FastAPI. Компетенции подтверждаются открытыми репозиториями, а не списком вымышленных клиентов.</p>
-      <div class="about-links">
-        <a class="btn btn-ghost btn-sm" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">GitHub</a>
-        <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Telegram</a>
-        <a class="btn btn-ghost btn-sm" href="{{ fl_url }}" target="_blank" rel="noopener">FL.ru</a>
-        <a class="btn btn-ghost btn-sm" href="{{ kwork_url }}" target="_blank" rel="noopener">Kwork</a>
+    <div class="about-block author-profile reveal">
+      <div class="author-photo">
+        <img src="{{ url_for('static', filename='images/avatar.jpg') }}" width="220" height="220" alt="Дмитрий Степанов — автор портала ДИС">
+      </div>
+      <div class="author-copy">
+        <p class="author-role">Врач · AI‑архитектор · автор портала</p>
+        <p>Дмитрий Степанов объединяет медицинский опыт и разработку прикладных AI‑систем. На портале он объясняет сложные темы простым языком, разбирает источники и показывает собственные проекты.</p>
+        <p style="margin-top:12px;color:var(--muted)">Клинический стаж — 29 лет. Основные технологические направления: AI‑ассистенты, Telegram‑боты, RAG, n8n, Python и FastAPI.</p>
+        <div class="about-links">
+          <a class="btn btn-ghost btn-sm" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">GitHub</a>
+          <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Telegram</a>
+          <a class="btn btn-ghost btn-sm" href="{{ fl_url }}" target="_blank" rel="noopener">FL.ru</a>
+          <a class="btn btn-ghost btn-sm" href="{{ kwork_url }}" target="_blank" rel="noopener">Kwork</a>
+        </div>
       </div>
     </div>
   </section>
