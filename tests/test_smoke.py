@@ -53,6 +53,10 @@ def test_cases_and_details(client):
     assert b"Zdorowii_magazin" in healthy_store.data
     assert "концепция / техническое задание".encode("utf-8") in healthy_store.data
     assert b"case-healthy-store.webp" in healthy_store.data
+    assert b"biobalance-promo-16x9.mp4" in healthy_store.data
+    assert b"biobalance-promo-poster.webp" in healthy_store.data
+    assert b"biobalance-promo-ru.vtt" in healthy_store.data
+    assert b'preload="metadata"' in healthy_store.data
     assert b"case-autosfera-ai.png" in autosfera.data
     assert b"autosfera-ai-defense.mp4" in autosfera.data
     assert b"autosfera-ai-defense-poster.png" in autosfera.data
