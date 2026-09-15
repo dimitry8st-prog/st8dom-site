@@ -63,7 +63,6 @@ SECTIONS = {
 
 PROJECTS = [
     {"name": "AutoSfera-AI", "summary": "AI-контур для продаж, сервиса и внутренних коммуникаций автодилера.", "group": "flagship", "areas": ["ai", "automation"], "repo": "AutoSfera-AI-", "case_slug": "autosfera-ai", "video": "autosfera-ai-defense.mp4", "poster": "autosfera-ai-defense-poster.png"},
-    {"name": "st8dom-site", "summary": "Портал ДИС и витрина авторских материалов и проектов.", "group": "flagship", "areas": ["web", "ai"], "repo": "st8dom-site"},
     {"name": "KPI-Pulse", "summary": "Сбор показателей и подготовка понятных управленческих отчётов.", "group": "flagship", "areas": ["analytics", "automation"], "repo": "KPI-Pulse"},
     {"name": "Life-OS", "summary": "Сбор, классификация и поиск связанных знаний в Obsidian.", "group": "flagship", "areas": ["knowledge", "rag"], "repo": "Life-Os"},
     {"name": "DIS-Meeting-360", "summary": "Транскрибация встреч, выделение решений, рисков и следующих действий.", "group": "flagship", "areas": ["ai", "automation"], "repo": "meeting-360"},
@@ -80,8 +79,8 @@ PROJECTS = [
 ]
 
 PROJECT_FILTERS = [
-    ("all", "Все 15"),
-    ("flagship", "6 флагманов"),
+    ("all", "Все 14"),
+    ("flagship", "5 флагманов"),
     ("medicine", "Медицина"),
     ("ai", "AI"),
     ("rag", "RAG"),
