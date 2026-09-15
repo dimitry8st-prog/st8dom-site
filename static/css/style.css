@@ -367,6 +367,14 @@ nav {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: linear-gradient(145deg, rgba(19, 28, 46, 0.98), rgba(11, 15, 26, 0.96));
+  transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.portal-project-card:hover,
+.portal-project-card:focus-within {
+  transform: translateY(-8px);
+  border-color: rgba(129, 140, 248, 0.85);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(59, 130, 246, 0.18);
 }
 
 .topic-card h3,
@@ -425,12 +433,38 @@ nav {
   color: #d8b36d;
 }
 
-.portal-project-card a,
-.project-repo-link {
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: auto;
-  padding-top: 20px;
+  padding-top: 24px;
+}
+
+.repository-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.repository-pending::before {
+  content: "●";
   color: var(--orange);
-  text-decoration: none;
+  font-size: 9px;
+}
+
+.project-actions .btn {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.project-actions .btn:hover,
+.project-actions .btn:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
 }
 
 .portal-project-card--flagship {
@@ -466,6 +500,60 @@ nav {
 .portfolio-summary span { color: var(--muted); font-size: 13px; }
 .portfolio-grid { padding-bottom: 36px; }
 .portfolio-grid .portal-project-card.case-hidden { display: none; }
+
+.project-video-modal {
+  width: min(900px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  overflow: hidden;
+  color: var(--text);
+  background: var(--bg2);
+  border: 1px solid rgba(129, 140, 248, 0.7);
+  border-radius: 18px;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.72);
+}
+
+.project-video-modal::backdrop {
+  background: rgba(2, 6, 23, 0.86);
+  backdrop-filter: blur(5px);
+}
+
+.project-video-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-video-modal__head h2 { font-size: 18px; }
+
+.project-video-close {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.project-video-close:hover,
+.project-video-close:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--orange);
+}
+
+.project-video-player {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 110px);
+  background: #000;
+}
 
 .portal-next-step {
   display: flex;
@@ -1747,6 +1835,15 @@ footer.foot span {
   * {
     animation: none !important;
     transition: none !important;
+  }
+
+  .portal-project-card:hover,
+  .portal-project-card:focus-within,
+  .project-actions .btn:hover,
+  .project-actions .btn:focus-visible,
+  .project-video-close:hover,
+  .project-video-close:focus-visible {
+    transform: none;
   }
 }
 
