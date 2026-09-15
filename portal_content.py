@@ -62,20 +62,20 @@ SECTIONS = {
 
 
 PROJECTS = [
-    {"name": "AutoSfera-AI", "summary": "AI-контур для продаж, сервиса и внутренних коммуникаций автодилера.", "group": "flagship", "areas": ["ai", "automation"], "repo": "AutoSfera-AI-"},
+    {"name": "AutoSfera-AI", "summary": "AI-контур для продаж, сервиса и внутренних коммуникаций автодилера.", "group": "flagship", "areas": ["ai", "automation"], "repo": "AutoSfera-AI-", "case_slug": "autosfera-ai", "video": "autosfera-ai-defense.mp4", "poster": "autosfera-ai-defense-poster.png"},
     {"name": "st8dom-site", "summary": "Портал ДИС и витрина авторских материалов и проектов.", "group": "flagship", "areas": ["web", "ai"], "repo": "st8dom-site"},
     {"name": "KPI-Pulse", "summary": "Сбор показателей и подготовка понятных управленческих отчётов.", "group": "flagship", "areas": ["analytics", "automation"], "repo": "KPI-Pulse"},
     {"name": "Life-OS", "summary": "Сбор, классификация и поиск связанных знаний в Obsidian.", "group": "flagship", "areas": ["knowledge", "rag"], "repo": "Life-Os"},
     {"name": "DIS-Meeting-360", "summary": "Транскрибация встреч, выделение решений, рисков и следующих действий.", "group": "flagship", "areas": ["ai", "automation"], "repo": "meeting-360"},
-    {"name": "DIS-Reputation-360", "summary": "Анализ отзывов и подготовка ответа с контролем оператора.", "group": "flagship", "areas": ["ai", "automation"], "repo": "-_-360"},
-    {"name": "DIS-AI-Mentor-360", "summary": "Персональное обучение, практика и проверка знаний.", "group": "quality", "areas": ["ai", "education"], "repo": "-AI--360"},
-    {"name": "DIS-Analytics-360", "summary": "Разбор таблиц и документов с локальной визуализацией.", "group": "quality", "areas": ["analytics", "ai"], "repo": "-360"},
-    {"name": "DocPulse-AI", "summary": "Структурированный разбор документов и медицинских PDF в Telegram.", "group": "quality", "areas": ["medicine", "rag"], "repo": "DocPulse---"},
-    {"name": "LegalBot-AI", "summary": "Извлечение фактов из судебных документов и подготовка проекта апелляции.", "group": "quality", "areas": ["rag", "ai"], "repo": "JustBot"},
+    {"name": "DIS-Reputation-360", "summary": "Анализ отзывов и подготовка ответа с контролем оператора.", "group": "flagship", "areas": ["ai", "automation"], "repo": "-_-360", "case_slug": "dis-reputatsiya-360", "video": "dis-reputatsiya-360-16x9.mp4", "poster": "dis-reputatsiya-360-poster.jpg"},
+    {"name": "DIS-AI-Mentor-360", "summary": "Персональное обучение, практика и проверка знаний.", "group": "quality", "areas": ["ai", "education"], "repo": "-AI--360", "case_slug": "ai-nastavnik-360", "video": "ai-nastavnik-360-16x9.mp4", "poster": "ai-nastavnik-360-poster.png"},
+    {"name": "DIS-Analytics-360", "summary": "Разбор таблиц и документов с локальной визуализацией.", "group": "quality", "areas": ["analytics", "ai"], "repo": "-360", "case_slug": "dis-analyst-360", "video": "dis-analyst-360-16x9.mp4", "poster": "dis-analyst-360-poster.png"},
+    {"name": "DocPulse-AI", "summary": "Структурированный разбор документов и медицинских PDF в Telegram.", "group": "quality", "areas": ["medicine", "rag"], "repo": "DocPulse---", "case_slug": "docpulse", "video": "docpulse-demo.mp4", "poster": "docpulse-demo-poster.png"},
+    {"name": "LegalBot-AI", "summary": "Извлечение фактов из судебных документов и подготовка проекта апелляции.", "group": "quality", "areas": ["rag", "ai"], "repo": "JustBot", "case_slug": "legalbot", "video": "legalbot-demo.mp4", "poster": "legalbot-demo-poster.png"},
     {"name": "MedBot-AI", "summary": "Медицинский AI-ассистент с источниками и контролем клинических выводов.", "group": "quality", "areas": ["medicine", "rag"], "repo": "MedBot-AI"},
     {"name": "DIS-Lingua-360", "summary": "AI-репетитор английского и испанского с личной базой знаний.", "group": "quality", "areas": ["education", "rag"], "repo": "-Lingua-360"},
     {"name": "SAR-GPT-Analyzer", "summary": "Помощник для анализа радарных данных и работы в QGIS.", "group": "quality", "areas": ["analytics", "ai"], "repo": "QGIS-"},
-    {"name": "HealthyStore", "summary": "Концепция интернет-магазина полезных и безглютеновых продуктов.", "group": "quality", "areas": ["web"], "repo": "Zdorowii_magazin"},
+    {"name": "HealthyStore", "summary": "Концепция интернет-магазина полезных и безглютеновых продуктов.", "group": "quality", "areas": ["web"], "repo": "Zdorowii_magazin", "case_slug": "healthy-store", "video": "biobalance-promo-16x9.mp4", "poster": "biobalance-promo-poster.webp"},
     {"name": "OnboardFlow-AI", "summary": "Онбординг сотрудников по проверенной корпоративной базе знаний.", "group": "quality", "areas": ["education", "rag"], "repo": "OnboardFlow_AI"},
 ]
 
@@ -91,4 +91,3 @@ PROJECT_FILTERS = [
 
 def get_section(slug: str):
     return SECTIONS.get(slug)
-

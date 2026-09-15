@@ -37,11 +37,36 @@
       <div class="project-stack">
         {% for area in project.areas %}<span class="tag">{{ area }}</span>{% endfor %}
       </div>
-      <a class="project-repo-link" href="https://github.com/dimitry8st-prog/{{ project.repo }}" target="_blank" rel="noopener" data-track="portfolio_repo_open">Открыть репозиторий →</a>
+      <div class="project-actions">
+        {% if project.video %}
+        <button
+          class="btn btn-primary btn-sm project-video-trigger"
+          type="button"
+          data-video-src="{{ url_for('static', filename='video/' + project.video) }}"
+          data-video-poster="{{ url_for('static', filename='video/' + project.poster) }}"
+          data-video-title="{{ project.name }}"
+        >▶ Смотреть видео</button>
+        {% endif %}
+        {% if project.case_slug %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('case_detail', slug=project.case_slug) }}">Подробнее</a>
+        {% endif %}
+      </div>
+      <span class="repository-pending">Репозиторий готовится к публикации</span>
     </article>
     {% endfor %}
   </div>
 
-  <p class="portfolio-note">Названия на портале приведены к единому стилю. Пока переименование GitHub-репозиториев не завершено, ссылки ведут на их действующие адреса.</p>
+  <p class="portfolio-note">Репозитории откроются постепенно после переименования, обновления README и проверки материалов: сначала у шести флагманов, затем у остальных проектов.</p>
 </div>
+
+<dialog class="project-video-modal" id="project-video-modal" aria-labelledby="project-video-title">
+  <div class="project-video-modal__head">
+    <h2 id="project-video-title">Видео проекта</h2>
+    <button class="project-video-close" type="button" aria-label="Закрыть видео">×</button>
+  </div>
+  <video class="project-video-player" controls preload="none" playsinline>
+    <source src="" type="video/mp4">
+    Ваш браузер не поддерживает воспроизведение видео.
+  </video>
+</dialog>
 {% endblock %}

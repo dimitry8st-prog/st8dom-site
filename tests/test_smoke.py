@@ -134,6 +134,17 @@ def test_selected_projects_catalog(client):
         "OnboardFlow-AI",
     ]:
         assert name.encode("utf-8") in page.data
+    assert page.data.count(b"project-video-trigger") == 7
+    assert b"autosfera-ai-defense.mp4" in page.data
+    assert b"dis-reputatsiya-360-16x9.mp4" in page.data
+    assert b"ai-nastavnik-360-16x9.mp4" in page.data
+    assert b"dis-analyst-360-16x9.mp4" in page.data
+    assert b"docpulse-demo.mp4" in page.data
+    assert b"legalbot-demo.mp4" in page.data
+    assert b"biobalance-promo-16x9.mp4" in page.data
+    assert b'id="project-video-modal"' in page.data
+    assert b"portfolio_repo_open" not in page.data
+    assert "Репозиторий готовится к публикации".encode("utf-8") in page.data
 
 
 def test_legal_and_seo(client):

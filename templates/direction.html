@@ -39,9 +39,7 @@
       {% for principle in section.principles %}<li>{{ principle }}</li>{% endfor %}
     </ul>
     <p class="editorial-notice">{{ section.notice }}</p>
-    {% if section.repo_url %}
-    <p><a class="btn btn-ghost" href="{{ section.repo_url }}" target="_blank" rel="noopener">Открыть Life-OS на GitHub</a></p>
-    {% endif %}
+    {% if section.repo_url %}<p class="repository-pending">Репозиторий Life-OS готовится к публикации</p>{% endif %}
   </section>
 
   {% if related_projects %}
@@ -54,7 +52,7 @@
         <p class="project-kind">{{ "Флагман" if project.group == "flagship" else "Проект" }}</p>
         <h3>{{ project.name }}</h3>
         <p>{{ project.summary }}</p>
-        <a href="https://github.com/dimitry8st-prog/{{ project.repo }}" target="_blank" rel="noopener">Репозиторий →</a>
+        <span class="repository-pending">Репозиторий готовится к публикации</span>
       </article>
       {% endfor %}
     </div>
