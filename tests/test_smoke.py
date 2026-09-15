@@ -22,6 +22,7 @@ def test_cases_and_details(client):
     assert listing.status_code == 200
     slugs = [
         "autosfera-ai",
+        "healthy-store",
         "dis-reputatsiya-360",
         "legalbot",
         "docpulse",
@@ -47,9 +48,11 @@ def test_cases_and_details(client):
     assert b"AutoSfera-AI-" in autosfera.data
     assert "18 зарегистрированных skills".encode("utf-8") in autosfera.data
     assert "контролируемая beta".encode("utf-8") in autosfera.data
-    assert b"case-autosfera-ai.png" in autosfera.data
-    assert b"autosfera-ai-defense.mp4" in autosfera.data
-    assert b"autosfera-ai-defense-poster.png" in autosfera.data
+
+    healthy_store = client.get("/cases/healthy-store/")
+    assert b"Zdorowii_magazin" in healthy_store.data
+    assert "концепция / техническое задание".encode("utf-8") in healthy_store.data
+    assert b"case-healthy-store.webp" in healthy_store.data
 
     reputatsiya = client.get("/cases/dis-reputatsiya-360/")
     assert b"-_-360" in reputatsiya.data
@@ -105,6 +108,7 @@ def test_legal_and_seo(client):
     assert b"/cases/dis-analyst-360/" in sitemap.data
     assert b"/cases/dis-reputatsiya-360/" in sitemap.data
     assert b"/cases/autosfera-ai/" in sitemap.data
+    assert b"/cases/healthy-store/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
 
 
