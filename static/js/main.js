@@ -131,6 +131,50 @@
     });
   });
 
+  const videoModal = document.getElementById("project-video-modal");
+  if (videoModal) {
+    const videoPlayer = videoModal.querySelector(".project-video-player");
+    const videoSource = videoPlayer ? videoPlayer.querySelector("source") : null;
+    const videoTitle = videoModal.querySelector("#project-video-title");
+    const videoClose = videoModal.querySelector(".project-video-close");
+
+    function stopProjectVideo() {
+      if (!videoPlayer || !videoSource) return;
+      videoPlayer.pause();
+      videoPlayer.removeAttribute("poster");
+      videoSource.setAttribute("src", "");
+      videoPlayer.load();
+    }
+
+    document.querySelectorAll(".project-video-trigger").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (!videoPlayer || !videoSource) return;
+        videoSource.setAttribute("src", button.getAttribute("data-video-src") || "");
+        videoPlayer.setAttribute("poster", button.getAttribute("data-video-poster") || "");
+        if (videoTitle) videoTitle.textContent = button.getAttribute("data-video-title") || "Видео проекта";
+        videoPlayer.load();
+        if (typeof videoModal.showModal === "function") videoModal.showModal();
+        else videoModal.setAttribute("open", "");
+        videoPlayer.play().catch(function () {
+          // Браузер может запретить автозапуск; тогда остаётся штатная кнопка Play.
+        });
+        track("portfolio_video_open", { project: button.getAttribute("data-video-title") || "" });
+      });
+    });
+
+    if (videoClose) {
+      videoClose.addEventListener("click", function () {
+        if (typeof videoModal.close === "function") videoModal.close();
+        else videoModal.removeAttribute("open");
+      });
+    }
+    videoModal.addEventListener("close", stopProjectVideo);
+    videoModal.addEventListener("cancel", stopProjectVideo);
+    videoModal.addEventListener("click", function (event) {
+      if (event.target === videoModal && typeof videoModal.close === "function") videoModal.close();
+    });
+  }
+
   const canvas = document.getElementById("avatarCanvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
