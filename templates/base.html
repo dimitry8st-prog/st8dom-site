@@ -70,11 +70,11 @@
       <a class="nav-logo" href="{{ url_for('index') }}"><strong>ДИС</strong><span>медицина · AI · будущее человека</span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Открыть меню">☰</button>
       <div class="nav-links" id="site-menu">
-        <a href="{{ url_for('index') }}#medicine" {% if page_id == 'home' %}aria-current="page"{% endif %}>Медицина</a>
-        <a href="{{ url_for('index') }}#ai">AI</a>
-        <a href="{{ url_for('index') }}#longevity">Долголетие</a>
-        <a href="{{ url_for('index') }}#life-os">Life‑OS</a>
-        <a href="{{ url_for('cases_list') }}" {% if page_id in ['cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
+        <a href="{{ url_for('direction_detail', slug='medicine') }}" {% if page_id == 'direction-medicine' %}aria-current="page"{% endif %}>Медицина</a>
+        <a href="{{ url_for('direction_detail', slug='ai') }}" {% if page_id == 'direction-ai' %}aria-current="page"{% endif %}>AI</a>
+        <a href="{{ url_for('direction_detail', slug='longevity') }}" {% if page_id == 'direction-longevity' %}aria-current="page"{% endif %}>Долголетие</a>
+        <a href="{{ url_for('direction_detail', slug='life-os') }}" {% if page_id == 'direction-life-os' %}aria-current="page"{% endif %}>Life‑OS</a>
+        <a href="{{ url_for('projects_catalog') }}" {% if page_id in ['projects', 'cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
         <a href="{{ url_for('index') }}#about">Об авторе</a>
         <a href="{{ url_for('contact') }}" class="nav-cta" {% if page_id == 'contact' %}aria-current="page"{% endif %}>Контакты</a>
       </div>
@@ -99,6 +99,7 @@
       <div class="foot-links">
         <a href="{{ url_for('privacy') }}">Политика конфиденциальности</a>
         <a href="{{ url_for('consent') }}">Согласие на обработку данных</a>
+        <a href="{{ url_for('cases_list') }}">Подробные кейсы</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
       </div>
       <p>© 2026 <span>Степанов Д.А.</span> · Портал «ДИС» · Медицина, AI и будущее человека</p>
