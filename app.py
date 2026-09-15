@@ -36,6 +36,7 @@ from config import BASE_DIR, get_config
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, InquiryForm, LoginForm
 from models import AdminUser, Inquiry
+from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section
 
 logger = logging.getLogger("st8dom")
 
@@ -229,6 +230,34 @@ def create_app() -> Flask:
             page_id="cases",
         )
 
+    @app.route("/directions/<slug>/")
+    def direction_detail(slug: str):
+        section = get_section(slug)
+        if not section:
+            abort(404)
+        related_projects = [
+            project
+            for project in PROJECTS
+            if slug in project["areas"]
+            or (slug == "life-os" and project["name"] == "Life-OS")
+        ][:6]
+        return render_template(
+            "direction.html",
+            section=section,
+            slug=slug,
+            related_projects=related_projects,
+            page_id=f"direction-{slug}",
+        )
+
+    @app.route("/projects/")
+    def projects_catalog():
+        return render_template(
+            "projects.html",
+            projects=PROJECTS,
+            filters=PROJECT_FILTERS,
+            page_id="projects",
+        )
+
     @app.route("/cases/<slug>/")
     def case_detail(slug: str):
         case = get_case(slug)
@@ -387,10 +416,14 @@ def create_app() -> Flask:
         pages = [
             origin + "/",
             origin + url_for("cases_list"),
+            origin + url_for("projects_catalog"),
             origin + url_for("contact"),
             origin + url_for("privacy"),
             origin + url_for("consent"),
         ]
+        pages.extend(
+            origin + url_for("direction_detail", slug=slug) for slug in SECTIONS
+        )
         pages.extend(origin + url_for("case_detail", slug=case["slug"]) for case in get_all_cases())
         xml_urls = "".join(f"<url><loc>{page}</loc></url>" for page in pages)
         xml = (

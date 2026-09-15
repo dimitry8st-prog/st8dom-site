@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}15 проектов — портал ДИС{% endblock %}
+{% block description %}Шесть флагманских и девять качественных проектов Дмитрия Степанова: AI, медицина, RAG, аналитика, автоматизация и Life-OS.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('projects_catalog') }}{% endblock %}
+{% block og_title %}15 отобранных проектов портала ДИС{% endblock %}
+{% block og_description %}Шесть флагманов и девять качественных проектов с прямыми ссылками на репозитории.{% endblock %}
+
+{% block content %}
+<div class="container container--wide">
+  <section class="hero" style="padding-bottom:32px;border-bottom:none">
+    <p class="eyebrow">// отобранное портфолио</p>
+    <h1>15 проектов</h1>
+    <p class="hero-sub">В начале — шесть флагманов. Затем девять качественных проектов. У каждой карточки есть краткая польза и прямая ссылка на репозиторий.</p>
+  </section>
+
+  <div class="portfolio-summary" aria-label="Состав портфолио">
+    <div><strong>6</strong><span>флагманов</span></div>
+    <div><strong>9</strong><span>качественных</span></div>
+    <div><strong>15</strong><span>всего</span></div>
+  </div>
+
+  <div class="filters" role="group" aria-label="Фильтр проектов">
+    {% for value, label in filters %}
+    <button class="filter-btn{% if value == 'all' %} is-active{% endif %}" type="button" data-filter="{{ value }}" aria-pressed="{{ 'true' if value == 'all' else 'false' }}">{{ label }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="portal-project-grid portfolio-grid">
+    {% for project in projects %}
+    <article class="portal-project-card{% if project.group == 'flagship' %} portal-project-card--flagship{% endif %}" data-tags="{{ project.group }} {{ project.areas|join(' ') }}">
+      <div class="project-card-top">
+        <span class="project-index">{{ "%02d"|format(loop.index) }}</span>
+        <span class="project-kind">{{ "Флагман" if project.group == "flagship" else "Качественный проект" }}</span>
+      </div>
+      <h2>{{ project.name }}</h2>
+      <p>{{ project.summary }}</p>
+      <div class="project-stack">
+        {% for area in project.areas %}<span class="tag">{{ area }}</span>{% endfor %}
+      </div>
+      <a class="project-repo-link" href="https://github.com/dimitry8st-prog/{{ project.repo }}" target="_blank" rel="noopener" data-track="portfolio_repo_open">Открыть репозиторий →</a>
+    </article>
+    {% endfor %}
+  </div>
+
+  <p class="portfolio-note">Названия на портале приведены к единому стилю. Пока переименование GitHub-репозиториев не завершено, ссылки ведут на их действующие адреса.</p>
+</div>
+{% endblock %}

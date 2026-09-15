@@ -104,6 +104,38 @@ def test_cases_and_details(client):
     assert b"autoplay" not in faq.data.lower()
 
 
+def test_portal_directions(client):
+    expected = {
+        "medicine": "Медицина",
+        "ai": "AI на практике",
+        "longevity": "Долголетие и будущее человека",
+        "life-os": "Life-OS",
+    }
+    for slug, title in expected.items():
+        page = client.get(f"/directions/{slug}/")
+        assert page.status_code == 200, slug
+        assert title.encode("utf-8") in page.data
+        assert "Как проверяются материалы".encode("utf-8") in page.data
+
+    assert client.get("/directions/unknown/").status_code == 404
+
+
+def test_selected_projects_catalog(client):
+    page = client.get("/projects/")
+    assert page.status_code == 200
+    assert "15 проектов".encode("utf-8") in page.data
+    assert page.data.count(b'class="portal-project-card') == 15
+    for name in [
+        "AutoSfera-AI",
+        "Life-OS",
+        "DIS-Meeting-360",
+        "MedBot-AI",
+        "SAR-GPT-Analyzer",
+        "OnboardFlow-AI",
+    ]:
+        assert name.encode("utf-8") in page.data
+
+
 def test_legal_and_seo(client):
     assert client.get("/privacy/").status_code == 200
     assert client.get("/consent/").status_code == 200
@@ -118,6 +150,11 @@ def test_legal_and_seo(client):
     assert b"/cases/dis-reputatsiya-360/" in sitemap.data
     assert b"/cases/autosfera-ai/" in sitemap.data
     assert b"/cases/healthy-store/" in sitemap.data
+    assert b"/projects/" in sitemap.data
+    assert b"/directions/medicine/" in sitemap.data
+    assert b"/directions/ai/" in sitemap.data
+    assert b"/directions/longevity/" in sitemap.data
+    assert b"/directions/life-os/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
 
 
