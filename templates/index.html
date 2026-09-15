@@ -36,7 +36,7 @@
         <p class="trust-line reveal">Клинический опыт · Работа с источниками · Практические AI‑системы · Авторская проверка</p>
         <div class="hero-cta reveal">
           <a href="#directions" class="btn btn-primary" data-track="hero_cta_click" id="hero-cta">Выбрать направление</a>
-          <a href="{{ url_for('cases_list') }}" class="btn btn-ghost">Смотреть проекты</a>
+          <a href="{{ url_for('projects_catalog') }}" class="btn btn-ghost">Смотреть 15 проектов</a>
         </div>
       </div>
       <div class="portal-identity reveal">
@@ -50,10 +50,10 @@
     <h2 class="reveal">О чём портал</h2>
     <p class="lead reveal">Одна площадка связывает клинический опыт, современные технологии и проверенные знания.</p>
     <div class="direction-grid">
-      <article class="direction-card reveal" id="medicine"><span class="direction-icon" aria-hidden="true">✚</span><h3>Медицина</h3><p>Неврология, нейрохирургия, реабилитация, клинические рекомендации и материалы для пациентов.</p><a href="#">Материалы готовятся →</a></article>
-      <article class="direction-card reveal" id="ai"><span class="direction-icon" aria-hidden="true">AI</span><h3>AI на практике</h3><p>Промпт‑инжиниринг, RAG, AI‑ассистенты, автоматизация и разборы работающих решений.</p><a href="{{ url_for('cases_list') }}">Открыть проекты →</a></article>
-      <article class="direction-card reveal" id="longevity"><span class="direction-icon" aria-hidden="true">∞</span><h3>Долголетие</h3><p>Наука о старении, здоровое долголетие, будущее человека, цифровое наследие и этика.</p><a href="#">Материалы готовятся →</a></article>
-      <article class="direction-card reveal" id="life-os"><span class="direction-icon" aria-hidden="true">OS</span><h3>Life‑OS</h3><p>Система сбора знаний из статей, PDF, видео и заметок с поиском связанных материалов.</p><a href="https://github.com/dimitry8st-prog/Life-Os" target="_blank" rel="noopener">Посмотреть систему →</a></article>
+      <article class="direction-card reveal" id="medicine"><span class="direction-icon" aria-hidden="true">✚</span><h3>Медицина</h3><p>Неврология, нейрохирургия, реабилитация, клинические рекомендации и материалы для пациентов.</p><a href="{{ url_for('direction_detail', slug='medicine') }}">Открыть раздел →</a></article>
+      <article class="direction-card reveal" id="ai"><span class="direction-icon" aria-hidden="true">AI</span><h3>AI на практике</h3><p>Промпт‑инжиниринг, RAG, AI‑ассистенты, автоматизация и разборы работающих решений.</p><a href="{{ url_for('direction_detail', slug='ai') }}">Открыть раздел →</a></article>
+      <article class="direction-card reveal" id="longevity"><span class="direction-icon" aria-hidden="true">∞</span><h3>Долголетие</h3><p>Наука о старении, здоровое долголетие, будущее человека, цифровое наследие и этика.</p><a href="{{ url_for('direction_detail', slug='longevity') }}">Открыть раздел →</a></article>
+      <article class="direction-card reveal" id="life-os"><span class="direction-icon" aria-hidden="true">OS</span><h3>Life‑OS</h3><p>Система сбора знаний из статей, PDF, видео и заметок с поиском связанных материалов.</p><a href="{{ url_for('direction_detail', slug='life-os') }}">Как работает Life‑OS →</a></article>
     </div>
   </section>
 
@@ -164,7 +164,7 @@
       </a>
       {% endfor %}
     </div>
-    <p style="margin-top:20px"><a class="btn btn-ghost" href="{{ url_for('cases_list') }}">Все кейсы с фильтрами</a></p>
+    <p style="margin-top:20px"><a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Все 15 проектов</a></p>
   </section>
 
   <section class="s" id="metrics">
