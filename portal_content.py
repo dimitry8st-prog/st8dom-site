@@ -7,7 +7,45 @@ SECTIONS = {
         "summary": "Неврология, нейрохирургия и реабилитация — понятным языком для специалистов, пациентов и их близких.",
         "description": "Медицинские материалы портала ДИС: неврология, нейрохирургия, реабилитация, клинические рекомендации и памятки для пациентов.",
         "topics": [
-            {"slug": "neurology-neurosurgery", "title": "Неврология и нейрохирургия", "description": "Разбор заболеваний, диагностики и маршрута пациента.", "rubrics": [("diseases", "Заболевания"), ("diagnostics", "Диагностика"), ("treatment-route", "Маршрут лечения"), ("surgery", "Нейрохирургия")]},
+            {
+                "slug": "neurology-neurosurgery",
+                "title": "Неврология и нейрохирургия",
+                "description": "Выберите клиническое направление, а затем нужный этап: от заболевания и диагностики до лечения и восстановления.",
+                "rubrics": [
+                    ("neurology-diseases", "Неврология — заболевания"),
+                    ("neurology-diagnostics", "Неврология — диагностика"),
+                    ("neurology-treatment", "Неврология — лечение"),
+                    ("neurology-rehabilitation", "Неврология — реабилитация"),
+                    ("neurosurgery-diseases", "Нейрохирургия — заболевания"),
+                    ("neurosurgery-diagnostics", "Нейрохирургия — диагностика"),
+                    ("neurosurgery-treatment", "Нейрохирургия — лечение"),
+                    ("neurosurgery-rehabilitation", "Нейрохирургия — реабилитация"),
+                ],
+                "rubric_groups": [
+                    {
+                        "slug": "neurology",
+                        "title": "Неврология",
+                        "description": "Заболевания нервной системы, обследование, консервативное лечение и восстановление.",
+                        "rubrics": [
+                            ("neurology-diseases", "Заболевания"),
+                            ("neurology-diagnostics", "Диагностика"),
+                            ("neurology-treatment", "Лечение"),
+                            ("neurology-rehabilitation", "Реабилитация"),
+                        ],
+                    },
+                    {
+                        "slug": "neurosurgery",
+                        "title": "Нейрохирургия",
+                        "description": "Патологии, требующие оценки нейрохирурга, хирургическая тактика и восстановление после вмешательства.",
+                        "rubrics": [
+                            ("neurosurgery-diseases", "Заболевания"),
+                            ("neurosurgery-diagnostics", "Диагностика"),
+                            ("neurosurgery-treatment", "Лечение"),
+                            ("neurosurgery-rehabilitation", "Реабилитация"),
+                        ],
+                    },
+                ],
+            },
             {"slug": "rehabilitation", "title": "Реабилитация", "description": "Восстановление после инсульта и других поражений нервной системы.", "rubrics": [("after-stroke", "После инсульта"), ("movement", "Движение и координация"), ("speech-memory", "Речь и память"), ("home-care", "Восстановление дома")]},
             {"slug": "clinical-guidelines", "title": "Клинические рекомендации", "description": "Практические выводы с датой проверки и ссылками на источники.", "rubrics": [("russian-guidelines", "Российские рекомендации"), ("international-guidelines", "Международные рекомендации"), ("evidence-review", "Разбор доказательств"), ("updates", "Обновления документов")]},
             {"slug": "for-patients", "title": "Материалы для пациентов", "description": "Объяснения без лишней терминологии и обещаний лечения.", "rubrics": [("symptoms", "Симптомы и тревожные признаки"), ("doctor-visit", "Подготовка к врачу"), ("examinations", "Обследования понятным языком"), ("family-care", "Памятки для близких")]},

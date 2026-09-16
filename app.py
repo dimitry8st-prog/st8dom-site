@@ -285,6 +285,15 @@ def create_app() -> Flask:
             rubric = rubric_by_slug.get(full_slug)
             count = published_articles().filter_by(rubric_id=rubric.id).count() if rubric else 0
             rubric_cards.append({"slug": full_slug, "name": name, "count": count})
+        grouped_rubrics = []
+        card_by_slug = {card["slug"]: card for card in rubric_cards}
+        for group in topic.get("rubric_groups", []):
+            cards = []
+            for short_slug, label in group["rubrics"]:
+                card = card_by_slug[f"{topic_slug}-{short_slug}"].copy()
+                card["name"] = label
+                cards.append(card)
+            grouped_rubrics.append({**group, "cards": cards})
         articles = (
             published_articles()
             .join(Rubric)
@@ -298,6 +307,7 @@ def create_app() -> Flask:
             section_slug=section_slug,
             topic=topic,
             rubrics=rubric_cards,
+            grouped_rubrics=grouped_rubrics,
             materials=articles,
             page_id=f"direction-{section_slug}",
         )
