@@ -43,7 +43,6 @@
           "addressCountry": "RU"
         },
         "sameAs": [
-          "{{ telegram_url }}",
           "{{ github_url }}",
           "{{ fl_url }}",
           "{{ kwork_url }}"
@@ -75,6 +74,7 @@
         <a href="{{ url_for('direction_detail', slug='longevity') }}" {% if page_id == 'direction-longevity' %}aria-current="page"{% endif %}>Долголетие</a>
         <a href="{{ url_for('direction_detail', slug='life-os') }}" {% if page_id == 'direction-life-os' %}aria-current="page"{% endif %}>Life‑OS</a>
         <a href="{{ url_for('materials_catalog') }}" {% if page_id in ['materials', 'material'] %}aria-current="page"{% endif %}>Материалы</a>
+        <a href="{{ url_for('unified_search') }}" {% if page_id == 'search' %}aria-current="page"{% endif %}>Поиск</a>
         <a href="{{ url_for('projects_catalog') }}" {% if page_id in ['projects', 'cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
         <a href="{{ url_for('index') }}#about">Об авторе</a>
         <a href="{{ url_for('contact') }}" class="nav-cta" {% if page_id == 'contact' %}aria-current="page"{% endif %}>Контакты</a>

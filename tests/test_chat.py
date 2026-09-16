@@ -11,7 +11,8 @@ def test_home_has_widget(client):
     assert b"chat-widget.js" in page.data
     assert b"dis-mascot-orange.jpg" in page.data
     assert "Дис — цифровой помощник".encode("utf-8") in page.data
-    assert b"t.me/+VNBg4iudNxw2Mzgy" in page.data
+    assert b"/telegram/" in page.data
+    assert "Telegram-бот готовится".encode("utf-8") in page.data
 
 
 def test_admin_hides_widget(client):

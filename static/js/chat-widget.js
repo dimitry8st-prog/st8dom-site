@@ -16,11 +16,11 @@
 
   const chatUrl = root.getAttribute("data-chat-url") || "/chat/";
   const contactUrl = root.getAttribute("data-contact-url") || "/contact/";
-  const telegramUrl = root.getAttribute("data-telegram-url") || "https://t.me/+VNBg4iudNxw2Mzgy";
+  const telegramUrl = root.getAttribute("data-telegram-url") || "/telegram/";
   const csrf = root.getAttribute("data-csrf") || "";
 
   const GREETING =
-    "Привет! Я Дис, цифровой помощник Дмитрия Степанова. Подскажу по услугам, стартовым ценам и кейсам. Если вопроса нет в базе — предложу заявку или Telegram.";
+    "Привет! Я Дис, цифровой помощник Дмитрия Степанова. Подскажу по услугам, стартовым ценам и кейсам. Если вопроса нет в базе — предложу оставить заявку.";
 
   let isSending = false;
   let greeted = false;
@@ -55,9 +55,7 @@
       const telegram = document.createElement("a");
       telegram.className = "btn btn-tg btn-sm";
       telegram.href = telegramUrl;
-      telegram.target = "_blank";
-      telegram.rel = "noopener";
-      telegram.textContent = "Написать в Telegram";
+      telegram.textContent = "Telegram-бот готовится";
       telegram.addEventListener("click", function () {
         track("chat_telegram_click");
       });
@@ -139,7 +137,7 @@
       });
       removeTyping();
       const answer =
-        data.answer || "Не удалось получить ответ. Оставьте заявку или напишите в Telegram.";
+        data.answer || "Не удалось получить ответ. Оставьте заявку через форму.";
       const escalated = Boolean(data.escalated) || !res.ok;
       appendMessage(answer, "bot", escalated);
       if (escalated) track("chat_escalate");
@@ -147,7 +145,7 @@
       console.error(err);
       removeTyping();
       appendMessage(
-        "Связь с сервером не удалась. Оставьте заявку или напишите в Telegram.",
+        "Связь с сервером не удалась. Оставьте заявку через форму.",
         "bot",
         true
       );

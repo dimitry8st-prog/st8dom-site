@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 from extensions import db
 from models import Article, ArticleSource, Rubric, Tag
+from portal_content import rubric_catalog
 
 
 STATUS_LABELS = {
@@ -118,6 +119,10 @@ def apply_article_form(article: Article, form) -> list[str]:
 
 def ensure_editorial_seed() -> None:
     """Создаёт один проверенный стартовый материал для первого вертикального среза."""
+    for item in rubric_catalog():
+        if Rubric.query.filter_by(slug=item["slug"]).first() is None:
+            db.session.add(Rubric(name=item["name"], slug=item["slug"], section=item["section"], description=item["description"]))
+
     rubric = Rubric.query.filter_by(slug="medical-ai").first()
     if rubric is None:
         rubric = Rubric(

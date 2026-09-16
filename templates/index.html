@@ -150,7 +150,7 @@
     <div class="materials-grid">
       {% for article in latest_materials %}{{ material_card(article) }}{% endfor %}
     </div>
-    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog') }}">Все материалы</a><a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener">Следить за темой</a></div>
+    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog') }}">Все материалы</a><a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a></div>
   </section>
 
   <section class="s" id="projects">
@@ -202,7 +202,7 @@
         <p style="margin-top:12px;color:var(--muted)">Клинический стаж — 29 лет. Основные технологические направления: AI‑ассистенты, Telegram‑боты, RAG, n8n, Python и FastAPI.</p>
         <div class="about-links">
           <a class="btn btn-ghost btn-sm" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">GitHub</a>
-          <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Telegram</a>
+          <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" data-track="telegram_click">Telegram-бот готовится</a>
           <a class="btn btn-ghost btn-sm" href="{{ fl_url }}" target="_blank" rel="noopener">FL.ru</a>
           <a class="btn btn-ghost btn-sm" href="{{ kwork_url }}" target="_blank" rel="noopener">Kwork</a>
         </div>
@@ -325,10 +325,10 @@
   <section class="s" id="cta" style="border-bottom:none">
     <div class="cta-block reveal">
       <h2>Разберём, что можно автоматизировать</h2>
-      <p>Напишите задачу — отвечу лично. Удобнее мессенджер — чат обсуждения в Telegram.</p>
+      <p>Напишите задачу — отвечу лично на указанный email. Новый Telegram-бот готовится.</p>
       <div class="cta-btns">
         <a href="{{ url_for('contact') }}" class="btn btn-primary" data-track="hero_cta_click">Оставить заявку</a>
-        <a href="{{ telegram_url }}" class="btn btn-tg" target="_blank" rel="noopener" data-track="telegram_click">Написать в Telegram</a>
+        <a href="{{ telegram_url }}" class="btn btn-tg" data-track="telegram_click">Telegram-бот готовится</a>
       </div>
     </div>
   </section>
@@ -339,9 +339,9 @@
     <p class="lead reveal">Имя, email и описание задачи обязательны. Телефон и компания — по желанию.</p>
     {{ render_inquiry_form(form) }}
     <div class="contact-grid" style="margin-top:24px">
-      <a class="contact-item reveal" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">
+      <a class="contact-item reveal" href="{{ telegram_url }}" data-track="telegram_click">
         <div class="contact-icon" aria-hidden="true">✈️</div>
-        <div><div class="contact-label">Telegram</div><div class="contact-value">Чат обсуждения</div></div>
+        <div><div class="contact-label">Telegram</div><div class="contact-value">Новый бот готовится</div></div>
       </a>
       <a class="contact-item reveal" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">
         <div class="contact-icon" aria-hidden="true">💻</div>

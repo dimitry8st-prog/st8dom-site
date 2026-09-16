@@ -46,8 +46,9 @@ from editorial import (
 )
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
-from models import AdminUser, Article, Inquiry, Rubric, Tag
-from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section
+from lifeos_import import ImportValidationError, import_lifeos_package
+from models import AdminUser, Article, ImportPackage, Inquiry, Rubric, Tag
+from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get_topic
 
 logger = logging.getLogger("st8dom")
 
@@ -213,7 +214,7 @@ def create_app() -> Flask:
         return {
             "site_url": app.config["SITE_URL"],
             "analytics_id": app.config.get("ANALYTICS_ID") or "",
-            "telegram_url": "https://t.me/+VNBg4iudNxw2Mzgy",
+            "telegram_url": url_for("telegram_placeholder"),
             "github_url": "https://github.com/dimitry8st-prog",
             "fl_url": "https://www.fl.ru/users/dimitry8st/",
             "kwork_url": "https://kwork.ru/user/stepanov_craft",
@@ -268,6 +269,64 @@ def create_app() -> Flask:
             .all(),
             page_id=f"direction-{slug}",
         )
+
+    @app.route("/directions/<section_slug>/<topic_slug>/")
+    def topic_detail(section_slug: str, topic_slug: str):
+        section = get_section(section_slug)
+        topic = get_topic(section_slug, topic_slug)
+        if not section or not topic:
+            abort(404)
+        rubric_slugs = [f"{topic_slug}-{slug}" for slug, _name in topic["rubrics"]]
+        rubrics = Rubric.query.filter(Rubric.slug.in_(rubric_slugs)).all()
+        rubric_by_slug = {rubric.slug: rubric for rubric in rubrics}
+        rubric_cards = []
+        for short_slug, name in topic["rubrics"]:
+            full_slug = f"{topic_slug}-{short_slug}"
+            rubric = rubric_by_slug.get(full_slug)
+            count = published_articles().filter_by(rubric_id=rubric.id).count() if rubric else 0
+            rubric_cards.append({"slug": full_slug, "name": name, "count": count})
+        articles = (
+            published_articles()
+            .join(Rubric)
+            .filter(Rubric.slug.in_(rubric_slugs))
+            .order_by(Article.published_at.desc())
+            .all()
+        )
+        return render_template(
+            "topic.html",
+            section=section,
+            section_slug=section_slug,
+            topic=topic,
+            rubrics=rubric_cards,
+            materials=articles,
+            page_id=f"direction-{section_slug}",
+        )
+
+    @app.route("/telegram/")
+    def telegram_placeholder():
+        return render_template("telegram_placeholder.html", page_id="telegram")
+
+    @app.route("/search/")
+    def unified_search():
+        search = request.args.get("q", "").strip()
+        materials = []
+        projects = []
+        if search:
+            terms = [term.casefold() for term in search.split() if len(term) >= 2]
+            for article in published_articles().all():
+                tag_text = " ".join(tag.name for tag in article.tags)
+                haystack = " ".join([article.title, article.summary, article.body, article.rubric.name, tag_text]).casefold()
+                score = sum(3 if term in article.title.casefold() else 1 for term in terms if term in haystack)
+                if score:
+                    materials.append((score, article))
+            materials = [item for _score, item in sorted(materials, key=lambda row: (row[0], row[1].published_at), reverse=True)]
+            for project in PROJECTS:
+                haystack = " ".join([project["name"], project["summary"], *project["areas"]]).casefold()
+                score = sum(3 if term in project["name"].casefold() else 1 for term in terms if term in haystack)
+                if score:
+                    projects.append((score, project))
+            projects = [item for _score, item in sorted(projects, key=lambda row: row[0], reverse=True)]
+        return render_template("search.html", query=search, materials=materials, projects=projects, page_id="search")
 
     @app.route("/materials/")
     def materials_catalog():
@@ -484,6 +543,27 @@ def create_app() -> Flask:
             page_id="admin",
         )
 
+    @app.route("/admin/imports/life-os/", methods=["GET", "POST"])
+    @login_required
+    def admin_lifeos_import():
+        raw = ""
+        if request.method == "POST":
+            raw = request.form.get("package", "")
+            try:
+                record, created = import_lifeos_package(raw)
+                if created:
+                    logger.info("Life-OS: импортирован пакет %s в черновик #%s", record.package_id, record.article_id)
+                    flash("Пакет принят. Создан только черновик; публикация требует проверки.", "success")
+                else:
+                    flash("Этот пакет уже импортирован — дубликат не создан.", "info")
+                return redirect(url_for("admin_article_edit", article_id=record.article_id))
+            except ImportValidationError as exc:
+                db.session.rollback()
+                logger.warning("Life-OS: пакет отклонён: %s", exc)
+                flash(str(exc), "error")
+        imports = ImportPackage.query.order_by(ImportPackage.created_at.desc()).limit(50).all()
+        return render_template("admin/lifeos_import.html", package=raw, imports=imports, page_id="admin")
+
     @app.route("/admin/articles/new/", methods=["GET", "POST"])
     @login_required
     def admin_article_create():
@@ -628,6 +708,11 @@ def create_app() -> Flask:
         ]
         pages.extend(
             origin + url_for("direction_detail", slug=slug) for slug in SECTIONS
+        )
+        pages.extend(
+            origin + url_for("topic_detail", section_slug=section_slug, topic_slug=topic["slug"])
+            for section_slug, section in SECTIONS.items()
+            for topic in section["topics"]
         )
         pages.extend(origin + url_for("case_detail", slug=case["slug"]) for case in get_all_cases())
         pages.append(origin + url_for("materials_catalog"))
