@@ -37,7 +37,7 @@ def valid_package(package_id="lifeos-test-001", slug="lifeos-test-draft"):
             "summary": "Проверяем безопасный импорт материала в редакционный контур.",
             "body": "Это тестовый текст черновика, который не должен публиковаться автоматически. " * 3,
             "section": "medicine",
-            "rubric": "neurology-neurosurgery-diseases",
+            "rubric": "neurology-neurosurgery-neurology-diseases",
             "content_type": "article",
             "status": "published",
             "tags": ["Неврология", "Life-OS"],
@@ -54,9 +54,15 @@ def test_topic_cards_link_to_rubric_pages(client):
 
     topic = client.get("/directions/medicine/neurology-neurosurgery/")
     assert topic.status_code == 200
-    assert "Выберите рубрику".encode("utf-8") in topic.data
+    assert "Выберите направление".encode("utf-8") in topic.data
+    assert "Неврология".encode("utf-8") in topic.data
+    assert "Нейрохирургия".encode("utf-8") in topic.data
     assert "Заболевания".encode("utf-8") in topic.data
-    assert b"neurology-neurosurgery-diseases" in topic.data
+    assert topic.data.count("Диагностика".encode("utf-8")) == 2
+    assert topic.data.count("Лечение".encode("utf-8")) == 2
+    assert topic.data.count("Реабилитация".encode("utf-8")) == 2
+    assert b"neurology-neurosurgery-neurology-diseases" in topic.data
+    assert b"neurology-neurosurgery-neurosurgery-rehabilitation" in topic.data
     assert client.get("/directions/medicine/not-found/").status_code == 404
 
 

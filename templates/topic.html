@@ -18,7 +18,27 @@
 
   <section class="s">
     <div class="s-label"><span>//</span> рубрики темы</div>
-    <h2>Выберите рубрику</h2>
+    <h2>{{ "Выберите направление" if grouped_rubrics else "Выберите рубрику" }}</h2>
+    {% if grouped_rubrics %}
+    <div class="clinical-track-grid">
+      {% for group in grouped_rubrics %}
+      <section class="clinical-track" aria-labelledby="track-{{ group.slug }}">
+        <header class="clinical-track__header">
+          <span class="clinical-track__index">0{{ loop.index }}</span>
+          <div><h3 id="track-{{ group.slug }}">{{ group.title }}</h3><p>{{ group.description }}</p></div>
+        </header>
+        <div class="clinical-track__rubrics">
+          {% for rubric in group.cards %}
+          <a class="clinical-rubric" href="{{ url_for('materials_catalog', section=section_slug, rubric=rubric.slug) }}">
+            <span><strong>{{ rubric.name }}</strong><small>{{ rubric.count if rubric.count else 'Материалы готовятся' }}</small></span>
+            <span class="clinical-rubric__arrow" aria-hidden="true">→</span>
+          </a>
+          {% endfor %}
+        </div>
+      </section>
+      {% endfor %}
+    </div>
+    {% else %}
     <div class="rubric-grid">
       {% for rubric in rubrics %}
       <a class="rubric-card" href="{{ url_for('materials_catalog', section=section_slug, rubric=rubric.slug) }}">
@@ -29,6 +49,7 @@
       </a>
       {% endfor %}
     </div>
+    {% endif %}
   </section>
 
   <section class="s">
