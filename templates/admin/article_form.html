@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование' if article else 'Новый материал' }} — админка ДИС{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% macro errors(field) %}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}{% endmacro %}
+{% block content %}
+<div class="container container--wide">
+  <section class="hero" style="padding-bottom:24px">
+    <p class="eyebrow">// {{ 'редактирование' if article else 'новый черновик' }}</p>
+    <h1>{{ article.title if article else 'Новый материал' }}</h1>
+    {% if article %}<p class="trust-line">Статус: {{ article.status }} · публичный адрес закрыт до безопасной публикации.</p>{% endif %}
+  </section>
+
+  <form class="editor-form" method="post">
+    {{ form.hidden_tag() }}
+    <div class="editor-grid">
+      <label>Заголовок {{ form.title() }}{{ errors(form.title) }}</label>
+      <label>Постоянный адрес {{ form.slug() }}{{ errors(form.slug) }}</label>
+      <label class="editor-span">Краткое описание {{ form.summary(rows=3) }}{{ errors(form.summary) }}</label>
+      <label class="editor-span">Текст {{ form.body(rows=16) }}{{ errors(form.body) }}</label>
+      <label>Раздел {{ form.section() }}{{ errors(form.section) }}</label>
+      <label>Рубрика {{ form.rubric_id() }}{{ errors(form.rubric_id) }}</label>
+      <label>Тип материала {{ form.content_type() }}{{ errors(form.content_type) }}</label>
+      <label>Редакционный статус {{ form.status() }}{{ errors(form.status) }}</label>
+      <label class="editor-span">Теги {{ form.tags(placeholder='Медицина, AI, RAG') }}{{ errors(form.tags) }}</label>
+      <label>Автор {{ form.author() }}{{ errors(form.author) }}</label>
+      <label>Медицинский редактор {{ form.medical_reviewer() }}{{ errors(form.medical_reviewer) }}</label>
+      <label class="check-row">{{ form.reviewed_confirmed() }} {{ form.reviewed_confirmed.label.text }}</label>
+      <label class="check-row">{{ form.is_featured() }} {{ form.is_featured.label.text }}</label>
+      <label class="editor-span">Источники {{ form.sources(rows=5, placeholder='Название источника | https://example.org/document') }}{{ errors(form.sources) }}</label>
+      <label class="editor-span">Предупреждение {{ form.disclaimer(rows=3) }}{{ errors(form.disclaimer) }}</label>
+      <label class="editor-span">Причина обновления {{ form.revision_note() }}{{ errors(form.revision_note) }}</label>
+    </div>
+    <div class="admin-toolbar"><button class="btn btn-primary" type="submit">Сохранить</button>{% if article %}<a class="btn btn-ghost" href="{{ url_for('admin_article_preview', article_id=article.id) }}">Предпросмотр</a>{% endif %}<a class="btn btn-ghost" href="{{ url_for('admin_articles') }}">К списку</a></div>
+  </form>
+
+  {% if article %}
+  <div class="publication-actions">
+    {% if article.is_public %}
+    <form method="post" action="{{ url_for('admin_article_unpublish', article_id=article.id) }}">{{ form.csrf_token }}<button class="btn btn-ghost" type="submit">Снять с публикации</button></form>
+    {% else %}
+    <form method="post" action="{{ url_for('admin_article_publish', article_id=article.id) }}">{{ form.csrf_token }}<button class="btn btn-primary" type="submit">Проверить и опубликовать</button></form>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% from "macros/material_card.html" import material_card %}
+{% extends "base.html" %}
+{% block title %}{{ article.title }} — портал ДИС{% endblock %}
+{% block description %}{{ article.summary }}{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('material_detail', slug=article.slug) }}{% endblock %}
+{% block robots %}{{ 'noindex,nofollow' if preview else 'index,follow' }}{% endblock %}
+{% block og_title %}{{ article.title }}{% endblock %}
+{% block og_description %}{{ article.summary }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if preview %}<div class="preview-banner" role="status">Предпросмотр: материал не виден посетителям, пока не опубликован.</div>{% endif %}
+  <article class="publication">
+    <header class="publication__header">
+      <p class="eyebrow">{{ article.rubric.name }} · {{ content_type_labels.get(article.content_type, article.content_type) }}</p>
+      <h1>{{ article.title }}</h1>
+      <p class="hero-sub">{{ article.summary }}</p>
+      <div class="publication__facts">
+        <span>Автор: {{ article.author }}</span>
+        {% if article.published_at %}<span>Опубликовано: {{ article.published_at.strftime('%d.%m.%Y') }}</span>{% endif %}
+        {% if article.reviewed_at %}<span class="verified-mark">✓ Проверено {{ article.reviewed_at.strftime('%d.%m.%Y') }}</span>{% endif %}
+      </div>
+      <div class="project-stack">
+        {% for tag in article.tags %}<a class="tag" href="{{ url_for('materials_catalog', tag=tag.slug) }}">{{ tag.name }}</a>{% endfor %}
+      </div>
+    </header>
+
+    <div class="publication__body">
+      {% for paragraph in article.body_paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+    </div>
+
+    {% if article.disclaimer %}<aside class="medical-notice"><strong>Важно</strong><p>{{ article.disclaimer }}</p></aside>{% endif %}
+
+    {% if article.sources %}
+    <section class="publication__sources" aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Источники</h2>
+      <ol>
+        {% for source in article.sources %}
+        <li><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.title }}</a></li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if article.medical_reviewer %}<p class="reviewer-line">Медицинская проверка: {{ article.medical_reviewer }}</p>{% endif %}
+    {% if article.revision_note %}<p class="revision-note">Обновление: {{ article.revision_note }}</p>{% endif %}
+  </article>
+
+  {% if related %}
+  <section class="s">
+    <div class="s-label"><span>//</span> по теме</div>
+    <h2>Рекомендуемые материалы</h2>
+    <div class="materials-grid materials-grid--compact">
+      {% for item in related %}{{ material_card(item) }}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="topic-follow">
+    <div><strong>Следить за темой «{{ article.rubric.name }}»</strong><p>Новые проверенные материалы — в Telegram.</p></div>
+    <a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener">Следить за темой</a>
+  </section>
+</div>
+{% endblock %}

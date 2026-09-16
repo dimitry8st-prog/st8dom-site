@@ -1,0 +1,16 @@
+{% macro material_card(article) %}
+<article class="material-card">
+  <div class="material-card__meta">
+    <span>{{ article.rubric.name }}</span>
+    <time datetime="{{ article.published_at.date().isoformat() }}">{{ article.published_at.strftime('%d.%m.%Y') }}</time>
+  </div>
+  <h3><a href="{{ url_for('material_detail', slug=article.slug) }}">{{ article.title }}</a></h3>
+  <p>{{ article.summary }}</p>
+  <div class="project-stack" aria-label="Темы материала">
+    {% for tag in article.tags[:4] %}
+      <a class="tag" href="{{ url_for('materials_catalog', tag=tag.slug) }}">{{ tag.name }}</a>
+    {% endfor %}
+  </div>
+  <a class="material-card__link" href="{{ url_for('material_detail', slug=article.slug) }}">Читать материал →</a>
+</article>
+{% endmacro %}

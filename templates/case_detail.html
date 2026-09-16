@@ -1,4 +1,5 @@
 {% from "macros/faq_demo.html" import faq_demo_player %}
+{% from "macros/material_card.html" import material_card %}
 {% extends "base.html" %}
 {% block title %}{{ case.title }} — кейс Дмитрия Степанова{% endblock %}
 {% block description %}{{ case.card_summary }}{% endblock %}
@@ -98,6 +99,16 @@
       </ul>
     {% endif %}
   </section>
+
+  {% if recommended_materials %}
+  <section class="s">
+    <div class="s-label"><span>//</span> по теме проекта</div>
+    <h2>Рекомендуемые материалы</h2>
+    <div class="materials-grid materials-grid--compact">
+      {% for article in recommended_materials %}{{ material_card(article) }}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
 
   <section class="s">
     <h2>Другие кейсы</h2>

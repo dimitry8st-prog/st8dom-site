@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Публикации — админка ДИС{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block content %}
+<div class="container container--wide">
+  <section class="hero" style="padding-bottom:28px">
+    <p class="eyebrow">// редакционная панель</p>
+    <h1>Публикации</h1>
+    <div class="admin-toolbar">
+      <a class="btn btn-primary btn-sm" href="{{ url_for('admin_article_create') }}">Новый материал</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries') }}">Заявки</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_logout') }}">Выйти</a>
+    </div>
+  </section>
+  <div class="admin-article-list">
+    {% for article in articles %}
+    <article class="admin-article-row">
+      <div><span class="status-pill status-{{ article.status }}">{{ status_labels.get(article.status, article.status) }}</span><h2>{{ article.title }}</h2><p>{{ article.rubric.name }} · обновлено {{ article.updated_at.strftime('%d.%m.%Y %H:%M') }}</p></div>
+      <div class="project-actions"><a class="btn btn-ghost btn-sm" href="{{ url_for('admin_article_preview', article_id=article.id) }}">Предпросмотр</a><a class="btn btn-primary btn-sm" href="{{ url_for('admin_article_edit', article_id=article.id) }}">Редактировать</a></div>
+    </article>
+    {% else %}<p>Материалов пока нет.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

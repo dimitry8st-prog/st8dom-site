@@ -1,3 +1,4 @@
+{% from "macros/material_card.html" import material_card %}
 {% extends "base.html" %}
 {% block title %}{{ section.title }} — портал ДИС{% endblock %}
 {% block description %}{{ section.description }}{% endblock %}
@@ -16,6 +17,17 @@
       <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
     </div>
   </section>
+
+  {% if latest_materials %}
+  <section class="s">
+    <div class="s-label"><span>//</span> новые публикации</div>
+    <h2>Материалы раздела</h2>
+    <div class="materials-grid materials-grid--compact">
+      {% for article in latest_materials %}{{ material_card(article) }}{% endfor %}
+    </div>
+    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog', section=slug) }}">Все материалы раздела</a><a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener">Следить за темой</a></div>
+  </section>
+  {% endif %}
 
   <section class="s" id="topics">
     <div class="s-label"><span>//</span> тематический маршрут</div>

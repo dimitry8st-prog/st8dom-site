@@ -91,3 +91,97 @@ class LoginForm(FlaskForm):
         "Пароль",
         validators=[DataRequired(message="Введите пароль.")],
     )
+
+
+SECTION_CHOICES = [
+    ("medicine", "Медицина"),
+    ("ai", "AI и промпт-инжиниринг"),
+    ("longevity", "Долголетие и будущее человека"),
+    ("life-os", "Life-OS"),
+]
+
+CONTENT_TYPE_CHOICES = [
+    ("article", "Статья"),
+    ("review", "Обзор"),
+    ("recommendation", "Рекомендация"),
+    ("analysis", "Разбор"),
+    ("patient", "Материал пациенту"),
+]
+
+EDITORIAL_STATUS_CHOICES = [
+    ("draft", "Черновик"),
+    ("review", "На проверке"),
+    ("ready", "Готово к публикации"),
+    ("archive", "Архив"),
+]
+
+
+class ArticleForm(FlaskForm):
+    """Форма вертикального редакционного среза без прямой автопубликации."""
+
+    title = StringField(
+        "Заголовок",
+        validators=[DataRequired(), Length(min=5, max=220)],
+    )
+    slug = StringField(
+        "Постоянный адрес",
+        validators=[
+            DataRequired(),
+            Length(min=3, max=220),
+            Regexp(
+                r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                message="Используйте латинские буквы, цифры и дефисы.",
+            ),
+        ],
+    )
+    summary = TextAreaField(
+        "Краткое описание",
+        validators=[DataRequired(), Length(min=20, max=600)],
+    )
+    body = TextAreaField(
+        "Текст",
+        validators=[DataRequired(), Length(min=80, max=50000)],
+    )
+    section = SelectField(
+        "Раздел",
+        choices=SECTION_CHOICES,
+        validators=[DataRequired()],
+    )
+    rubric_id = SelectField("Рубрика", coerce=int, validators=[DataRequired()])
+    content_type = SelectField(
+        "Тип материала",
+        choices=CONTENT_TYPE_CHOICES,
+        validators=[DataRequired()],
+    )
+    status = SelectField(
+        "Редакционный статус",
+        choices=EDITORIAL_STATUS_CHOICES,
+        validators=[DataRequired()],
+    )
+    tags = StringField(
+        "Теги через запятую",
+        validators=[DataRequired(), Length(max=500)],
+    )
+    author = StringField(
+        "Автор",
+        validators=[DataRequired(), Length(max=120)],
+        default="Степанов Д.А.",
+    )
+    medical_reviewer = StringField(
+        "Медицинский редактор",
+        validators=[Optional(), Length(max=120)],
+    )
+    reviewed_confirmed = BooleanField("Медицинская проверка выполнена")
+    sources = TextAreaField(
+        "Источники — по одному в строке: Название | https://...",
+        validators=[Optional(), Length(max=10000)],
+    )
+    disclaimer = TextAreaField(
+        "Предупреждение",
+        validators=[Optional(), Length(max=2000)],
+    )
+    revision_note = StringField(
+        "Причина обновления",
+        validators=[Optional(), Length(max=500)],
+    )
+    is_featured = BooleanField("Показывать в рекомендуемых")
