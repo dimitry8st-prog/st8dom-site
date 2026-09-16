@@ -1,0 +1,19 @@
+{% from "macros/material_card.html" import material_card %}
+{% extends "base.html" %}
+{% block title %}Поиск — портал ДИС{% endblock %}
+{% block content %}
+<div class="container">
+  <section class="hero" style="padding-bottom:32px">
+    <p class="eyebrow">// единый поиск</p><h1>Поиск по порталу</h1>
+    <form class="topic-search" method="get" role="search"><input type="search" name="q" value="{{ query }}" placeholder="Материал, рубрика, тег или проект" autofocus><button class="btn btn-primary" type="submit">Найти</button></form>
+  </section>
+  {% if query %}
+    <section class="s"><div class="s-label"><span>//</span> материалы · {{ materials|length }}</div><h2>Публикации</h2>
+      {% if materials %}<div class="materials-grid materials-grid--compact">{% for article in materials %}{{ material_card(article) }}{% endfor %}</div>{% else %}<p class="lead">Публикаций по запросу не найдено.</p>{% endif %}
+    </section>
+    <section class="s"><div class="s-label"><span>//</span> проекты · {{ projects|length }}</div><h2>Проекты</h2>
+      {% if projects %}<div class="portal-project-grid">{% for project in projects %}<article class="portal-project-card"><h3>{{ project.name }}</h3><p>{{ project.summary }}</p>{% if project.case_slug %}<a href="{{ url_for('case_detail', slug=project.case_slug) }}">Подробнее →</a>{% endif %}</article>{% endfor %}</div>{% else %}<p class="lead">Проектов по запросу не найдено.</p>{% endif %}
+    </section>
+  {% else %}<div class="empty-state"><h2>Введите запрос</h2><p>Поиск проверяет заголовки, тексты, рубрики, теги и проекты.</p></div>{% endif %}
+</div>
+{% endblock %}

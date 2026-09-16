@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Импорт Life-OS — админка ДИС{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block content %}
+<div class="container">
+  <section class="hero" style="padding-bottom:28px">
+    <p class="eyebrow">// безопасный входящий контур</p><h1>Импорт из Life-OS</h1>
+    <p class="hero-sub">JSON-пакет всегда создаёт только черновик. Повторный package_id не создаёт дубликат.</p>
+  </section>
+  <form class="admin-form" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>JSON-пакет<textarea name="package" rows="18" required placeholder='{"package_id":"lifeos-...","generator_version":"1.0","article":{...}}'>{{ package }}</textarea></label>
+    <div class="row-actions"><button class="btn btn-primary" type="submit">Проверить и создать черновик</button><a class="btn btn-ghost" href="{{ url_for('admin_articles') }}">К публикациям</a></div>
+  </form>
+  <section class="s"><h2>Последние импорты</h2>
+    <div class="admin-article-list">{% for item in imports %}<article class="admin-article-row"><div><strong>{{ item.package_id }}</strong><p>{{ item.generator_version }} · {{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</p></div><a class="btn btn-ghost btn-sm" href="{{ url_for('admin_article_edit', article_id=item.article_id) }}">Открыть черновик</a></article>{% else %}<p>Импортов пока нет.</p>{% endfor %}</div>
+  </section>
+</div>
+{% endblock %}

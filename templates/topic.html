@@ -1,0 +1,46 @@
+{% from "macros/material_card.html" import material_card %}
+{% extends "base.html" %}
+{% block title %}{{ topic.title }} — {{ section.title }} — портал ДИС{% endblock %}
+{% block description %}{{ topic.description }}{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('topic_detail', section_slug=section_slug, topic_slug=topic.slug) }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero direction-hero topic-hero">
+    <p class="eyebrow"><a href="{{ url_for('direction_detail', slug=section_slug) }}">{{ section.title }}</a> / тема</p>
+    <h1>{{ topic.title }}</h1>
+    <p class="hero-sub">{{ topic.description }}</p>
+    <form class="topic-search" action="{{ url_for('unified_search') }}" method="get" role="search">
+      <input type="search" name="q" placeholder="Найти материал или проект" aria-label="Поиск по порталу">
+      <button class="btn btn-primary btn-sm" type="submit">Найти</button>
+    </form>
+  </section>
+
+  <section class="s">
+    <div class="s-label"><span>//</span> рубрики темы</div>
+    <h2>Выберите рубрику</h2>
+    <div class="rubric-grid">
+      {% for rubric in rubrics %}
+      <a class="rubric-card" href="{{ url_for('materials_catalog', section=section_slug, rubric=rubric.slug) }}">
+        <span class="rubric-card__count">{{ rubric.count }}</span>
+        <h3>{{ rubric.name }}</h3>
+        <p>{{ 'Опубликованных материалов' if rubric.count else 'Материалы готовятся' }}</p>
+        <span class="rubric-card__arrow" aria-hidden="true">→</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="s">
+    <div class="s-label"><span>//</span> публикации</div>
+    <h2>Материалы по теме</h2>
+    {% if materials %}<div class="materials-grid materials-grid--compact">{% for article in materials %}{{ material_card(article) }}{% endfor %}</div>
+    {% else %}<div class="empty-state"><h3>Публикации готовятся</h3><p>Новые материалы появятся здесь после редакционной проверки.</p></div>{% endif %}
+  </section>
+
+  <section class="topic-follow">
+    <div><strong>Следить за темой</strong><p>Новый Telegram-бот готовится.</p></div>
+    <a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a>
+  </section>
+</div>
+{% endblock %}

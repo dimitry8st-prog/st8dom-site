@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Telegram-бот готовится — портал ДИС{% endblock %}
+{% block robots %}noindex,follow{% endblock %}
+{% block content %}
+<div class="container">
+  <section class="hero direction-hero placeholder-page">
+    <p class="eyebrow">// скоро</p>
+    <h1>Новый Telegram-бот готовится</h1>
+    <p class="hero-sub">Здесь появится подписка на темы и новые проверенные материалы. Пока можно пользоваться каталогом и поиском на сайте.</p>
+    <div class="hero-cta"><a class="btn btn-primary" href="{{ url_for('materials_catalog') }}">Смотреть материалы</a><a class="btn btn-ghost" href="{{ url_for('unified_search') }}">Открыть поиск</a></div>
+  </section>
+</div>
+{% endblock %}

@@ -25,7 +25,7 @@
     <div class="materials-grid materials-grid--compact">
       {% for article in latest_materials %}{{ material_card(article) }}{% endfor %}
     </div>
-    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog', section=slug) }}">Все материалы раздела</a><a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener">Следить за темой</a></div>
+    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog', section=slug) }}">Все материалы раздела</a><a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a></div>
   </section>
   {% endif %}
 
@@ -33,13 +33,13 @@
     <div class="s-label"><span>//</span> тематический маршрут</div>
     <h2>Что будет в разделе</h2>
     <div class="topic-grid">
-      {% for title, description in section.topics %}
-      <article class="topic-card reveal">
+      {% for topic in section.topics %}
+      <a class="topic-card reveal" href="{{ url_for('topic_detail', section_slug=slug, topic_slug=topic.slug) }}" aria-label="Открыть тему: {{ topic.title }}">
         <span class="topic-number">0{{ loop.index }}</span>
-        <h3>{{ title }}</h3>
-        <p>{{ description }}</p>
-        <span class="content-status">Материалы готовятся</span>
-      </article>
+        <h3>{{ topic.title }}</h3>
+        <p>{{ topic.description }}</p>
+        <span class="content-status">{{ topic.rubrics|length }} рубрики <span aria-hidden="true">→</span></span>
+      </a>
       {% endfor %}
     </div>
   </section>

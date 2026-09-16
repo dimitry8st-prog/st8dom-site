@@ -15,7 +15,8 @@ def test_home_ok(client):
     assert "от 180 000".encode("utf-8") in response.data
     assert b"dis-mascot-orange.jpg" in response.data
     assert b"t.me/Dmitryprompt" not in response.data
-    assert b"t.me/+VNBg4iudNxw2Mzgy" in response.data
+    assert b"/telegram/" in response.data
+    assert "Telegram-бот готовится".encode("utf-8") in response.data
     assert b'id="chat-launcher"' in response.data
 
 

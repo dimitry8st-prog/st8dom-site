@@ -207,3 +207,19 @@ class ArticleSource(db.Model):
     accessed_at = db.Column(db.DateTime, default=utcnow, nullable=False)
 
     article = db.relationship("Article", back_populates="sources")
+
+
+class ImportPackage(db.Model):
+    """Журнал идемпотентного импорта черновиков из Life-OS."""
+
+    __tablename__ = "import_packages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    package_id = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    checksum = db.Column(db.String(64), nullable=False, index=True)
+    generator_version = db.Column(db.String(80), nullable=False)
+    status = db.Column(db.String(24), nullable=False, default="imported", index=True)
+    article_id = db.Column(db.Integer, db.ForeignKey("articles.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
+
+    article = db.relationship("Article")

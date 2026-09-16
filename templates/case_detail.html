@@ -88,7 +88,7 @@
       {% if case.demo_reel %}
         <a class="btn btn-ghost" href="{{ url_for('contact', topic='faq') }}">Обсудить внедрение</a>
       {% endif %}
-      <a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener" data-track="telegram_click">Написать в Telegram</a>
+      <a class="btn btn-tg" href="{{ telegram_url }}" data-track="telegram_click">Telegram-бот готовится</a>
     </div>
     {% if case.related_repos %}
       <h2>Связанные репозитории</h2>
