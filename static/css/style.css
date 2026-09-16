@@ -1252,6 +1252,25 @@ section.s {
   margin-top: 18px;
 }
 
+.author-details { margin-top: 18px; }
+.author-details summary {
+  display: inline-flex;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.author-details summary::-webkit-details-marker { display: none; }
+.author-details[open] summary { margin-bottom: 18px; }
+.author-article {
+  padding: 20px 22px;
+  border-left: 3px solid var(--orange);
+  border-radius: 0 12px 12px 0;
+  background: rgba(7, 13, 24, .48);
+}
+.author-article h3 { margin-bottom: 14px; font-size: 20px; }
+.author-article p { color: var(--muted); font-size: 15px; line-height: 1.75; }
+.author-article p + p { margin-top: 12px; }
+
 /* CTA / CONTACT */
 .cta-block {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(129, 140, 248, 0.08));
