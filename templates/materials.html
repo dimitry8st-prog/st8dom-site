@@ -1,0 +1,57 @@
+{% from "macros/material_card.html" import material_card %}
+{% extends "base.html" %}
+{% block title %}Материалы — портал ДИС{% endblock %}
+{% block description %}Проверенные материалы Дмитрия Степанова о медицине, AI, долголетии и Life-OS с источниками и датой проверки.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('materials_catalog') }}{% endblock %}
+
+{% block content %}
+<div class="container container--wide">
+  <section class="hero" style="padding-bottom:34px;border-bottom:none">
+    <p class="eyebrow">// библиотека портала</p>
+    <h1>Новые и рекомендуемые материалы</h1>
+    <p class="hero-sub">Статьи, обзоры и разборы с автором, датой проверки и открытыми источниками.</p>
+  </section>
+
+  <form class="material-filters" method="get" action="{{ url_for('materials_catalog') }}" role="search">
+    <label>Поиск
+      <input type="search" name="q" value="{{ selected.q }}" placeholder="Заголовок или слово из текста">
+    </label>
+    <label>Раздел
+      <select name="section">
+        <option value="">Все разделы</option>
+        {% for value, item in sections.items() %}<option value="{{ value }}"{% if selected.section == value %} selected{% endif %}>{{ item.title }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Рубрика
+      <select name="rubric">
+        <option value="">Все рубрики</option>
+        {% for item in rubrics %}<option value="{{ item.slug }}"{% if selected.rubric == item.slug %} selected{% endif %}>{{ item.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Тип
+      <select name="type">
+        <option value="">Все типы</option>
+        {% for value, label in content_type_labels.items() %}<option value="{{ value }}"{% if selected.type == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-primary btn-sm" type="submit">Найти</button>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('materials_catalog') }}">Сбросить</a>
+  </form>
+
+  {% if materials %}
+  <div class="materials-grid">
+    {% for article in materials %}{{ material_card(article) }}{% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h2>Материалы не найдены</h2>
+    <p>Попробуйте убрать часть фильтров или изменить поисковый запрос.</p>
+  </div>
+  {% endif %}
+
+  <section class="topic-follow">
+    <div><strong>Следить за новыми материалами</strong><p>Анонсы проверенных публикаций выходят в Telegram.</p></div>
+    <a class="btn btn-tg" href="{{ telegram_url }}" target="_blank" rel="noopener">Следить в Telegram</a>
+  </section>
+</div>
+{% endblock %}

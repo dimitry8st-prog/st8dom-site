@@ -16,6 +16,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import requests
+from sqlalchemy import or_
 from flask import (
     Flask,
     abort,
@@ -33,9 +34,19 @@ from assistant.answer import MAX_MESSAGE_LEN, answer_question
 from assistant.rate_limit import limiter
 from cases import FILTERS, get_all_cases, get_case
 from config import BASE_DIR, get_config
+from editorial import (
+    CONTENT_TYPE_LABELS,
+    STATUS_LABELS,
+    apply_article_form,
+    ensure_editorial_seed,
+    published_articles,
+    recommended_for_case,
+    related_articles,
+    sources_as_text,
+)
 from extensions import csrf, db, login_manager
-from forms import TOPIC_CHOICES, InquiryForm, LoginForm
-from models import AdminUser, Inquiry
+from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
+from models import AdminUser, Article, Inquiry, Rubric, Tag
 from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section
 
 logger = logging.getLogger("st8dom")
@@ -214,9 +225,13 @@ def create_app() -> Flask:
     @app.route("/")
     def index():
         form = InquiryForm()
+        latest_materials = published_articles().order_by(
+            Article.published_at.desc()
+        ).limit(6).all()
         return render_template(
             "index.html",
             cases=get_all_cases(),
+            latest_materials=latest_materials,
             form=form,
             page_id="home",
         )
@@ -246,7 +261,71 @@ def create_app() -> Flask:
             section=section,
             slug=slug,
             related_projects=related_projects,
+            latest_materials=published_articles()
+            .filter_by(section=slug)
+            .order_by(Article.published_at.desc())
+            .limit(6)
+            .all(),
             page_id=f"direction-{slug}",
+        )
+
+    @app.route("/materials/")
+    def materials_catalog():
+        query = published_articles()
+        section = request.args.get("section", "").strip()
+        rubric = request.args.get("rubric", "").strip()
+        content_type = request.args.get("type", "").strip()
+        tag = request.args.get("tag", "").strip()
+        search = request.args.get("q", "").strip()
+
+        if section in SECTIONS:
+            query = query.filter(Article.section == section)
+        if rubric:
+            query = query.join(Rubric).filter(Rubric.slug == rubric)
+        if content_type in CONTENT_TYPE_LABELS:
+            query = query.filter(Article.content_type == content_type)
+        if tag:
+            query = query.join(Article.tags).filter(Tag.slug == tag)
+        if search:
+            pattern = f"%{search}%"
+            query = query.filter(
+                or_(
+                    Article.title.ilike(pattern),
+                    Article.summary.ilike(pattern),
+                    Article.body.ilike(pattern),
+                )
+            )
+
+        materials = query.order_by(Article.published_at.desc()).distinct().all()
+        return render_template(
+            "materials.html",
+            materials=materials,
+            rubrics=Rubric.query.order_by(Rubric.name).all(),
+            tags=Tag.query.order_by(Tag.name).all(),
+            sections=SECTIONS,
+            content_type_labels=CONTENT_TYPE_LABELS,
+            selected={
+                "section": section,
+                "rubric": rubric,
+                "type": content_type,
+                "tag": tag,
+                "q": search,
+            },
+            page_id="materials",
+        )
+
+    @app.route("/materials/<slug>/")
+    def material_detail(slug: str):
+        article = published_articles().filter_by(slug=slug).first()
+        if article is None:
+            abort(404)
+        return render_template(
+            "material_detail.html",
+            article=article,
+            related=related_articles(article),
+            content_type_labels=CONTENT_TYPE_LABELS,
+            preview=False,
+            page_id="material",
         )
 
     @app.route("/projects/")
@@ -268,6 +347,7 @@ def create_app() -> Flask:
             "case_detail.html",
             case=case,
             others=others,
+            recommended_materials=recommended_for_case(case),
             page_id="case",
         )
 
@@ -376,6 +456,131 @@ def create_app() -> Flask:
             page_id="admin",
         )
 
+    def prepare_article_form(article: Article | None = None) -> ArticleForm:
+        form = ArticleForm(obj=article)
+        form.rubric_id.choices = [
+            (rubric.id, f"{SECTIONS.get(rubric.section, {}).get('title', rubric.section)} · {rubric.name}")
+            for rubric in Rubric.query.order_by(Rubric.section, Rubric.name).all()
+        ]
+        if article is not None and request.method == "GET":
+            form.tags.data = ", ".join(article.tag_names)
+            form.sources.data = sources_as_text(article)
+            form.reviewed_confirmed.data = article.reviewed_at is not None
+        if article is not None and article.is_public:
+            form.status.choices = [
+                *form.status.choices,
+                ("published", "Опубликовано"),
+            ]
+        return form
+
+    @app.route("/admin/articles/")
+    @login_required
+    def admin_articles():
+        articles = Article.query.order_by(Article.updated_at.desc()).all()
+        return render_template(
+            "admin/articles.html",
+            articles=articles,
+            status_labels=STATUS_LABELS,
+            page_id="admin",
+        )
+
+    @app.route("/admin/articles/new/", methods=["GET", "POST"])
+    @login_required
+    def admin_article_create():
+        article = Article()
+        form = prepare_article_form()
+        if form.validate_on_submit():
+            if Article.query.filter_by(slug=form.slug.data.strip().lower()).first():
+                form.slug.errors.append("Такой постоянный адрес уже используется.")
+            else:
+                errors = apply_article_form(article, form)
+                if not errors:
+                    db.session.add(article)
+                    db.session.commit()
+                    logger.info("Создан черновик статьи #%s", article.id)
+                    flash("Материал сохранён. Проверьте предпросмотр перед публикацией.", "success")
+                    return redirect(url_for("admin_article_edit", article_id=article.id))
+                for error in errors:
+                    flash(error, "error")
+        return render_template(
+            "admin/article_form.html",
+            form=form,
+            article=None,
+            page_id="admin",
+        )
+
+    @app.route("/admin/articles/<int:article_id>/edit/", methods=["GET", "POST"])
+    @login_required
+    def admin_article_edit(article_id: int):
+        article = db.session.get(Article, article_id)
+        if article is None:
+            abort(404)
+        form = prepare_article_form(article)
+        if form.validate_on_submit():
+            duplicate = Article.query.filter(
+                Article.slug == form.slug.data.strip().lower(),
+                Article.id != article.id,
+            ).first()
+            if duplicate:
+                form.slug.errors.append("Такой постоянный адрес уже используется.")
+            else:
+                errors = apply_article_form(article, form)
+                if not errors:
+                    db.session.commit()
+                    logger.info("Статья #%s обновлена", article.id)
+                    flash("Изменения сохранены.", "success")
+                    return redirect(url_for("admin_article_edit", article_id=article.id))
+                for error in errors:
+                    flash(error, "error")
+        return render_template(
+            "admin/article_form.html",
+            form=form,
+            article=article,
+            page_id="admin",
+        )
+
+    @app.route("/admin/articles/<int:article_id>/preview/")
+    @login_required
+    def admin_article_preview(article_id: int):
+        article = db.session.get(Article, article_id)
+        if article is None:
+            abort(404)
+        return render_template(
+            "material_detail.html",
+            article=article,
+            related=[],
+            content_type_labels=CONTENT_TYPE_LABELS,
+            preview=True,
+            page_id="admin",
+        )
+
+    @app.post("/admin/articles/<int:article_id>/publish/")
+    @login_required
+    def admin_article_publish(article_id: int):
+        article = db.session.get(Article, article_id)
+        if article is None:
+            abort(404)
+        errors = article.publish()
+        if errors:
+            flash("Публикация заблокирована: " + ", ".join(errors) + ".", "error")
+            return redirect(url_for("admin_article_edit", article_id=article.id))
+        db.session.commit()
+        logger.info("Статья #%s опубликована", article.id)
+        flash("Материал опубликован и добавлен в публичный каталог.", "success")
+        return redirect(url_for("admin_article_edit", article_id=article.id))
+
+    @app.post("/admin/articles/<int:article_id>/unpublish/")
+    @login_required
+    def admin_article_unpublish(article_id: int):
+        article = db.session.get(Article, article_id)
+        if article is None:
+            abort(404)
+        article.unpublish()
+        db.session.commit()
+        logger.info("Статья #%s снята с публикации", article.id)
+        flash("Материал снят с публикации, публичный URL закрыт.", "info")
+        return redirect(url_for("admin_article_edit", article_id=article.id))
+
     @app.post("/admin/inquiries/<int:inquiry_id>/read/")
     @login_required
     def admin_mark_read(inquiry_id: int):
@@ -425,6 +630,11 @@ def create_app() -> Flask:
             origin + url_for("direction_detail", slug=slug) for slug in SECTIONS
         )
         pages.extend(origin + url_for("case_detail", slug=case["slug"]) for case in get_all_cases())
+        pages.append(origin + url_for("materials_catalog"))
+        pages.extend(
+            origin + url_for("material_detail", slug=article.slug)
+            for article in published_articles().all()
+        )
         xml_urls = "".join(f"<url><loc>{page}</loc></url>" for page in pages)
         xml = (
             '<?xml version="1.0" encoding="UTF-8"?>'
@@ -445,6 +655,7 @@ def create_app() -> Flask:
     with app.app_context():
         db.create_all()
         ensure_admin(app)
+        ensure_editorial_seed()
 
     return app
 

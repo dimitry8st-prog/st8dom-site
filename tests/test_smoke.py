@@ -153,6 +153,14 @@ def test_selected_projects_catalog(client):
     assert b"biobalance-promo-16x9.mp4" in page.data
     assert b"vitalis-medical-ai.mp4" in page.data
     assert b"Vitalis-Medical-AI-FL.png" in page.data
+    html = page.data.decode("utf-8")
+    vitalis_start = html.index("<h2>Vitalis Medical AI</h2>")
+    vitalis_end = html.index("</article>", vitalis_start)
+    vitalis_card = html[vitalis_start:vitalis_end]
+    assert vitalis_card.count('class="btn ') == 2
+    assert "Смотреть видео" in vitalis_card
+    assert "Подробнее" in vitalis_card
+    assert "GitHub" not in vitalis_card
     assert b'id="project-video-modal"' in page.data
     assert b"portfolio_repo_open" not in page.data
     assert "Репозиторий готовится к публикации".encode("utf-8") in page.data
