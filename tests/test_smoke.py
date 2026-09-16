@@ -24,6 +24,7 @@ def test_cases_and_details(client):
     assert listing.status_code == 200
     slugs = [
         "autosfera-ai",
+        "vitalis-medical-ai",
         "healthy-store",
         "dis-reputatsiya-360",
         "legalbot",
@@ -50,6 +51,12 @@ def test_cases_and_details(client):
     assert b"AutoSfera-AI-" in autosfera.data
     assert "18 зарегистрированных skills".encode("utf-8") in autosfera.data
     assert "контролируемая beta".encode("utf-8") in autosfera.data
+
+    vitalis = client.get("/cases/vitalis-medical-ai/")
+    assert b"Vitalis-Medical-AI" in vitalis.data
+    assert b"vitalis-medical-ai.mp4" in vitalis.data
+    assert b"Vitalis-Medical-AI-FL.png" in vitalis.data
+    assert "не медицинское изделие".encode("utf-8") in vitalis.data
 
     healthy_store = client.get("/cases/healthy-store/")
     assert b"Zdorowii_magazin" in healthy_store.data
@@ -123,11 +130,12 @@ def test_portal_directions(client):
 def test_selected_projects_catalog(client):
     page = client.get("/projects/")
     assert page.status_code == 200
-    assert "14 проектов".encode("utf-8") in page.data
-    assert page.data.count(b'class="portal-project-card') == 14
+    assert "15 проектов".encode("utf-8") in page.data
+    assert page.data.count(b'class="portal-project-card') == 15
     assert b"st8dom-site" not in page.data
     for name in [
         "AutoSfera-AI",
+        "Vitalis Medical AI",
         "Life-OS",
         "DIS-Meeting-360",
         "MedBot-AI",
@@ -135,7 +143,7 @@ def test_selected_projects_catalog(client):
         "OnboardFlow-AI",
     ]:
         assert name.encode("utf-8") in page.data
-    assert page.data.count(b"project-video-trigger") == 7
+    assert page.data.count(b"project-video-trigger") == 8
     assert b"autosfera-ai-defense.mp4" in page.data
     assert b"dis-reputatsiya-360-16x9.mp4" in page.data
     assert b"ai-nastavnik-360-16x9.mp4" in page.data
@@ -143,6 +151,8 @@ def test_selected_projects_catalog(client):
     assert b"docpulse-demo.mp4" in page.data
     assert b"legalbot-demo.mp4" in page.data
     assert b"biobalance-promo-16x9.mp4" in page.data
+    assert b"vitalis-medical-ai.mp4" in page.data
+    assert b"Vitalis-Medical-AI-FL.png" in page.data
     assert b'id="project-video-modal"' in page.data
     assert b"portfolio_repo_open" not in page.data
     assert "Репозиторий готовится к публикации".encode("utf-8") in page.data
@@ -161,6 +171,7 @@ def test_legal_and_seo(client):
     assert b"/cases/dis-analyst-360/" in sitemap.data
     assert b"/cases/dis-reputatsiya-360/" in sitemap.data
     assert b"/cases/autosfera-ai/" in sitemap.data
+    assert b"/cases/vitalis-medical-ai/" in sitemap.data
     assert b"/cases/healthy-store/" in sitemap.data
     assert b"/projects/" in sitemap.data
     assert b"/directions/medicine/" in sitemap.data
