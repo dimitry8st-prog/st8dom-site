@@ -11,6 +11,11 @@ def test_home_ok(client):
     assert "Выбрать направление".encode("utf-8") in response.data
     assert "Медицина, AI и будущее человека".encode("utf-8") in response.data
     assert "Дмитрий Степанов".encode("utf-8") in response.data
+    assert b'class="author-details"' in response.data
+    assert ">Подробнее<".encode("utf-8") in response.data
+    assert "Сначала работал нейрохирургом".encode("utf-8") in response.data
+    assert "юридическое и экономическое образование".encode("utf-8") in response.data
+    assert "По мере развития портала этот раздел".encode("utf-8") not in response.data
     assert "от 15 000".encode("utf-8") in response.data
     assert "от 180 000".encode("utf-8") in response.data
     assert b"dis-mascot-orange.jpg" in response.data
