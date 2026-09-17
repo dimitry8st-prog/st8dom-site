@@ -9,7 +9,10 @@
   <div class="library-card__footer">
     <span class="library-status{% if not item.file %} library-status--draft{% endif %}">{{ item.status }}</span>
     {% if item.file %}
-      <a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+      <div class="library-card__actions">
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('library_detail', slug=item.slug) }}">Читать онлайн</a>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+      </div>
     {% else %}
       <span class="library-card__pending">Скачивание откроется после проверки</span>
     {% endif %}

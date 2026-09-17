@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} — Библиотека ДИС{% endblock %}
+{% block description %}{{ item.summary }}{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('library_detail', slug=item.slug) }}{% endblock %}
+{% block og_title %}{{ item.title }}{% endblock %}
+{% block og_description %}{{ item.summary }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <article class="publication library-reader">
+    <header class="publication__header">
+      <p class="eyebrow">{{ item.kind }} · Библиотека ДИС</p>
+      <h1>{{ item.title }}</h1>
+      <p class="hero-sub">{{ item.summary }}</p>
+      <div class="publication__facts">
+        <span>Автор: Степанов Д.А.</span>
+        <span>Дата: {{ item.date }}</span>
+        <span class="verified-mark">✓ {{ item.status }}</span>
+      </div>
+      <div class="publication-actions">
+        <a class="btn btn-ghost" href="{{ url_for('library_catalog') }}">← Вернуться в библиотеку</a>
+        <a class="btn btn-primary" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+      </div>
+    </header>
+
+    <div class="publication__body">
+      {% for block in blocks %}
+        {% if block.type == 'heading' and block.level == 2 %}
+          <h2>{{ block.text }}</h2>
+        {% elif block.type == 'heading' %}
+          <h3>{{ block.text }}</h3>
+        {% elif block.type == 'list' %}
+          <ul>{% for list_item in block['items'] %}<li>{{ list_item }}</li>{% endfor %}</ul>
+        {% elif block.type == 'table' %}
+          <div class="publication-table-wrap" tabindex="0" role="region" aria-label="Таблица в методичке">
+            <table>
+              <thead><tr>{% for cell in block.header %}<th scope="col">{{ cell }}</th>{% endfor %}</tr></thead>
+              <tbody>{% for row in block.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>{{ block.text }}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="publication-actions library-reader__bottom-actions">
+      <a class="btn btn-ghost" href="{{ url_for('library_catalog') }}">← Все материалы</a>
+      <a class="btn btn-primary" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+    </div>
+  </article>
+</div>
+{% endblock %}

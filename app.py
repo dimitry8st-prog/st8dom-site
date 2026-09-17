@@ -34,6 +34,7 @@ from assistant.answer import MAX_MESSAGE_LEN, answer_question
 from assistant.rate_limit import limiter
 from cases import FILTERS, get_all_cases, get_case
 from config import BASE_DIR, get_config
+from docx_reader import read_docx_blocks
 from editorial import (
     CONTENT_TYPE_LABELS,
     STATUS_LABELS,
@@ -51,6 +52,7 @@ from library_content import (
     LIBRARY_CATEGORIES,
     LIBRARY_ITEMS,
     featured_library_items,
+    get_library_item,
     grouped_library_items,
     library_items_for_direction,
 )
@@ -422,6 +424,24 @@ def create_app() -> Flask:
             page_id="library",
         )
 
+    @app.route("/library/<slug>/")
+    def library_detail(slug: str):
+        item = get_library_item(slug)
+        if item is None or not item["file"]:
+            abort(404)
+        docx_path = Path(app.static_folder or "") / "downloads" / item["file"]
+        try:
+            blocks = read_docx_blocks(str(docx_path.resolve()))
+        except (FileNotFoundError, ValueError):
+            logger.exception("Не удалось открыть онлайн-версию %s", slug)
+            abort(404)
+        return render_template(
+            "library_detail.html",
+            item=item,
+            blocks=blocks,
+            page_id="library",
+        )
+
     @app.route("/materials/<slug>/")
     def material_detail(slug: str):
         article = published_articles().filter_by(slug=slug).first()
@@ -769,6 +789,11 @@ def create_app() -> Flask:
         pages.extend(
             origin + url_for("material_detail", slug=article.slug)
             for article in published_articles().all()
+        )
+        pages.extend(
+            origin + url_for("library_detail", slug=item["slug"])
+            for item in LIBRARY_ITEMS
+            if item["file"]
         )
         xml_urls = "".join(f"<url><loc>{page}</loc></url>" for page in pages)
         xml = (

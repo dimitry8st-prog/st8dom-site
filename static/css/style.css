@@ -1956,6 +1956,29 @@ section.s {
   padding-top: 22px;
 }
 
+.library-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.library-card__actions .btn-sm {
+  padding-inline: 12px;
+}
+
+.library-reader {
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+.library-reader__bottom-actions {
+  justify-content: space-between;
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
 .library-status {
   color: var(--green);
   font-family: "JetBrains Mono", monospace;
@@ -1989,6 +2012,15 @@ section.s {
   .library-grid,
   .library-grid--preview {
     grid-template-columns: 1fr;
+  }
+
+  .library-card__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .library-card__actions .btn {
+    flex: 1 1 140px;
   }
 }
 

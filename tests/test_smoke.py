@@ -148,6 +148,8 @@ def test_library_catalog_groups_and_downloads(client):
         assert title.encode("utf-8") in page.data
     assert page.data.count(b'class="library-card"') == 17
     assert b"/static/downloads/ai-law-brand-protection.docx" in page.data
+    assert b"/library/ai-law-brand-protection/" in page.data
+    assert "Читать онлайн".encode("utf-8") in page.data
     assert "На редактуре".encode("utf-8") in page.data
 
     filtered = client.get("/library/?category=law-safety")
@@ -158,6 +160,15 @@ def test_library_catalog_groups_and_downloads(client):
     download = client.get("/static/downloads/ai-law-brand-protection.docx")
     assert download.status_code == 200
     assert download.data.startswith(b"PK")
+
+    reader = client.get("/library/ai-law-brand-protection/")
+    assert reader.status_code == 200
+    assert "Искусственный интеллект в правовом поле".encode("utf-8") in reader.data
+    assert "Как пользоваться брошюрой".encode("utf-8") in reader.data
+    assert "Скачать DOCX".encode("utf-8") in reader.data
+
+    assert client.get("/library/ai-audit-pilot/").status_code == 404
+    assert client.get("/library/not-found/").status_code == 404
 
 
 def test_life_os_and_library_use_distinct_names(client):
