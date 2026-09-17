@@ -25,6 +25,16 @@ LIBRARY_GENERIC_TOKENS = {
 }
 
 
+def _library_topical_tokens(text: str) -> set[str]:
+    """Оставляет тему запроса, убирая все словоформы типа материала."""
+    return {
+        token
+        for token in tokenize(text)
+        if token not in LIBRARY_GENERIC_TOKENS
+        and not token.startswith(("методич", "методик", "брошюр", "библиотек"))
+    }
+
+
 def normalize_message(raw: str | None) -> str:
     return (raw or "").strip()
 
@@ -90,7 +100,7 @@ def _library_listing(
     if not requested_kind:
         return None
 
-    topical_tokens = tokenize(text) - LIBRARY_GENERIC_TOKENS
+    topical_tokens = _library_topical_tokens(text)
     if topical_tokens:
         return None
 
@@ -110,11 +120,21 @@ def _library_listing(
     tail = f" и ещё {remainder}" if remainder else ""
     answer = f"В библиотеке ДИС есть {len(items)} {label}: {', '.join(titles)}{tail}."
     matches = [(item, 1.0) for item in items]
+    results = _results(matches)
+    if len(items) > MAX_RESULTS:
+        results = [
+            {
+                "title": "Все методички и брошюры",
+                "url": "/library/",
+                "kind": "Библиотека",
+            },
+            *_results(matches[: MAX_RESULTS - 1]),
+        ]
     return {
         "answer": answer,
         "escalated": False,
         "source": "library",
-        "results": _results(matches),
+        "results": results,
     }
 
 
@@ -149,7 +169,7 @@ def answer_question(question: str, app_config: dict | None = None) -> dict[str, 
 
     matches = retrieve(text, search_space, top_k=6)
     if requested_library_kind and matches:
-        topical_tokens = tokenize(text) - LIBRARY_GENERIC_TOKENS
+        topical_tokens = _library_topical_tokens(text)
         if topical_tokens:
             best_library_score = matches[0][1]
             matches = [

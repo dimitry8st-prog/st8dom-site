@@ -204,6 +204,11 @@ def _library_documents() -> list[dict[str, Any]]:
     documents = []
     for item in LIBRARY_ITEMS:
         category_title = category_titles.get(item["category"], "")
+        item_url = (
+            f"/library/{item['slug']}/"
+            if item["file"]
+            else f"/library/#{item['slug']}"
+        )
         aliases = [
             item["kind"],
             category_title,
@@ -216,7 +221,7 @@ def _library_documents() -> list[dict[str, Any]]:
                     f"library-{item['slug']}",
                     item["title"],
                     item["summary"],
-                    f"/library/#{item['slug']}",
+                    item_url,
                     "library",
                     aliases=aliases,
                     content=" ".join(
@@ -225,6 +230,7 @@ def _library_documents() -> list[dict[str, Any]]:
                 ),
                 "library_kind": item["kind"],
                 "library_status": item["status"],
+                "kind_label": item["kind"],
             }
         )
     return documents

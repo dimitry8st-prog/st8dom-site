@@ -93,6 +93,14 @@ def normalize(text: str) -> str:
     return text.lower().replace("ё", "е")
 
 
+def contains_phrase(text: str, phrase: str) -> bool:
+    """Ищет слово или фразу целиком, не совпадая с частью другого слова."""
+    if not phrase:
+        return False
+    pattern = rf"(?<![а-яa-z0-9]){re.escape(phrase)}(?![а-яa-z0-9])"
+    return re.search(pattern, text, re.IGNORECASE) is not None
+
+
 def stem(word: str) -> str:
     token = normalize(word)
     for ending in ENDINGS:
@@ -126,7 +134,10 @@ def _score_item(query: str, query_tokens: set[str], item: dict[str, Any]) -> flo
         score += 0.35
     for alias in item.get("aliases", []):
         alias_norm = normalize(alias)
-        if alias_norm and (alias_norm in query_norm or query_norm in alias_norm):
+        if alias_norm and (
+            contains_phrase(query_norm, alias_norm)
+            or contains_phrase(alias_norm, query_norm)
+        ):
             score += 0.4
             break
     return score

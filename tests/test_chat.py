@@ -62,17 +62,17 @@ def test_assistant_lists_brochures_instead_of_unrelated_case():
     assert result["source"] == "library"
     assert "2 брошюры" in result["answer"]
     assert {item["url"] for item in result["results"]} == {
-        "/library/#ai-law-brand-protection",
-        "/library/#neural-networks-marketing",
+        "/library/ai-law-brand-protection/",
+        "/library/neural-networks-marketing/",
     }
-    assert all(item["kind"] == "Библиотека" for item in result["results"])
+    assert all(item["kind"] == "Брошюра" for item in result["results"])
 
 
 def test_assistant_finds_specific_brochure_by_topic():
     result = answer_question("Найди брошюру про защиту бренда", {})
     assert result["escalated"] is False
     assert result["source"] == "library"
-    assert result["results"][0]["url"] == "/library/#ai-law-brand-protection"
+    assert result["results"][0]["url"] == "/library/ai-law-brand-protection/"
     assert len(result["results"]) == 1
 
 
@@ -82,6 +82,15 @@ def test_assistant_lists_methodical_materials():
     assert result["source"] == "library"
     assert "15 методических материалов" in result["answer"]
     assert result["results"]
+
+
+def test_assistant_understands_methodics_list_word_form():
+    result = answer_question("Список методичек", {})
+    assert result["escalated"] is False
+    assert result["source"] == "library"
+    assert "15 методических материалов" in result["answer"]
+    assert result["results"][0]["url"] == "/library/"
+    assert all(item["url"].startswith("/library/") for item in result["results"])
 
 
 def test_assistant_answers_brochure_count_question():
@@ -97,9 +106,16 @@ def test_chat_endpoint_returns_relevant_brochures(client):
     result = response.get_json()
     assert result["source"] == "library"
     assert [item["url"] for item in result["results"]] == [
-        "/library/#ai-law-brand-protection",
-        "/library/#neural-networks-marketing",
+        "/library/ai-law-brand-protection/",
+        "/library/neural-networks-marketing/",
     ]
+
+
+def test_assistant_finds_specific_library_reading_page():
+    result = answer_question("методичка системные продажи", {})
+    assert result["escalated"] is False
+    assert result["source"] == "library"
+    assert result["results"][0]["url"] == "/library/system-sales/"
 
 
 def test_assistant_finds_published_article(client):
