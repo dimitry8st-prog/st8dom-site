@@ -25,11 +25,28 @@
       </div>
     </header>
 
-    <div class="publication__body">
-      {% for paragraph in article.body_paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
-    </div>
-
     {% if article.disclaimer %}<aside class="medical-notice"><strong>Важно</strong><p>{{ article.disclaimer }}</p></aside>{% endif %}
+
+    <div class="publication__body">
+      {% for block in article.body_blocks %}
+        {% if block.type == 'heading' and block.level == 2 %}
+          <h2>{{ block.text }}</h2>
+        {% elif block.type == 'heading' %}
+          <h3>{{ block.text }}</h3>
+        {% elif block.type == 'list' %}
+          <ul>{% for item in block['items'] %}<li>{{ item }}</li>{% endfor %}</ul>
+        {% elif block.type == 'table' %}
+          <div class="publication-table-wrap" tabindex="0" role="region" aria-label="Таблица в материале">
+            <table>
+              <thead><tr>{% for cell in block.header %}<th scope="col">{{ cell }}</th>{% endfor %}</tr></thead>
+              <tbody>{% for row in block.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>{{ block.text }}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
 
     {% if article.sources %}
     <section class="publication__sources" aria-labelledby="sources-heading">

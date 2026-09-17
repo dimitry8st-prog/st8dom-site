@@ -45,6 +45,23 @@ def test_seed_material_is_public_and_connected(client):
     assert f"/materials/{slug}/".encode() in sitemap.data
 
 
+def test_stroke_rehabilitation_article_is_structured_and_sourced(client):
+    slug = "reabilitaciya-posle-ishemicheskogo-insulta"
+    page = client.get(f"/materials/{slug}/")
+
+    assert page.status_code == 200
+    assert "Периоды ишемического инсульта".encode("utf-8") in page.data
+    assert b"<table>" in page.data
+    assert b"<ul>" in page.data
+    assert b"## " not in page.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        assert article.rubric.slug == "neurology-neurosurgery-neurology-rehabilitation"
+        assert article.medical_reviewer == "Степанов Д.А."
+        assert len(article.sources) == 15
+
+
 def test_draft_is_private_but_admin_can_preview(client):
     slug = "test-private-draft"
     remove_article(slug)

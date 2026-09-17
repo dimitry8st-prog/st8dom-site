@@ -60,7 +60,7 @@ def test_topic_cards_link_to_rubric_pages(client):
     assert "Заболевания".encode("utf-8") in topic.data
     assert topic.data.count("Диагностика".encode("utf-8")) == 2
     assert topic.data.count("Лечение".encode("utf-8")) == 2
-    assert topic.data.count("Реабилитация".encode("utf-8")) == 2
+    assert topic.data.count("<strong>Реабилитация</strong>".encode("utf-8")) == 2
     assert b"neurology-neurosurgery-neurology-diseases" in topic.data
     assert b"neurology-neurosurgery-neurosurgery-rehabilitation" in topic.data
     assert client.get("/directions/medicine/not-found/").status_code == 404
