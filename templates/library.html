@@ -1,0 +1,52 @@
+{% from "macros/library_card.html" import library_card %}
+{% extends "base.html" %}
+{% block title %}Библиотека ДИС — методички и брошюры{% endblock %}
+{% block description %}Авторские методички и брошюры Степанова Д.А. об AI, бизнесе, праве, бренде и командной работе.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('library_catalog') }}{% endblock %}
+
+{% block content %}
+<div class="container container--wide">
+  <section class="hero library-hero">
+    <p class="eyebrow">// библиотека ДИС</p>
+    <h1>Методички и практические брошюры</h1>
+    <p class="hero-sub">{{ total }} уникальных материалов по пяти направлениям. Опубликовано для скачивания: {{ published }}.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#library-groups">Открыть библиотеку</a>
+      <a class="btn btn-ghost" href="{{ url_for('materials_catalog') }}">Статьи и обзоры</a>
+    </div>
+  </section>
+
+  <section class="library-explainer" aria-labelledby="library-model-title">
+    <div>
+      <p class="eyebrow">// без дублей</p>
+      <h2 id="library-model-title">Один материал — одна публикация</h2>
+    </div>
+    <p><strong>Life‑OS</strong> собирает источники, заметки и черновики во внутренней базе знаний. После авторской проверки готовый материал один раз публикуется здесь, а другие разделы портала ссылаются на эту же карточку и файл.</p>
+  </section>
+
+  <nav class="library-categories" aria-label="Темы библиотеки">
+    <a class="{% if not selected_category %}is-active{% endif %}" href="{{ url_for('library_catalog') }}">Все · {{ total }}</a>
+    {% for category in categories %}
+      <a class="{% if selected_category == category.slug %}is-active{% endif %}" href="{{ url_for('library_catalog', category=category.slug) }}">{{ category.title }}</a>
+    {% endfor %}
+  </nav>
+
+  <div id="library-groups">
+    {% for group in groups %}
+    <section class="library-group" aria-labelledby="library-{{ group.slug }}">
+      <div class="library-group__head">
+        <div>
+          <p class="eyebrow">// {{ "%02d"|format(loop.index) }}</p>
+          <h2 id="library-{{ group.slug }}">{{ group.title }}</h2>
+          <p>{{ group.description }}</p>
+        </div>
+        <span class="library-group__count">{{ group["items"]|length }} {{ 'материал' if group["items"]|length == 1 else 'материала' if group["items"]|length < 5 else 'материалов' }}</span>
+      </div>
+      <div class="library-grid">
+        {% for item in group["items"] %}{{ library_card(item) }}{% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

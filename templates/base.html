@@ -73,7 +73,7 @@
         <a href="{{ url_for('direction_detail', slug='ai') }}" {% if page_id == 'direction-ai' %}aria-current="page"{% endif %}>AI</a>
         <a href="{{ url_for('direction_detail', slug='longevity') }}" {% if page_id == 'direction-longevity' %}aria-current="page"{% endif %}>Долголетие</a>
         <a href="{{ url_for('direction_detail', slug='life-os') }}" {% if page_id == 'direction-life-os' %}aria-current="page"{% endif %}>Life‑OS</a>
-        <a href="{{ url_for('materials_catalog') }}" {% if page_id in ['materials', 'material'] %}aria-current="page"{% endif %}>Материалы</a>
+        <a href="{{ url_for('library_catalog') }}" {% if page_id == 'library' %}aria-current="page"{% endif %}>Библиотека</a>
         <a href="{{ url_for('unified_search') }}" {% if page_id == 'search' %}aria-current="page"{% endif %}>Поиск</a>
         <a href="{{ url_for('projects_catalog') }}" {% if page_id in ['projects', 'cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
         <a href="{{ url_for('index') }}#about">Об авторе</a>
@@ -101,7 +101,8 @@
         <a href="{{ url_for('privacy') }}">Политика конфиденциальности</a>
         <a href="{{ url_for('consent') }}">Согласие на обработку данных</a>
         <a href="{{ url_for('cases_list') }}">Подробные кейсы</a>
-        <a href="{{ url_for('materials_catalog') }}">Материалы</a>
+        <a href="{{ url_for('library_catalog') }}">Библиотека ДИС</a>
+        <a href="{{ url_for('materials_catalog') }}">Статьи</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
       </div>
       <p>© 2026 <span>Степанов Д.А.</span> · Портал «ДИС» · Медицина, AI и будущее человека</p>

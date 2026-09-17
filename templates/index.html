@@ -1,5 +1,6 @@
 {% from "macros/form.html" import render_inquiry_form %}
 {% from "macros/material_card.html" import material_card %}
+{% from "macros/library_card.html" import library_card %}
 {% extends "base.html" %}
 
 {% block jsonld %}
@@ -176,6 +177,16 @@
       {% endfor %}
     </div>
     <p style="margin-top:20px"><a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Все 15 проектов</a></p>
+  </section>
+
+  <section class="s" id="library">
+    <div class="s-label reveal"><span>//</span> библиотека ДИС</div>
+    <h2 class="reveal">Методички и практические брошюры</h2>
+    <p class="lead reveal">Пять тематических разделов и одна каноническая карточка для каждого материала — без копий между порталом и Life‑OS.</p>
+    <div class="library-grid library-grid--preview">
+      {% for item in library_preview %}{{ library_card(item) }}{% endfor %}
+    </div>
+    <div class="section-actions"><a class="btn btn-primary" href="{{ url_for('library_catalog') }}">Все 17 материалов</a></div>
   </section>
 
   <section class="s" id="metrics">
