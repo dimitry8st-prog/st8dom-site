@@ -1,5 +1,6 @@
 """Модели SQLAlchemy: пользователи, заявки и редакционные публикации."""
 
+import re
 from datetime import datetime, timezone
 
 from flask_login import UserMixin
@@ -146,6 +147,71 @@ class Article(db.Model):
     @property
     def body_paragraphs(self) -> list[str]:
         return [part.strip() for part in self.body.split("\n\n") if part.strip()]
+
+    @property
+    def body_blocks(self) -> list[dict]:
+        """Разбирает небольшой безопасный поднабор Markdown без сырого HTML."""
+        lines = self.body.splitlines()
+        blocks = []
+        index = 0
+
+        while index < len(lines):
+            line = lines[index].strip()
+            if not line:
+                index += 1
+                continue
+
+            if line.startswith("### "):
+                blocks.append({"type": "heading", "level": 3, "text": line[4:]})
+                index += 1
+                continue
+            if line.startswith("## "):
+                blocks.append({"type": "heading", "level": 2, "text": line[3:]})
+                index += 1
+                continue
+
+            if line.startswith("- "):
+                items = []
+                while index < len(lines) and lines[index].strip().startswith("- "):
+                    items.append(lines[index].strip()[2:].strip())
+                    index += 1
+                blocks.append({"type": "list", "items": items})
+                continue
+
+            if line.startswith("|") and index + 1 < len(lines):
+                header = [cell.strip() for cell in line.strip("|").split("|")]
+                separator = [
+                    cell.strip() for cell in lines[index + 1].strip().strip("|").split("|")
+                ]
+                if len(header) == len(separator) and all(
+                    re.fullmatch(r":?-{3,}:?", cell) for cell in separator
+                ):
+                    index += 2
+                    rows = []
+                    while index < len(lines) and lines[index].strip().startswith("|"):
+                        row = [
+                            cell.strip()
+                            for cell in lines[index].strip().strip("|").split("|")
+                        ]
+                        if len(row) == len(header):
+                            rows.append(row)
+                        index += 1
+                    blocks.append({"type": "table", "header": header, "rows": rows})
+                    continue
+
+            paragraph = [line]
+            index += 1
+            while index < len(lines):
+                next_line = lines[index].strip()
+                if not next_line:
+                    break
+                if next_line.startswith(("## ", "### ", "- ", "|")):
+                    break
+                paragraph.append(next_line)
+                index += 1
+            blocks.append({"type": "paragraph", "text": " ".join(paragraph)})
+
+        return blocks
 
     def publication_errors(self) -> list[str]:
         """Возвращает причины, по которым материал нельзя публиковать."""
