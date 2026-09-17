@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 
 from cases import get_all_cases
 from editorial import published_articles
+from library_content import LIBRARY_CATEGORIES, LIBRARY_ITEMS
 from portal_content import PROJECTS, SECTIONS
 
 
@@ -18,6 +19,7 @@ KIND_LABELS = {
     "topic": "Тема",
     "rubric": "Рубрика",
     "page": "Страница",
+    "library": "Библиотека",
 }
 
 
@@ -196,6 +198,38 @@ def _case_and_project_documents() -> list[dict[str, Any]]:
     return documents
 
 
+def _library_documents() -> list[dict[str, Any]]:
+    """Карточки публичной библиотеки с типом и тематикой материала."""
+    category_titles = {category["slug"]: category["title"] for category in LIBRARY_CATEGORIES}
+    documents = []
+    for item in LIBRARY_ITEMS:
+        category_title = category_titles.get(item["category"], "")
+        aliases = [
+            item["kind"],
+            category_title,
+            "библиотека ДИС",
+            "методички и брошюры",
+        ]
+        documents.append(
+            {
+                **_document(
+                    f"library-{item['slug']}",
+                    item["title"],
+                    item["summary"],
+                    f"/library/#{item['slug']}",
+                    "library",
+                    aliases=aliases,
+                    content=" ".join(
+                        [item["kind"], category_title, item["status"], item["summary"]]
+                    ),
+                ),
+                "library_kind": item["kind"],
+                "library_status": item["status"],
+            }
+        )
+    return documents
+
+
 def _published_article_documents() -> list[dict[str, Any]]:
     """Читает живые публикации только внутри Flask application context."""
     try:
@@ -227,6 +261,7 @@ def load_portal_documents() -> tuple[dict[str, Any], ...]:
     documents = [
         *_static_pages(),
         *_direction_documents(),
+        *_library_documents(),
         *_case_and_project_documents(),
         *_published_article_documents(),
     ]

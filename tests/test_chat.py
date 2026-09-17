@@ -56,6 +56,52 @@ def test_assistant_finds_project_case():
     assert any(item["url"] == "/cases/vitalis-medical-ai/" for item in result["results"])
 
 
+def test_assistant_lists_brochures_instead_of_unrelated_case():
+    result = answer_question("Какие брошюры есть?", {})
+    assert result["escalated"] is False
+    assert result["source"] == "library"
+    assert "2 брошюры" in result["answer"]
+    assert {item["url"] for item in result["results"]} == {
+        "/library/#ai-law-brand-protection",
+        "/library/#neural-networks-marketing",
+    }
+    assert all(item["kind"] == "Библиотека" for item in result["results"])
+
+
+def test_assistant_finds_specific_brochure_by_topic():
+    result = answer_question("Найди брошюру про защиту бренда", {})
+    assert result["escalated"] is False
+    assert result["source"] == "library"
+    assert result["results"][0]["url"] == "/library/#ai-law-brand-protection"
+    assert len(result["results"]) == 1
+
+
+def test_assistant_lists_methodical_materials():
+    result = answer_question("Какие методички есть?", {})
+    assert result["escalated"] is False
+    assert result["source"] == "library"
+    assert "15 методических материалов" in result["answer"]
+    assert result["results"]
+
+
+def test_assistant_answers_brochure_count_question():
+    result = answer_question("Сколько брошюр доступно?", {})
+    assert result["source"] == "library"
+    assert "2 брошюры" in result["answer"]
+
+
+def test_chat_endpoint_returns_relevant_brochures(client):
+    limiter.reset()
+    response = client.post("/chat/", json={"message": "Какие брошюры есть?"})
+    assert response.status_code == 200
+    result = response.get_json()
+    assert result["source"] == "library"
+    assert [item["url"] for item in result["results"]] == [
+        "/library/#ai-law-brand-protection",
+        "/library/#neural-networks-marketing",
+    ]
+
+
 def test_assistant_finds_published_article(client):
     limiter.reset()
     response = client.post("/chat/", json={"message": "реабилитация после ишемического инсульта"})

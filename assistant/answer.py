@@ -6,7 +6,7 @@ from typing import Any
 
 from assistant.knowledge import load_knowledge
 from assistant.llm import generate_answer
-from assistant.retrieve import is_relevant, retrieve
+from assistant.retrieve import is_relevant, normalize, retrieve, tokenize
 
 ESCALATE_TEXT = (
     "В материалах сайта этого нет — выдумывать не буду. "
@@ -14,6 +14,15 @@ ESCALATE_TEXT = (
 )
 MAX_MESSAGE_LEN = 400
 MAX_RESULTS = 4
+LIBRARY_GENERIC_TOKENS = {
+    "библиотек",
+    "брошюр",
+    "методичк",
+    "методик",
+    "материал",
+    "список",
+    "весь",
+}
 
 
 def normalize_message(raw: str | None) -> str:
@@ -50,6 +59,65 @@ def _context_chunk(item: dict[str, Any]) -> str:
     )
 
 
+def _library_kind(text: str) -> str | None:
+    query = normalize(text)
+    if "брошюр" in query:
+        return "brochure"
+    if "методич" in query or "методик" in query:
+        return "guide"
+    if "библиотек" in query:
+        return "all"
+    return None
+
+
+def _is_library_item(item: dict[str, Any], requested_kind: str) -> bool:
+    if item.get("kind") != "library":
+        return False
+    library_kind = normalize(item.get("library_kind", ""))
+    if requested_kind == "brochure":
+        return library_kind == "брошюра"
+    if requested_kind == "guide":
+        return library_kind.startswith("методич") or library_kind == "методика"
+    return True
+
+
+def _library_listing(
+    text: str,
+    knowledge: tuple[dict[str, Any], ...],
+) -> dict[str, Any] | None:
+    """Даёт точный список вместо генерации, когда пользователь спрашивает виды материалов."""
+    requested_kind = _library_kind(text)
+    if not requested_kind:
+        return None
+
+    topical_tokens = tokenize(text) - LIBRARY_GENERIC_TOKENS
+    if topical_tokens:
+        return None
+
+    items = [item for item in knowledge if _is_library_item(item, requested_kind)]
+    if not items:
+        return None
+
+    if requested_kind == "brochure":
+        label = "брошюры"
+    elif requested_kind == "guide":
+        label = "методических материалов"
+    else:
+        label = "материалов"
+
+    titles = [item["title"] for item in items[:MAX_RESULTS]]
+    remainder = len(items) - len(titles)
+    tail = f" и ещё {remainder}" if remainder else ""
+    answer = f"В библиотеке ДИС есть {len(items)} {label}: {', '.join(titles)}{tail}."
+    matches = [(item, 1.0) for item in items]
+    return {
+        "answer": answer,
+        "escalated": False,
+        "source": "library",
+        "results": _results(matches),
+    }
+
+
 def answer_question(question: str, app_config: dict | None = None) -> dict[str, Any]:
     text = normalize_message(question)
     if not text:
@@ -67,7 +135,28 @@ def answer_question(question: str, app_config: dict | None = None) -> dict[str, 
             "results": [],
         }
 
-    matches = retrieve(text, load_knowledge(), top_k=6)
+    knowledge = load_knowledge()
+    library_listing = _library_listing(text, knowledge)
+    if library_listing:
+        return library_listing
+
+    requested_library_kind = _library_kind(text)
+    search_space = knowledge
+    if requested_library_kind:
+        search_space = tuple(
+            item for item in knowledge if _is_library_item(item, requested_library_kind)
+        )
+
+    matches = retrieve(text, search_space, top_k=6)
+    if requested_library_kind and matches:
+        topical_tokens = tokenize(text) - LIBRARY_GENERIC_TOKENS
+        if topical_tokens:
+            best_library_score = matches[0][1]
+            matches = [
+                match
+                for match in matches
+                if match[1] >= max(0.5, best_library_score - 0.2)
+            ]
     best_item, best_score = (matches[0] if matches else (None, 0.0))
     if not best_item or not is_relevant(best_score):
         return {
@@ -89,7 +178,12 @@ def answer_question(question: str, app_config: dict | None = None) -> dict[str, 
             "results": results,
         }
 
-    source = "faq" if best_item.get("kind") == "faq" else "portal"
+    if best_item.get("kind") == "faq":
+        source = "faq"
+    elif best_item.get("kind") == "library":
+        source = "library"
+    else:
+        source = "portal"
     if source == "faq":
         answer = best_item["answer"]
     else:
