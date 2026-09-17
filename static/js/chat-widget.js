@@ -1,4 +1,4 @@
-/* Плавающий FAQ-виджет: история, индикатор печати, эскалация в заявку и Telegram. */
+/* Плавающий поиск: история, ссылки на портал, эскалация в заявку и Telegram. */
 
 (function () {
   "use strict";
@@ -20,7 +20,7 @@
   const csrf = root.getAttribute("data-csrf") || "";
 
   const GREETING =
-    "Привет! Я Дис, цифровой помощник Дмитрия Степанова. Подскажу по услугам, стартовым ценам и кейсам. Если вопроса нет в базе — предложу оставить заявку.";
+    "Привет! Я Дис, цифровой помощник портала. Найду статьи, рубрики, проекты, кейсы, услуги и контакты. Просто напишите, что ищете.";
 
   let isSending = false;
   let greeted = false;
@@ -31,7 +31,7 @@
     }
   }
 
-  function appendMessage(text, from, actions) {
+  function appendMessage(text, from, actions, results) {
     const wrap = document.createElement("div");
     wrap.className = "chat-message " + from;
 
@@ -39,6 +39,35 @@
     body.className = "chat-message-text";
     body.textContent = text;
     wrap.appendChild(body);
+
+    if (Array.isArray(results) && results.length) {
+      const list = document.createElement("div");
+      list.className = "chat-results";
+      results.forEach(function (result) {
+        if (!result || typeof result.url !== "string" || result.url.charAt(0) !== "/") {
+          return;
+        }
+        const link = document.createElement("a");
+        link.className = "chat-result";
+        link.href = result.url;
+
+        const kind = document.createElement("span");
+        kind.className = "chat-result-kind";
+        kind.textContent = result.kind || "Материал";
+
+        const title = document.createElement("span");
+        title.className = "chat-result-title";
+        title.textContent = result.title || "Открыть";
+
+        link.appendChild(kind);
+        link.appendChild(title);
+        link.addEventListener("click", function () {
+          track("chat_result_click", { url: result.url });
+        });
+        list.appendChild(link);
+      });
+      if (list.childElementCount) wrap.appendChild(list);
+    }
 
     if (actions) {
       const row = document.createElement("div");
@@ -139,7 +168,7 @@
       const answer =
         data.answer || "Не удалось получить ответ. Оставьте заявку через форму.";
       const escalated = Boolean(data.escalated) || !res.ok;
-      appendMessage(answer, "bot", escalated);
+      appendMessage(answer, "bot", escalated, data.results);
       if (escalated) track("chat_escalate");
     } catch (err) {
       console.error(err);

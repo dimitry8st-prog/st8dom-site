@@ -43,10 +43,47 @@ def test_dis_identity_from_faq():
     assert "помощник" in result["answer"].lower()
 
 
+def test_assistant_finds_portal_topic():
+    result = answer_question("найди нейрохирургию", {})
+    assert result["escalated"] is False
+    assert result["source"] == "portal"
+    assert result["results"][0]["url"] == "/directions/medicine/neurology-neurosurgery/"
+
+
+def test_assistant_finds_project_case():
+    result = answer_question("Vitalis Medical AI", {})
+    assert result["escalated"] is False
+    assert any(item["url"] == "/cases/vitalis-medical-ai/" for item in result["results"])
+
+
+def test_assistant_finds_published_article(client):
+    limiter.reset()
+    response = client.post("/chat/", json={"message": "реабилитация после ишемического инсульта"})
+    assert response.status_code == 200
+    result = response.get_json()
+    assert result["escalated"] is False
+    assert any(
+        item["url"] == "/materials/reabilitaciya-posle-ishemicheskogo-insulta/"
+        for item in result["results"]
+    )
+
+
+def test_assistant_finds_term_inside_published_article(client):
+    limiter.reset()
+    response = client.post("/chat/", json={"message": "цитиколин"})
+    result = response.get_json()
+    assert result["escalated"] is False
+    assert any(
+        item["url"] == "/materials/reabilitaciya-posle-ishemicheskogo-insulta/"
+        for item in result["results"]
+    )
+
+
 def test_offtopic_escalates():
     result = answer_question("как сварить борщ из свёклы?", {})
     assert result["escalated"] is True
     assert result["answer"] == ESCALATE_TEXT
+    assert result["results"] == []
 
 
 def test_chat_endpoint_faq_and_escalate(client):

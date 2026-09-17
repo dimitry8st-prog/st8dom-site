@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from assistant.portal_index import load_portal_documents
 from config import BASE_DIR
 
 FAQ_PATH = BASE_DIR / "data" / "faqs.json"
@@ -27,8 +28,14 @@ def _load_faqs_cached(mtime: float) -> tuple[dict[str, Any], ...]:
             {
                 "id": str(row.get("id") or question),
                 "question": question,
+                "title": question,
                 "answer": answer,
                 "aliases": aliases,
+                "search_text": "",
+                "content": answer,
+                "url": None,
+                "kind": "faq",
+                "kind_label": "Ответ",
             }
         )
     return tuple(items)
@@ -42,3 +49,8 @@ def load_faqs() -> tuple[dict[str, Any], ...]:
 def reload_faqs() -> tuple[dict[str, Any], ...]:
     _load_faqs_cached.cache_clear()
     return load_faqs()
+
+
+def load_knowledge() -> tuple[dict[str, Any], ...]:
+    """FAQ плюс всё доступное для посетителя содержимое портала."""
+    return (*load_faqs(), *load_portal_documents())
