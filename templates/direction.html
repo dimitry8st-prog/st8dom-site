@@ -1,4 +1,5 @@
 {% from "macros/material_card.html" import material_card %}
+{% from "macros/library_card.html" import library_card %}
 {% extends "base.html" %}
 {% block title %}{{ section.title }} — портал ДИС{% endblock %}
 {% block description %}{{ section.description }}{% endblock %}
@@ -53,6 +54,18 @@
     <p class="editorial-notice">{{ section.notice }}</p>
     {% if section.repo_url %}<p class="repository-pending">Репозиторий Life-OS готовится к публикации</p>{% endif %}
   </section>
+
+  {% if library_items %}
+  <section class="s">
+    <div class="s-label"><span>//</span> библиотека ДИС</div>
+    <h2>Методички по теме</h2>
+    <p class="lead">Показываются те же канонические материалы, что и в общей библиотеке. Life‑OS хранит связи и черновики, но не создаёт копии публикаций.</p>
+    <div class="library-grid library-grid--preview">
+      {% for item in library_items %}{{ library_card(item) }}{% endfor %}
+    </div>
+    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('library_catalog') }}">Вся библиотека</a></div>
+  </section>
+  {% endif %}
 
   {% if related_projects %}
   <section class="s">

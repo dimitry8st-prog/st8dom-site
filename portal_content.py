@@ -89,7 +89,7 @@ SECTIONS = {
         "topics": [
             {"slug": "capture", "title": "Сбор материалов", "description": "URL, PDF, текст и YouTube попадают в единый входящий поток.", "rubrics": [("urls", "Ссылки и статьи"), ("pdf", "PDF и документы"), ("video", "Видео"), ("notes", "Личные заметки")]},
             {"slug": "processing", "title": "Обработка", "description": "Классификация, краткое содержание, теги и научный контекст.", "rubrics": [("classification", "Классификация"), ("summaries", "Краткие выводы"), ("tags", "Теги и связи"), ("source-check", "Проверка источника")]},
-            {"slug": "knowledge-library", "title": "Библиотека знаний", "description": "Заметки сохраняются в Obsidian и связываются по темам.", "rubrics": [("obsidian", "Obsidian"), ("structure", "Структура базы"), ("links", "Связи заметок"), ("archive", "Архив")]},
+            {"slug": "knowledge-library", "title": "База знаний Life-OS", "description": "Заметки и черновики сохраняются в Obsidian, связываются по темам и ведут к одной итоговой публикации на портале.", "rubrics": [("obsidian", "Obsidian"), ("structure", "Структура базы"), ("links", "Связи заметок"), ("archive", "Архив")]},
             {"slug": "search-collections", "title": "Поиск и подборки", "description": "Локальный поиск помогает возвращаться к источникам и готовить черновики.", "rubrics": [("local-search", "Локальный поиск"), ("collections", "Подборки"), ("drafts", "Черновики"), ("portal-export", "Передача в портал")]},
         ],
         "principles": ["источник сохраняется", "черновик не равен публикации", "медицинский контент проверяет автор"],

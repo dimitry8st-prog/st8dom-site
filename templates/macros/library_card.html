@@ -1,0 +1,18 @@
+{% macro library_card(item) -%}
+<article class="library-card" id="{{ item.slug }}">
+  <div class="library-card__meta">
+    <span>{{ item.kind }}</span>
+    <span>{{ item.date }}</span>
+  </div>
+  <h3>{{ item.title }}</h3>
+  <p>{{ item.summary }}</p>
+  <div class="library-card__footer">
+    <span class="library-status{% if not item.file %} library-status--draft{% endif %}">{{ item.status }}</span>
+    {% if item.file %}
+      <a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+    {% else %}
+      <span class="library-card__pending">Скачивание откроется после проверки</span>
+    {% endif %}
+  </div>
+</article>
+{%- endmacro %}

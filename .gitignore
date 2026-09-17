@@ -15,4 +15,4 @@ _live.css
 videos/
 node_modules/
 *.docx
-
+!static/downloads/*.docx

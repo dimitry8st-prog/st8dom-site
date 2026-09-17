@@ -47,6 +47,13 @@ from editorial import (
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
 from lifeos_import import ImportValidationError, import_lifeos_package
+from library_content import (
+    LIBRARY_CATEGORIES,
+    LIBRARY_ITEMS,
+    featured_library_items,
+    grouped_library_items,
+    library_items_for_direction,
+)
 from models import AdminUser, Article, ImportPackage, Inquiry, Rubric, Tag
 from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get_topic
 
@@ -233,6 +240,7 @@ def create_app() -> Flask:
             "index.html",
             cases=get_all_cases(),
             latest_materials=latest_materials,
+            library_preview=featured_library_items(),
             form=form,
             page_id="home",
         )
@@ -267,6 +275,7 @@ def create_app() -> Flask:
             .order_by(Article.published_at.desc())
             .limit(6)
             .all(),
+            library_items=library_items_for_direction(slug),
             page_id=f"direction-{slug}",
         )
 
@@ -320,6 +329,7 @@ def create_app() -> Flask:
     def unified_search():
         search = request.args.get("q", "").strip()
         materials = []
+        library_items = []
         projects = []
         if search:
             terms = [term.casefold() for term in search.split() if len(term) >= 2]
@@ -330,13 +340,26 @@ def create_app() -> Flask:
                 if score:
                     materials.append((score, article))
             materials = [item for _score, item in sorted(materials, key=lambda row: (row[0], row[1].published_at), reverse=True)]
+            for item in LIBRARY_ITEMS:
+                haystack = " ".join([item["title"], item["summary"], item["kind"]]).casefold()
+                score = sum(3 if term in item["title"].casefold() else 1 for term in terms if term in haystack)
+                if score:
+                    library_items.append((score, item))
+            library_items = [item for _score, item in sorted(library_items, key=lambda row: row[0], reverse=True)]
             for project in PROJECTS:
                 haystack = " ".join([project["name"], project["summary"], *project["areas"]]).casefold()
                 score = sum(3 if term in project["name"].casefold() else 1 for term in terms if term in haystack)
                 if score:
                     projects.append((score, project))
             projects = [item for _score, item in sorted(projects, key=lambda row: row[0], reverse=True)]
-        return render_template("search.html", query=search, materials=materials, projects=projects, page_id="search")
+        return render_template(
+            "search.html",
+            query=search,
+            materials=materials,
+            library_items=library_items,
+            projects=projects,
+            page_id="search",
+        )
 
     @app.route("/materials/")
     def materials_catalog():
@@ -381,6 +404,22 @@ def create_app() -> Flask:
                 "q": search,
             },
             page_id="materials",
+        )
+
+    @app.route("/library/")
+    def library_catalog():
+        category = request.args.get("category", "").strip()
+        valid_categories = {item["slug"] for item in LIBRARY_CATEGORIES}
+        if category not in valid_categories:
+            category = ""
+        return render_template(
+            "library.html",
+            groups=grouped_library_items(category),
+            categories=LIBRARY_CATEGORIES,
+            selected_category=category,
+            total=len(LIBRARY_ITEMS),
+            published=sum(1 for item in LIBRARY_ITEMS if item["file"]),
+            page_id="library",
         )
 
     @app.route("/materials/<slug>/")
@@ -712,6 +751,7 @@ def create_app() -> Flask:
             origin + "/",
             origin + url_for("cases_list"),
             origin + url_for("projects_catalog"),
+            origin + url_for("library_catalog"),
             origin + url_for("contact"),
             origin + url_for("privacy"),
             origin + url_for("consent"),
