@@ -32,6 +32,11 @@ STOPWORDS = {
     "мы",
     "он",
     "она",
+    "где",
+    "найти",
+    "найди",
+    "покажи",
+    "расскажи",
 }
 ENDINGS = (
     "иями",
@@ -42,8 +47,12 @@ ENDINGS = (
     "ыми",
     "ими",
     "иях",
+    "ией",
     "ах",
     "ях",
+    "ия",
+    "ию",
+    "ии",
     "ов",
     "ев",
     "ой",
@@ -81,14 +90,16 @@ def tokenize(text: str) -> set[str]:
 def _score_item(query: str, query_tokens: set[str], item: dict[str, Any]) -> float:
     title_text = " ".join([item["question"], *item.get("aliases", [])])
     title_tokens = tokenize(title_text)
-    body_tokens = tokenize(item["answer"])
+    body_tokens = tokenize(" ".join([item["answer"], item.get("search_text", "")]))
     if not query_tokens:
         return 0.0
 
     title_hits = len(query_tokens & title_tokens)
     body_hits = len(query_tokens & body_tokens)
     coverage = title_hits / len(query_tokens)
-    score = coverage + (body_hits / len(query_tokens)) * 0.2
+    # Одно точное редкое слово из текста статьи (например, название препарата)
+    # должно находить материал, даже если его нет в заголовке.
+    score = coverage + (body_hits / len(query_tokens)) * 0.45
 
     query_norm = normalize(query)
     if normalize(item["question"]) in query_norm or query_norm in normalize(item["question"]):
