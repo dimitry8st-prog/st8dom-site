@@ -39,6 +39,7 @@ from clinical_guidelines import (
     OFFICIAL_SOURCES,
     fetch_minzdrav_page,
     public_guidelines_query,
+    sync_guidelines_registry,
     sync_minzdrav,
     upsert_guideline,
 )
@@ -938,6 +939,12 @@ def create_app() -> Flask:
         db.create_all()
         ensure_admin(app)
         ensure_editorial_seed()
+        try:
+            stats = sync_guidelines_registry(BASE_DIR / "data" / "clinical_guidelines.json")
+            logger.info("Карточки рекомендаций загружены из GitHub-реестра: %s", stats)
+        except (OSError, ValueError, GuidelineValidationError):
+            db.session.rollback()
+            logger.exception("Не удалось загрузить реестр клинических рекомендаций")
 
     return app
 

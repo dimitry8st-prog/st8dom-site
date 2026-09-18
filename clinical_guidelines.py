@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 from datetime import date, datetime, timezone
+from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
@@ -122,10 +123,16 @@ def _parse_date(value) -> date | None:
         return value
     if not isinstance(value, str):
         raise GuidelineValidationError("published_on: ожидается дата ГГГГ-ММ-ДД.")
-    try:
-        return date.fromisoformat(value[:10])
-    except ValueError as exc:
-        raise GuidelineValidationError("published_on: ожидается дата ГГГГ-ММ-ДД.") from exc
+    raw = value[:10]
+    for parser in (
+        date.fromisoformat,
+        lambda item: datetime.strptime(item, "%d.%m.%Y").date(),
+    ):
+        try:
+            return parser(raw)
+        except ValueError:
+            continue
+    raise GuidelineValidationError("published_on: ожидается дата ГГГГ-ММ-ДД или ДД.ММ.ГГГГ.")
 
 
 def _clean_text(value, field: str, maximum: int, required: bool = False) -> str | None:
@@ -327,6 +334,23 @@ def sync_minzdrav(items: list[dict] | None = None) -> dict[str, int]:
             continue
         stats["matched"] += 1
         _record, action = upsert_guideline(_minzdrav_payload(item))
+        stats[action] += 1
+    db.session.commit()
+    return stats
+
+
+def sync_guidelines_registry(path: str | Path) -> dict[str, int]:
+    """Загружает в БД публичные карточки из версионируемого GitHub-реестра."""
+    registry_path = Path(path)
+    if not registry_path.exists():
+        return {"scanned": 0, "created": 0, "updated": 0, "unchanged": 0}
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    items = payload.get("items") if isinstance(payload, dict) else None
+    if not isinstance(items, list):
+        raise GuidelineValidationError("Реестр рекомендаций должен содержать список items.")
+    stats = {"scanned": len(items), "created": 0, "updated": 0, "unchanged": 0}
+    for item in items:
+        _record, action = upsert_guideline(item)
         stats[action] += 1
     db.session.commit()
     return stats

@@ -14,9 +14,20 @@
 по названию, разработчикам и кодам МКБ. Повторный запуск не создаёт дубли:
 ключом служит сочетание источника и `CodeVersion`.
 
-### Запуск из n8n
+### Автоматическая загрузка в GitHub и Obsidian
 
-1. `Schedule Trigger`: ежедневно, например в 06:30 по Москве.
+Workflow `.github/workflows/sync-clinical-guidelines.yml` запускается каждый
+понедельник в 06:30 по Москве. Он проверяет официальный реестр, обновляет
+`data/clinical_guidelines.json` для карточек сайта и создаёт Markdown-заметки в
+`obsidian-vault/Клинические рекомендации/Входящие/`. Коммит создаётся только при
+реальном изменении данных; push запускает обычное обновление сайта.
+
+В Obsidian нужно открыть папку `obsidian-vault` как Vault. Полный первичный
+проход запускается вручную в GitHub Actions с параметром `full_sync`.
+
+### Альтернативный запуск из n8n
+
+1. `Schedule Trigger`: еженедельно, например в 06:30 по Москве.
 2. `HTTP Request`: `POST https://st8dom.ru/api/clinical-guidelines/sync/minzdrav/?page=1&page_size=25`.
 3. Заголовок: `Authorization: Bearer {{$env.GUIDELINES_SYNC_TOKEN}}`.
 4. `IF`: проверить, что `ok = true`.

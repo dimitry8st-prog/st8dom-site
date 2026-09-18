@@ -1,7 +1,14 @@
 """Безопасная синхронизация клинических рекомендаций."""
 
+import json
+
 from app import app
-from clinical_guidelines import GuidelineValidationError, sync_minzdrav, upsert_guideline
+from clinical_guidelines import (
+    GuidelineValidationError,
+    sync_guidelines_registry,
+    sync_minzdrav,
+    upsert_guideline,
+)
 from extensions import db
 from models import ClinicalGuideline
 
@@ -82,3 +89,37 @@ def test_sync_api_requires_token(client):
         assert response.status_code == 401
     finally:
         app.config["GUIDELINES_SYNC_TOKEN"] = original
+
+
+def test_registry_populates_public_cards(tmp_path):
+    external_id = "registry-neuro-2026-1"
+    cleanup("minzdrav", external_id)
+    registry = tmp_path / "clinical_guidelines.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "items": [
+                    {
+                        "source_key": "minzdrav",
+                        "external_id": external_id,
+                        "title": "Клинические рекомендации по неврологии",
+                        "organization": "Минздрав России",
+                        "version": "2026",
+                        "codes": "G40",
+                        "specialties": "Неврология",
+                        "url": f"https://cr.minzdrav.gov.ru/view-cr/{external_id}",
+                        "published_on": "17.09.2026",
+                        "status": "active",
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    with app.app_context():
+        stats = sync_guidelines_registry(registry)
+        assert stats["created"] == 1
+        assert stats["scanned"] == 1
+    cleanup("minzdrav", external_id)

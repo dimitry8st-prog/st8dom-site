@@ -1,0 +1,62 @@
+name: Синхронизация клинических рекомендаций
+
+on:
+  schedule:
+    # 06:30 по Москве (UTC+3), каждый понедельник.
+    - cron: "30 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      full_sync:
+        description: "Проверить все страницы реестра"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clinical-guidelines-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установить зависимости
+        run: pip install -r requirements.txt
+
+      - name: Обновить реестр и Obsidian-vault
+        shell: bash
+        run: |
+          if [[ "${{ inputs.full_sync }}" == "true" ]]; then
+            python scripts/sync_clinical_guidelines_vault.py --full
+          else
+            python scripts/sync_clinical_guidelines_vault.py --pages 5
+          fi
+
+      - name: Проверить тесты
+        run: python -m pytest -q
+
+      - name: Сохранить изменения
+        shell: bash
+        run: |
+          if git diff --quiet -- data/clinical_guidelines.json obsidian-vault/; then
+            echo "Официальный реестр не изменился"
+            exit 0
+          fi
+          git config user.name "DIS Clinical Guidelines Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/clinical_guidelines.json obsidian-vault/
+          git commit -m "Обновить клинические рекомендации"
+          git push
