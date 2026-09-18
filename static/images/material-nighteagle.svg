@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">NightEagle: цифровая маскировка под 1С и Adobe</title>
+  <desc id="desc">Тёмно-синяя обложка материала ДИС с оранжевым силуэтом орла и карточками подозрительных файлов.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071a45"/>
+      <stop offset="1" stop-color="#163b91"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#020817" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1020" cy="98" r="190" fill="#ff8a1f" opacity=".12"/>
+  <path d="M876 104c73 16 132 67 164 132-48-36-99-46-147-31 37 17 65 46 84 86-65-34-128-37-188-7 30-48 26-100-10-154 34 8 66 23 97 45z" fill="#ff8a1f" opacity=".96"/>
+  <g fill="none" stroke="#ffb15c" stroke-width="3" opacity=".55">
+    <path d="M770 337h298M805 389h225M842 441h154"/>
+    <circle cx="770" cy="337" r="8" fill="#ff8a1f"/>
+    <circle cx="805" cy="389" r="8" fill="#ff8a1f"/>
+    <circle cx="842" cy="441" r="8" fill="#ff8a1f"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="78" y="70" width="650" height="490" rx="34" fill="#0b245c" stroke="#315bb6"/>
+    <text x="128" y="137" fill="#ff8a1f" font-family="Arial, sans-serif" font-size="28" font-weight="700">ДИС · ЦИФРОВАЯ БЕЗОПАСНОСТЬ</text>
+    <text x="128" y="224" fill="#ffffff" font-family="Arial, sans-serif" font-size="54" font-weight="700">NightEagle</text>
+    <text x="128" y="286" fill="#ffffff" font-family="Arial, sans-serif" font-size="40" font-weight="700">маскируется под</text>
+    <text x="128" y="348" fill="#ff9a3d" font-family="Arial, sans-serif" font-size="48" font-weight="700">1С и Adobe</text>
+    <text x="128" y="418" fill="#c8d5f4" font-family="Arial, sans-serif" font-size="25">Как устроена атака и что проверить бизнесу</text>
+    <rect x="128" y="463" width="264" height="54" rx="27" fill="#ff8a1f"/>
+    <text x="162" y="499" fill="#071a45" font-family="Arial, sans-serif" font-size="22" font-weight="700">ПРАКТИЧЕСКИЙ РАЗБОР</text>
+  </g>
+</svg>

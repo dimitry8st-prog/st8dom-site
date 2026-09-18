@@ -1,6 +1,7 @@
 """Тематическая навигация, поиск и безопасный контур Life-OS."""
 
 import json
+from pathlib import Path
 
 from app import app
 from extensions import db
@@ -117,3 +118,72 @@ def test_lifeos_import_rejects_unsafe_source(client):
     assert "нужен полный адрес http(s)".encode("utf-8") in response.data
     with app.app_context():
         assert Article.query.filter_by(slug=slug).first() is None
+
+
+def test_nighteagle_content_package_imports_as_private_draft(client):
+    package_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "content-packages"
+        / "nighteagle-2026-09.json"
+    )
+    package = json.loads(package_path.read_text(encoding="utf-8"))
+    package_id = f'{package["package_id"]}-draft-test'
+    slug = f'{package["article"]["slug"]}-draft-test'
+    package["package_id"] = package_id
+    package["article"]["slug"] = slug
+    cleanup_import(package_id, slug)
+
+    assert package["workflow_status"] == "approved"
+    assert package["seo"]["cover_asset"] == "static/images/material-nighteagle.svg"
+    assert {"telegram", "vk", "video_55_seconds"} <= set(package["channels"])
+    assert package["quality_control"]["human_approval_required"] is True
+
+    login_as_admin(client)
+    response = client.post(
+        "/admin/imports/life-os/",
+        data={"package": json.dumps(package, ensure_ascii=False)},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Создан только черновик".encode("utf-8") in response.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        article_id = article.id
+        assert article.status == "draft"
+        assert article.rubric.slug == "learning-safety"
+        assert article.author == "Степанов Д.А."
+        assert len(article.sources) == 6
+
+    assert client.get(f"/materials/{slug}/").status_code == 404
+    preview = client.get(f"/admin/articles/{article_id}/preview/")
+    assert preview.status_code == 200
+    assert "Как начиналась атака".encode("utf-8") in preview.data
+    assert "Практический чек-лист".encode("utf-8") in preview.data
+    cleanup_import(package_id, slug)
+
+
+def test_nighteagle_package_is_public_and_searchable(client):
+    slug = "nighteagle-vredonos-pod-vidom-1c-adobe"
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "Вредонос под видом 1С и Adobe".encode("utf-8") in page.data
+    assert "Обобщающие выводы".encode("utf-8") in page.data
+    assert b"material-nighteagle.svg" in page.data
+
+    search = client.get("/search/?q=NightEagle")
+    assert search.status_code == 200
+    assert slug.encode() in search.data
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        record = ImportPackage.query.filter_by(
+            package_id="dis-content-factory-nighteagle-2026-09"
+        ).one()
+        assert article.status == "published"
+        assert article.is_public is True
+        assert len(article.sources) == 6
+        assert record.status == "published"

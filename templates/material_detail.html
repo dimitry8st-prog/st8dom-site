@@ -25,6 +25,12 @@
       </div>
     </header>
 
+    {% if article.cover_image %}
+    <figure class="publication__cover">
+      <img src="{{ url_for('static', filename=article.cover_image) }}" alt="Обложка материала: {{ article.title }}" width="1200" height="630">
+    </figure>
+    {% endif %}
+
     {% if article.disclaimer %}<aside class="medical-notice"><strong>Важно</strong><p>{{ article.disclaimer }}</p></aside>{% endif %}
 
     <div class="publication__body">
