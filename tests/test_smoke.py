@@ -151,6 +151,8 @@ def test_library_catalog_groups_and_downloads(client):
     assert b"/library/ai-law-brand-protection/" in page.data
     assert "Читать онлайн".encode("utf-8") in page.data
     assert "На редактуре".encode("utf-8") in page.data
+    assert b"/editorial-workshop/" in page.data
+    assert "Редакционная мастерская".encode("utf-8") in page.data
 
     filtered = client.get("/library/?category=law-safety")
     assert filtered.status_code == 200
@@ -169,6 +171,19 @@ def test_library_catalog_groups_and_downloads(client):
 
     assert client.get("/library/ai-audit-pilot/").status_code == 404
     assert client.get("/library/not-found/").status_code == 404
+
+
+def test_editorial_workshop_is_public_and_source_grounded(client):
+    page = client.get("/editorial-workshop/")
+    assert page.status_code == 200
+    assert "Редакционная мастерская".encode("utf-8") in page.data
+    assert "Ботулинический токсин при орофациальной боли".encode("utf-8") in page.data
+    assert b"10.1080/08869634.2026.2669199" in page.data
+    assert b"dis-mascot-orange.jpg" in page.data
+
+    sitemap = client.get("/sitemap.xml")
+    assert sitemap.status_code == 200
+    assert b"/editorial-workshop/" in sitemap.data
 
 
 def test_life_os_and_library_use_distinct_names(client):

@@ -55,6 +55,7 @@ from editorial import (
     related_articles,
     sources_as_text,
 )
+from editorial_workshop import EDITORIAL_SOURCES, EDITORIAL_STEPS
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
 from lifeos_import import ImportValidationError, import_lifeos_package
@@ -546,6 +547,15 @@ def create_app() -> Flask:
             page_id="library",
         )
 
+    @app.route("/editorial-workshop/")
+    def editorial_workshop():
+        return render_template(
+            "editorial_workshop.html",
+            sources=EDITORIAL_SOURCES,
+            steps=EDITORIAL_STEPS,
+            page_id="library",
+        )
+
     @app.route("/library/<slug>/")
     def library_detail(slug: str):
         item = get_library_item(slug)
@@ -894,6 +904,7 @@ def create_app() -> Flask:
             origin + url_for("cases_list"),
             origin + url_for("projects_catalog"),
             origin + url_for("library_catalog"),
+            origin + url_for("editorial_workshop"),
             origin + url_for("contact"),
             origin + url_for("privacy"),
             origin + url_for("consent"),

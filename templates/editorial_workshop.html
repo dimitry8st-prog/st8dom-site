@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Редакционная мастерская ДИС — подготовка медицинских статей{% endblock %}
+{% block description %}Публичный маршрут подготовки доказательных медицинских статей: источник, разбор, черновик, врачебная проверка и публикация.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('editorial_workshop') }}{% endblock %}
+
+{% block content %}
+<div class="container container--wide editorial-workshop">
+  <section class="hero editorial-workshop__hero">
+    <div>
+      <p class="eyebrow">// библиотека → редакционная мастерская</p>
+      <h1>От научного источника<br>до понятной статьи</h1>
+      <p class="hero-sub">Здесь видно, какие публикации изучаются, что готовится к выпуску и на каком этапе находится врачебная проверка.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#sources">Смотреть источники</a>
+        <a class="btn btn-ghost" href="{{ url_for('library_catalog') }}">← В библиотеку</a>
+      </div>
+    </div>
+    <div class="editorial-workshop__mascot">
+      <img src="{{ url_for('static', filename='images/dis-mascot-orange.jpg') }}" width="260" height="260" alt="Маскот ДИС в редакционной мастерской">
+      <span>ДИС проверяет путь материала</span>
+    </div>
+  </section>
+
+  <section class="editorial-process" aria-labelledby="editorial-process-title">
+    <div class="section-heading">
+      <p class="eyebrow">// контроль качества</p>
+      <h2 id="editorial-process-title">Как появляется статья</h2>
+    </div>
+    <div class="editorial-process__grid">
+      {% for number, title, description in steps %}
+      <article class="editorial-step">
+        <span>{{ number }}</span>
+        <h3>{{ title }}</h3>
+        <p>{{ description }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="sources" class="editorial-sources" aria-labelledby="editorial-sources-title">
+    <div class="section-heading">
+      <p class="eyebrow">// в работе</p>
+      <h2 id="editorial-sources-title">Источники и будущие статьи</h2>
+    </div>
+    {% for item in sources %}
+    <article class="editorial-source" id="{{ item.slug }}">
+      <div class="editorial-source__meta">
+        <span class="editorial-status editorial-status--{{ item.status }}">{{ item.status_label }}</span>
+        <span>{{ item.kind }}</span>
+        <time datetime="2026-05-08">{{ item.published_on }}</time>
+      </div>
+      <h3>{{ item.title }}</h3>
+      <p class="editorial-source__original">{{ item.original_title }}</p>
+      <p>{{ item.summary }}</p>
+      <dl class="editorial-source__facts">
+        <div><dt>Авторы</dt><dd>{{ item.authors }}</dd></div>
+        <div><dt>Журнал</dt><dd>{{ item.journal }}</dd></div>
+        <div><dt>DOI</dt><dd>{{ item.doi }}</dd></div>
+      </dl>
+      <div class="editorial-evidence"><strong>Уровень материала:</strong> {{ item.evidence }}</div>
+      <div class="editorial-draft">
+        <p class="eyebrow">// будущая публикация</p>
+        <h4>{{ item.working_title }}</h4>
+        <ol>{% for point in item.outline %}<li>{{ point }}</li>{% endfor %}</ol>
+      </div>
+      <div class="editorial-source__actions">
+        <a class="btn btn-primary" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">Открыть официальный источник ↗</a>
+        <span>Публикация на портале — после проверки Степановым Д.А.</span>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <aside class="editorial-note">
+    <strong>Важно:</strong> редакционная карточка не заменяет оригинал и не является медицинской рекомендацией. Схемы лечения и дозировки не публикуются без проверки действующих руководств и первичных исследований.
+  </aside>
+</div>
+{% endblock %}

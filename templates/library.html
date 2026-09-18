@@ -24,6 +24,16 @@
     <p><strong>Life‑OS</strong> собирает источники, заметки и черновики во внутренней базе знаний. После авторской проверки готовый материал один раз публикуется здесь, а другие разделы портала ссылаются на эту же карточку и файл.</p>
   </section>
 
+  <section class="editorial-entry" aria-labelledby="editorial-entry-title">
+    <div class="editorial-entry__copy">
+      <p class="eyebrow">// новая рабочая зона</p>
+      <h2 id="editorial-entry-title">ДИС · Редакционная мастерская</h2>
+      <p>Научные публикации проходят разбор доказательств, подготовку черновика и врачебную проверку до выхода на портал.</p>
+      <a class="btn btn-primary" href="{{ url_for('editorial_workshop') }}">Открыть мастерскую</a>
+    </div>
+    <img src="{{ url_for('static', filename='images/dis-mascot-orange.jpg') }}" width="150" height="150" alt="Маскот ДИС — редактор медицинских материалов">
+  </section>
+
   <nav class="library-categories" aria-label="Темы библиотеки">
     <a class="{% if not selected_category %}is-active{% endif %}" href="{{ url_for('library_catalog') }}">Все · {{ total }}</a>
     {% for category in categories %}
