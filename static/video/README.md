@@ -1,4 +1,13 @@
-# Видео ролика FAQ-ассистента
+# Видео проектов
+
+## ÉLAN
+
+- `elan-promo-16x9.mp4` — презентационный ролик лендинга, 42 секунды, 16:9.
+- `elan-promo-poster.jpg` — обложка ролика.
+- Музыка: Erik Satie — *Gymnopédie No. 1*, запись Teknopazzo, CC0 1.0.
+- Источник: https://commons.wikimedia.org/wiki/File:Gymnopedie_No._1..ogg
+
+## FAQ-ассистент
 
 Ожидаемые файлы:
 

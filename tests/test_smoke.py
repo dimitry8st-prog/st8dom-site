@@ -41,6 +41,7 @@ def test_cases_and_details(client):
         "telegram-bot",
         "online-store-ops",
         "crm-automation",
+        "elan",
         "corporate-site",
         "ai-support",
         "redcat-ai",
@@ -207,8 +208,8 @@ def test_life_os_and_library_use_distinct_names(client):
 def test_selected_projects_catalog(client):
     page = client.get("/projects/")
     assert page.status_code == 200
-    assert "15 проектов".encode("utf-8") in page.data
-    assert page.data.count(b'class="portal-project-card') == 15
+    assert "16 проектов".encode("utf-8") in page.data
+    assert page.data.count(b'class="portal-project-card') == 16
     assert b"st8dom-site" not in page.data
     for name in [
         "AutoSfera-AI",
@@ -220,7 +221,7 @@ def test_selected_projects_catalog(client):
         "OnboardFlow-AI",
     ]:
         assert name.encode("utf-8") in page.data
-    assert page.data.count(b"project-video-trigger") == 8
+    assert page.data.count(b"project-video-trigger") == 9
     assert b"autosfera-ai-defense.mp4" in page.data
     assert b"dis-reputatsiya-360-16x9.mp4" in page.data
     assert b"ai-nastavnik-360-16x9.mp4" in page.data
@@ -229,6 +230,7 @@ def test_selected_projects_catalog(client):
     assert b"legalbot-demo.mp4" in page.data
     assert b"biobalance-promo-16x9.mp4" in page.data
     assert b"vitalis-medical-ai.mp4" in page.data
+    assert b"elan-promo-16x9.mp4" in page.data
     assert b"Vitalis-Medical-AI-FL.png" in page.data
     html = page.data.decode("utf-8")
     vitalis_start = html.index("<h2>Vitalis Medical AI</h2>")

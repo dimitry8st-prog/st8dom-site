@@ -115,10 +115,11 @@ PROJECTS = [
     {"name": "SAR-GPT-Analyzer", "summary": "Помощник для анализа радарных данных и работы в QGIS.", "group": "quality", "areas": ["analytics", "ai"], "repo": "QGIS-"},
     {"name": "HealthyStore", "summary": "Концепция интернет-магазина полезных и безглютеновых продуктов.", "group": "quality", "areas": ["web"], "repo": "Zdorowii_magazin", "case_slug": "healthy-store", "video": "biobalance-promo-16x9.mp4", "poster": "biobalance-promo-poster.webp"},
     {"name": "OnboardFlow-AI", "summary": "Онбординг сотрудников по проверенной корпоративной базе знаний.", "group": "quality", "areas": ["education", "rag"], "repo": "OnboardFlow_AI"},
+    {"name": "ÉLAN", "summary": "Адаптивный MVP кабинета доказательной косметологии с услугами, ценами, FAQ и онлайн-записью.", "group": "quality", "areas": ["medicine", "web"], "repo": "ELAN---", "case_slug": "elan", "video": "elan-promo-16x9.mp4", "poster": "elan-promo-poster.jpg"},
 ]
 
 PROJECT_FILTERS = [
-    ("all", "Все 15"),
+    ("all", "Все 16"),
     ("flagship", "6 флагманов"),
     ("medicine", "Медицина"),
     ("ai", "AI"),
