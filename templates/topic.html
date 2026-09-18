@@ -29,7 +29,7 @@
         </header>
         <div class="clinical-track__rubrics">
           {% for rubric in group.cards %}
-          <a class="clinical-rubric" href="{{ url_for('materials_catalog', section=section_slug, rubric=rubric.slug) }}">
+          <a class="clinical-rubric" href="{{ rubric.href }}">
             <span><strong>{{ rubric.name }}</strong><small>{{ rubric.count if rubric.count else 'Материалы готовятся' }}</small></span>
             <span class="clinical-rubric__arrow" aria-hidden="true">→</span>
           </a>
@@ -41,7 +41,7 @@
     {% else %}
     <div class="rubric-grid">
       {% for rubric in rubrics %}
-      <a class="rubric-card" href="{{ url_for('materials_catalog', section=section_slug, rubric=rubric.slug) }}">
+      <a class="rubric-card" href="{{ rubric.href }}">
         <span class="rubric-card__count">{{ rubric.count }}</span>
         <h3>{{ rubric.name }}</h3>
         <p>{{ 'Опубликованных материалов' if rubric.count else 'Материалы готовятся' }}</p>
@@ -51,6 +51,27 @@
     </div>
     {% endif %}
   </section>
+
+  {% if guidelines %}
+  <section class="s">
+    <div class="s-label"><span>//</span> официальный мониторинг</div>
+    <h2>Последние клинические рекомендации</h2>
+    <div class="guideline-grid">
+      {% for item in guidelines %}
+      <article class="guideline-card">
+        <div class="guideline-card__meta">
+          <span>{{ "Россия" if item.is_russian else "Международные" }}</span>
+          {% if item.published_on %}<time datetime="{{ item.published_on.isoformat() }}">{{ item.published_on.strftime('%d.%m.%Y') }}</time>{% endif %}
+        </div>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.source_name }}</p>
+        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">Открыть официальный документ <span aria-hidden="true">↗</span></a>
+      </article>
+      {% endfor %}
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('clinical_guidelines_catalog') }}">Все рекомендации</a>
+  </section>
+  {% endif %}
 
   <section class="s">
     <div class="s-label"><span>//</span> публикации</div>

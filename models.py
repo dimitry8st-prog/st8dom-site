@@ -289,3 +289,42 @@ class ImportPackage(db.Model):
     created_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
 
     article = db.relationship("Article")
+
+
+class ClinicalGuideline(db.Model):
+    """Метаданные клинической рекомендации из официального источника.
+
+    В таблице хранится только библиографическая карточка и ссылка на оригинал.
+    Медицинский пересказ остаётся отдельной редакционной публикацией Article.
+    """
+
+    __tablename__ = "clinical_guidelines"
+    __table_args__ = (
+        db.UniqueConstraint(
+            "source_key", "external_id", name="uq_guideline_source_external_id"
+        ),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    source_key = db.Column(db.String(40), nullable=False, index=True)
+    source_name = db.Column(db.String(180), nullable=False)
+    external_id = db.Column(db.String(160), nullable=False, index=True)
+    kind = db.Column(db.String(24), nullable=False, index=True)
+    title = db.Column(db.String(500), nullable=False)
+    organization = db.Column(db.Text, nullable=True)
+    version = db.Column(db.String(80), nullable=True)
+    codes = db.Column(db.Text, nullable=True)
+    specialties = db.Column(db.Text, nullable=True)
+    url = db.Column(db.String(1000), nullable=False)
+    published_on = db.Column(db.Date, nullable=True, index=True)
+    status = db.Column(db.String(24), nullable=False, default="active", index=True)
+    content_hash = db.Column(db.String(64), nullable=False, index=True)
+    first_seen_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+    last_seen_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
+    updated_at = db.Column(
+        db.DateTime, default=utcnow, onupdate=utcnow, nullable=False
+    )
+
+    @property
+    def is_russian(self) -> bool:
+        return self.kind == "russian"

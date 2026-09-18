@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import logging
 import os
 import smtplib
@@ -33,6 +34,14 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from assistant.answer import MAX_MESSAGE_LEN, answer_question
 from assistant.rate_limit import limiter
 from cases import FILTERS, get_all_cases, get_case
+from clinical_guidelines import (
+    GuidelineValidationError,
+    OFFICIAL_SOURCES,
+    fetch_minzdrav_page,
+    public_guidelines_query,
+    sync_minzdrav,
+    upsert_guideline,
+)
 from config import BASE_DIR, get_config
 from docx_reader import read_docx_blocks
 from editorial import (
@@ -56,7 +65,15 @@ from library_content import (
     grouped_library_items,
     library_items_for_direction,
 )
-from models import AdminUser, Article, ImportPackage, Inquiry, Rubric, Tag
+from models import (
+    AdminUser,
+    Article,
+    ClinicalGuideline,
+    ImportPackage,
+    Inquiry,
+    Rubric,
+    Tag,
+)
 from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get_topic
 
 logger = logging.getLogger("st8dom")
@@ -295,7 +312,17 @@ def create_app() -> Flask:
             full_slug = f"{topic_slug}-{short_slug}"
             rubric = rubric_by_slug.get(full_slug)
             count = published_articles().filter_by(rubric_id=rubric.id).count() if rubric else 0
-            rubric_cards.append({"slug": full_slug, "name": name, "count": count})
+            href = url_for("materials_catalog", section=section_slug, rubric=full_slug)
+            if topic_slug == "clinical-guidelines" and short_slug in {
+                "russian-guidelines",
+                "international-guidelines",
+            }:
+                kind = "russian" if short_slug == "russian-guidelines" else "international"
+                count = public_guidelines_query().filter_by(kind=kind).count()
+                href = url_for("clinical_guidelines_catalog", kind=kind)
+            rubric_cards.append(
+                {"slug": full_slug, "name": name, "count": count, "href": href}
+            )
         grouped_rubrics = []
         card_by_slug = {card["slug"]: card for card in rubric_cards}
         for group in topic.get("rubric_groups", []):
@@ -312,6 +339,14 @@ def create_app() -> Flask:
             .order_by(Article.published_at.desc())
             .all()
         )
+        guidelines = []
+        if topic_slug == "clinical-guidelines":
+            guidelines = (
+                public_guidelines_query()
+                .order_by(ClinicalGuideline.published_on.desc(), ClinicalGuideline.id.desc())
+                .limit(8)
+                .all()
+            )
         return render_template(
             "topic.html",
             section=section,
@@ -320,8 +355,94 @@ def create_app() -> Flask:
             rubrics=rubric_cards,
             grouped_rubrics=grouped_rubrics,
             materials=articles,
+            guidelines=guidelines,
             page_id=f"direction-{section_slug}",
         )
+
+    @app.route("/clinical-guidelines/")
+    def clinical_guidelines_catalog():
+        kind = request.args.get("kind", "").strip().lower()
+        source_key = request.args.get("source", "").strip().lower()
+        search = request.args.get("q", "").strip()
+        query = public_guidelines_query()
+        if kind in {"russian", "international"}:
+            query = query.filter(ClinicalGuideline.kind == kind)
+        else:
+            kind = ""
+        if source_key in OFFICIAL_SOURCES:
+            query = query.filter(ClinicalGuideline.source_key == source_key)
+        else:
+            source_key = ""
+        if search:
+            pattern = f"%{search}%"
+            query = query.filter(
+                or_(
+                    ClinicalGuideline.title.ilike(pattern),
+                    ClinicalGuideline.organization.ilike(pattern),
+                    ClinicalGuideline.codes.ilike(pattern),
+                )
+            )
+        guidelines = query.order_by(
+            ClinicalGuideline.published_on.desc(), ClinicalGuideline.id.desc()
+        ).all()
+        return render_template(
+            "clinical_guidelines.html",
+            guidelines=guidelines,
+            official_sources=OFFICIAL_SOURCES,
+            selected={"kind": kind, "source": source_key, "q": search},
+            page_id="clinical-guidelines",
+        )
+
+    def require_guidelines_sync_token() -> None:
+        configured = (app.config.get("GUIDELINES_SYNC_TOKEN") or "").strip()
+        provided = request.headers.get("Authorization", "")
+        if not configured:
+            abort(503, description="Синхронизация рекомендаций не настроена.")
+        expected = f"Bearer {configured}"
+        if not hmac.compare_digest(provided, expected):
+            abort(401)
+
+    @app.post("/api/clinical-guidelines/sync/minzdrav/")
+    @csrf.exempt
+    def api_sync_minzdrav():
+        require_guidelines_sync_token()
+        try:
+            page = max(1, int(request.args.get("page", "1")))
+            page_size = min(100, max(5, int(request.args.get("page_size", "25"))))
+            source_data = fetch_minzdrav_page(current_page=page, page_size=page_size)
+            stats = sync_minzdrav(source_data["Data"])
+            stats["page"] = page
+            stats["page_size"] = page_size
+            stats["total_records"] = int(source_data.get("TotalRecords") or 0)
+            stats["total_pages"] = (
+                (stats["total_records"] + page_size - 1) // page_size
+                if stats["total_records"]
+                else 0
+            )
+        except (requests.RequestException, RuntimeError, ValueError):
+            logger.exception("Ошибка синхронизации рекомендаций Минздрава")
+            return jsonify({"ok": False, "error": "official_source_unavailable"}), 502
+        logger.info("Синхронизация рекомендаций Минздрава: %s", stats)
+        return jsonify({"ok": True, **stats})
+
+    @app.post("/api/clinical-guidelines/import/")
+    @csrf.exempt
+    def api_import_clinical_guideline():
+        """Принимает одну карточку от адаптера n8n, но только с официального домена."""
+        require_guidelines_sync_token()
+        try:
+            record, action = upsert_guideline(request.get_json(silent=True))
+            db.session.commit()
+        except GuidelineValidationError as exc:
+            db.session.rollback()
+            return jsonify({"ok": False, "error": str(exc)}), 400
+        logger.info(
+            "Импорт рекомендации %s:%s — %s",
+            record.source_key,
+            record.external_id,
+            action,
+        )
+        return jsonify({"ok": True, "action": action, "id": record.id})
 
     @app.route("/telegram/")
     def telegram_placeholder():
@@ -775,6 +896,7 @@ def create_app() -> Flask:
             origin + url_for("contact"),
             origin + url_for("privacy"),
             origin + url_for("consent"),
+            origin + url_for("clinical_guidelines_catalog"),
         ]
         pages.extend(
             origin + url_for("direction_detail", slug=slug) for slug in SECTIONS

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Клинические рекомендации по неврологии и нейрохирургии — портал ДИС{% endblock %}
+{% block description %}Карточки российских и международных клинических рекомендаций по неврологии и нейрохирургии со ссылками на официальные источники.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('clinical_guidelines_catalog') }}{% endblock %}
+
+{% block content %}
+<div class="container container--wide">
+  <section class="hero guideline-hero">
+    <p class="eyebrow"><a href="{{ url_for('direction_detail', slug='medicine') }}">Медицина</a> / официальный мониторинг</p>
+    <h1>Клинические рекомендации</h1>
+    <p class="hero-sub">Неврология и нейрохирургия. Система сохраняет дату, версию и прямую ссылку на первоисточник. Карточка не заменяет оригинальный документ.</p>
+  </section>
+
+  <form class="material-filters" method="get" action="{{ url_for('clinical_guidelines_catalog') }}" role="search">
+    <label>Поиск
+      <input type="search" name="q" value="{{ selected.q }}" placeholder="Название, МКБ или организация">
+    </label>
+    <label>Контур
+      <select name="kind">
+        <option value="">Все рекомендации</option>
+        <option value="russian"{% if selected.kind == 'russian' %} selected{% endif %}>Российские</option>
+        <option value="international"{% if selected.kind == 'international' %} selected{% endif %}>Международные</option>
+      </select>
+    </label>
+    <label>Источник
+      <select name="source">
+        <option value="">Все источники</option>
+        {% for key, source in official_sources.items() %}
+        <option value="{{ key }}"{% if selected.source == key %} selected{% endif %}>{{ source.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-primary btn-sm" type="submit">Найти</button>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('clinical_guidelines_catalog') }}">Сбросить</a>
+  </form>
+
+  <div class="source-notice">
+    <strong>Важно:</strong> автоматически публикуются только библиографические данные официального документа. Разбор доказательств и практические выводы проходят проверку Степановым Д.А.
+  </div>
+
+  {% if guidelines %}
+  <div class="guideline-grid guideline-grid--catalog">
+    {% for item in guidelines %}
+    <article class="guideline-card">
+      <div class="guideline-card__meta">
+        <span>{{ "Россия" if item.is_russian else "Международные" }}</span>
+        {% if item.published_on %}<time datetime="{{ item.published_on.isoformat() }}">{{ item.published_on.strftime('%d.%m.%Y') }}</time>{% endif %}
+      </div>
+      <h2>{{ item.title }}</h2>
+      <dl class="guideline-card__details">
+        <div><dt>Источник</dt><dd>{{ item.source_name }}</dd></div>
+        {% if item.organization %}<div><dt>Разработчик</dt><dd>{{ item.organization }}</dd></div>{% endif %}
+        {% if item.version %}<div><dt>Версия</dt><dd>{{ item.version }}</dd></div>{% endif %}
+        {% if item.codes %}<div><dt>МКБ</dt><dd>{{ item.codes }}</dd></div>{% endif %}
+      </dl>
+      <a class="btn btn-primary btn-sm" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">Открыть в официальном источнике ↗</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h2>Рекомендации пока не загружены</h2>
+    <p>После первой синхронизации здесь появятся карточки официальных документов.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

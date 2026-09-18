@@ -46,6 +46,10 @@ class Config:
     # Опциональная аналитика. Пустое значение = скрипт-заглушка без внешних вызовов.
     ANALYTICS_ID = os.environ.get("ANALYTICS_ID", "")
 
+    # Секрет для n8n/cron, запускающего синхронизацию клинических рекомендаций.
+    # Если значение пустое, внешние API-точки синхронизации отключены.
+    GUIDELINES_SYNC_TOKEN = os.environ.get("GUIDELINES_SYNC_TOKEN", "")
+
     # Виджет FAQ. Без ключа модели отвечает текстом из data/faqs.json.
     CHAT_ENABLED = os.environ.get("CHAT_ENABLED", "1").strip().lower() not in {
         "0",
