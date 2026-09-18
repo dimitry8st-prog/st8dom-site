@@ -62,6 +62,29 @@ def test_stroke_rehabilitation_article_is_structured_and_sourced(client):
         assert len(article.sources) == 15
 
 
+def test_botulinum_orofacial_pain_article_is_published_and_sourced(client):
+    slug = "botulinoterapiya-pri-litsevoy-boli"
+    page = client.get(f"/materials/{slug}/")
+
+    assert page.status_code == 200
+    assert "Ботулинотерапия при лицевой боли".encode("utf-8") in page.data
+    assert "Продолжение серии".encode("utf-8") in page.data
+    assert "Медицинская проверка: Степанов Д.А.".encode("utf-8") in page.data
+    assert b"10.1080/08869634.2026.2669199" in page.data
+
+    listing = client.get("/materials/")
+    assert slug.encode() in listing.data
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        assert article.status == "published"
+        assert article.medical_reviewer == "Степанов Д.А."
+        assert article.rubric.slug == "neurology-neurosurgery-neurology-treatment"
+        assert len(article.sources) == 11
+
+
 def test_draft_is_private_but_admin_can_preview(client):
     slug = "test-private-draft"
     remove_article(slug)

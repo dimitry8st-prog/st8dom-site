@@ -11,8 +11,8 @@ EDITORIAL_STEPS = (
 EDITORIAL_SOURCES = (
     {
         "slug": "botulinum-toxin-orofacial-pain-2026",
-        "status": "medical-review",
-        "status_label": "На врачебной проверке",
+        "status": "published",
+        "status_label": "Опубликовано",
         "kind": "Редакционная экспертная статья",
         "date_iso": "2026-05-08",
         "published_on": "08.05.2026",
@@ -52,6 +52,8 @@ EDITORIAL_SOURCES = (
             "Что врач должен проверить до процедуры",
         ),
         "source_label": "Открыть официальный источник ↗",
+        "article_slug": "botulinoterapiya-pri-litsevoy-boli",
+        "article_label": "Читать статью →",
     },
     {
         "slug": "antidepressants-general-clinical-practice-book",

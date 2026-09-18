@@ -169,8 +169,12 @@ def ensure_published_content_package(filename: str, published_at: datetime) -> N
     article.rubric = rubric
     article.content_type = article_data["content_type"]
     article.status = "ready"
-    article.author = "Степанов Д.А."
-    article.revision_note = "Материал и источники проверены 18 сентября 2026 года."
+    article.author = article_data.get("author", "Степанов Д.А.")
+    article.medical_reviewer = article_data.get("medical_reviewer")
+    article.disclaimer = article_data.get("disclaimer")
+    article.revision_note = article_data.get(
+        "revision_note", "Материал и источники проверены 18 сентября 2026 года."
+    )
     article.is_featured = True
     article.reviewed_at = published_at
     article.tags = tags
@@ -263,6 +267,10 @@ def ensure_editorial_seed() -> None:
 
     ensure_published_content_package(
         "nighteagle-2026-09.json",
+        datetime(2026, 9, 18, tzinfo=timezone.utc),
+    )
+    ensure_published_content_package(
+        "botulinum-orofacial-pain-2026-09.json",
         datetime(2026, 9, 18, tzinfo=timezone.utc),
     )
 

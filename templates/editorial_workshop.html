@@ -64,8 +64,9 @@
         <ol>{% for point in item.outline %}<li>{{ point }}</li>{% endfor %}</ol>
       </div>
       <div class="editorial-source__actions">
+        {% if item.article_slug %}<a class="btn btn-primary" href="{{ url_for('material_detail', slug=item.article_slug) }}">{{ item.article_label }}</a>{% endif %}
         <a class="btn btn-primary" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.source_label }}</a>
-        <span>Публикация на портале — после проверки Степановым Д.А.</span>
+        <span>{% if item.article_slug %}Проверено Степановым Д.А. · опубликовано 18.09.2026{% else %}Публикация на портале — после проверки Степановым Д.А.{% endif %}</span>
       </div>
     </article>
     {% endfor %}

@@ -182,6 +182,8 @@ def test_editorial_workshop_is_public_and_source_grounded(client):
     assert "Антидепрессанты в общей клинической практике".encode("utf-8") in page.data
     assert b"https://school-headachedr.ru/kniga" in page.data
     assert "Источник на разборе".encode("utf-8") in page.data
+    assert "Опубликовано".encode("utf-8") in page.data
+    assert b"/materials/botulinoterapiya-pri-litsevoy-boli/" in page.data
     assert b"dis-mascot-orange.jpg" in page.data
 
     sitemap = client.get("/sitemap.xml")
