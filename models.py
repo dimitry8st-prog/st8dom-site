@@ -145,6 +145,12 @@ class Article(db.Model):
         return [tag.name for tag in self.tags]
 
     @property
+    def cover_image(self) -> str | None:
+        return {
+            "nighteagle-vredonos-pod-vidom-1c-adobe": "images/material-nighteagle.svg",
+        }.get(self.slug)
+
+    @property
     def body_paragraphs(self) -> list[str]:
         return [part.strip() for part in self.body.split("\n\n") if part.strip()]
 

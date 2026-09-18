@@ -25,6 +25,9 @@ Bootstrap сознательно не подключался: он сломал 
 
 Редакционная схема и следующие этапы: [`docs/editorial-architecture.md`](docs/editorial-architecture.md).
 
+Пилотный пакет контент-завода NightEagle (статья, источники, SEO, адаптации и
+Obsidian-карточка): [`docs/content-packages/nighteagle-2026-09.md`](docs/content-packages/nighteagle-2026-09.md).
+
 ## Локальный запуск
 
 ```bash

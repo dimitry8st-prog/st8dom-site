@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from datetime import datetime, timezone
+from pathlib import Path
 from urllib.parse import urlparse
 
 from extensions import db
-from models import Article, ArticleSource, Rubric, Tag
+from models import Article, ArticleSource, ImportPackage, Rubric, Tag
 from portal_content import rubric_catalog
 
 
@@ -26,6 +29,8 @@ CONTENT_TYPE_LABELS = {
     "analysis": "Разбор",
     "patient": "Материал пациенту",
 }
+
+CONTENT_PACKAGES_DIR = Path(__file__).resolve().parent / "data" / "content-packages"
 
 
 def utcnow() -> datetime:
@@ -117,11 +122,82 @@ def apply_article_form(article: Article, form) -> list[str]:
     return []
 
 
+def ensure_published_content_package(filename: str, published_at: datetime) -> None:
+    """Публикует одобренный пакет и безопасно подхватывает прежний черновик."""
+    package_path = CONTENT_PACKAGES_DIR / filename
+    payload = json.loads(package_path.read_text(encoding="utf-8"))
+    if payload.get("workflow_status") != "approved":
+        raise ValueError(f"Пакет {filename} не получил редакционное одобрение.")
+
+    article_data = payload["article"]
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    checksum = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    rubric = Rubric.query.filter_by(
+        slug=article_data["rubric"], section=article_data["section"]
+    ).one()
+    article = Article.query.filter_by(slug=article_data["slug"]).first()
+    record = ImportPackage.query.filter_by(package_id=payload["package_id"]).first()
+
+    if article is not None and article.is_public:
+        if record is None:
+            record = ImportPackage(package_id=payload["package_id"], article=article)
+            db.session.add(record)
+        record.checksum = checksum
+        record.generator_version = payload["generator_version"]
+        record.status = "published"
+        return
+
+    tags = []
+    for name in article_data["tags"]:
+        slug = tag_slug(name)
+        tags.append(Tag.query.filter_by(slug=slug).first() or Tag(name=name, slug=slug))
+
+    sources = [
+        ArticleSource(title=source["title"], url=source["url"])
+        for source in payload["sources"]
+    ]
+    if article is None:
+        article = Article(slug=article_data["slug"])
+        db.session.add(article)
+    else:
+        article.sources.clear()
+
+    article.title = article_data["title"]
+    article.summary = article_data["summary"]
+    article.body = article_data["body"]
+    article.section = article_data["section"]
+    article.rubric = rubric
+    article.content_type = article_data["content_type"]
+    article.status = "ready"
+    article.author = "Степанов Д.А."
+    article.revision_note = "Материал и источники проверены 18 сентября 2026 года."
+    article.is_featured = True
+    article.reviewed_at = published_at
+    article.tags = tags
+    article.sources = sources
+
+    db.session.flush()
+    errors = article.publish()
+    if errors:
+        raise ValueError(f"Пакет {filename} нельзя опубликовать: {', '.join(errors)}")
+    article.published_at = published_at
+
+    if record is None:
+        record = ImportPackage(package_id=payload["package_id"], article=article)
+        db.session.add(record)
+    record.article = article
+    record.checksum = checksum
+    record.generator_version = payload["generator_version"]
+    record.status = "published"
+
+
 def ensure_editorial_seed() -> None:
     """Создаёт проверенные стартовые материалы и недостающие рубрики."""
     for item in rubric_catalog():
         if Rubric.query.filter_by(slug=item["slug"]).first() is None:
             db.session.add(Rubric(name=item["name"], slug=item["slug"], section=item["section"], description=item["description"]))
+
+    db.session.flush()
 
     rubric = Rubric.query.filter_by(slug="medical-ai").first()
     if rubric is None:
@@ -184,6 +260,11 @@ def ensure_editorial_seed() -> None:
                 ],
             )
         )
+
+    ensure_published_content_package(
+        "nighteagle-2026-09.json",
+        datetime(2026, 9, 18, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():

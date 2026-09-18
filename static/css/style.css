@@ -2305,6 +2305,22 @@ section.s {
   margin: 22px 0 18px;
 }
 
+.publication__cover {
+  margin: 30px 0 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.publication__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+}
+
 .verified-mark {
   color: var(--green);
 }
