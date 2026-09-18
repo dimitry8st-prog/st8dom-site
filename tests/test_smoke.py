@@ -179,6 +179,9 @@ def test_editorial_workshop_is_public_and_source_grounded(client):
     assert "Редакционная мастерская".encode("utf-8") in page.data
     assert "Ботулинический токсин при орофациальной боли".encode("utf-8") in page.data
     assert b"10.1080/08869634.2026.2669199" in page.data
+    assert "Антидепрессанты в общей клинической практике".encode("utf-8") in page.data
+    assert b"https://school-headachedr.ru/kniga" in page.data
+    assert "Источник на разборе".encode("utf-8") in page.data
     assert b"dis-mascot-orange.jpg" in page.data
 
     sitemap = client.get("/sitemap.xml")
