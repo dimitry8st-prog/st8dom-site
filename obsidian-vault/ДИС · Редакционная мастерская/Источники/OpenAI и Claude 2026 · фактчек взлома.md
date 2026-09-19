@@ -1,7 +1,7 @@
 ---
 title: "OpenAI и Claude 2026 · фактчек взлома"
 type: source-card
-status: needs-approval
+status: published
 section: ai
 rubric: learning-safety
 checked: 2026-09-19
