@@ -187,3 +187,72 @@ def test_nighteagle_package_is_public_and_searchable(client):
         assert article.is_public is True
         assert len(article.sources) == 6
         assert record.status == "published"
+
+
+def test_openai_claude_factcheck_package_imports_safely_as_private_draft(client):
+    package_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "content-packages"
+        / "openai-claude-hack-2026-09.json"
+    )
+    package = json.loads(package_path.read_text(encoding="utf-8"))
+    package_id = f'{package["package_id"]}-draft-test'
+    slug = f'{package["article"]["slug"]}-draft-test'
+    package["package_id"] = package_id
+    package["article"]["slug"] = slug
+    cleanup_import(package_id, slug)
+
+    assert package["workflow_status"] == "approved"
+    assert package["quality_control"]["headline_corrected"] is True
+    assert package["quality_control"]["human_approval_required"] is True
+    assert len(package["sources"]) == 7
+    assert "Что произошло на самом деле" in package["article"]["body"]
+    assert "Anthropic не проводила атаку" in package["article"]["body"]
+
+    login_as_admin(client)
+    response = client.post(
+        "/admin/imports/life-os/",
+        data={"package": json.dumps(package, ensure_ascii=False)},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Создан только черновик".encode("utf-8") in response.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        article_id = article.id
+        assert article.status == "draft"
+        assert article.rubric.slug == "learning-safety"
+        assert len(article.sources) == 7
+
+    assert client.get(f"/materials/{slug}/").status_code == 404
+    preview = client.get(f"/admin/articles/{article_id}/preview/")
+    assert preview.status_code == 200
+    assert "Проверка ключевых утверждений".encode("utf-8") in preview.data
+    cleanup_import(package_id, slug)
+
+
+def test_openai_claude_factcheck_is_public_and_searchable(client):
+    slug = "ne-anthropic-vzlomala-openai-claude-hacktron"
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "Не Anthropic взломала OpenAI".encode("utf-8") in page.data
+    assert "Проверка ключевых утверждений".encode("utf-8") in page.data
+    assert b"material-openai-claude-security.svg" in page.data
+
+    search = client.get("/search/?q=Hacktron")
+    assert search.status_code == 200
+    assert slug.encode() in search.data
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        record = ImportPackage.query.filter_by(
+            package_id="dis-content-factory-openai-claude-hack-2026-09"
+        ).one()
+        assert article.status == "published"
+        assert article.is_public is True
+        assert len(article.sources) == 7
+        assert record.status == "published"

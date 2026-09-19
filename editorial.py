@@ -273,6 +273,10 @@ def ensure_editorial_seed() -> None:
         "botulinum-orofacial-pain-2026-09.json",
         datetime(2026, 9, 18, tzinfo=timezone.utc),
     )
+    ensure_published_content_package(
+        "openai-claude-hack-2026-09.json",
+        datetime(2026, 9, 19, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():

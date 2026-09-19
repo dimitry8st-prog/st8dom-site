@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Не Anthropic взломала OpenAI</title>
+  <desc id="desc">Обложка фактчека портала ДИС об использовании Claude при исследовании безопасности OpenAI</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07142f"/>
+      <stop offset="1" stop-color="#122b66"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="78%" cy="32%" r="54%">
+      <stop offset="0" stop-color="#f28c28" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#f28c28" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="34" fill="url(#bg)"/>
+  <rect width="1200" height="630" rx="34" fill="url(#glow)"/>
+  <g fill="none" stroke="#f28c28" stroke-width="4" opacity=".85">
+    <path d="M820 166h104l44 44v104l-44 44H820l-44-44V210z"/>
+    <path d="M865 166v-48m0 288v-48m-89-96h-52m296 0h-52"/>
+    <circle cx="865" cy="262" r="42"/>
+  </g>
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="72" y="88" fill="#f28c28" font-size="28" font-weight="700" letter-spacing="3">ДИС · AI БЕЗ КЛИКБЕЙТА</text>
+    <text x="72" y="184" fill="#ffffff" font-size="58" font-weight="800">Не Anthropic</text>
+    <text x="72" y="252" fill="#ffffff" font-size="58" font-weight="800">взломала OpenAI</text>
+    <text x="72" y="323" fill="#a9bfe8" font-size="30">Что произошло на самом деле</text>
+    <rect x="72" y="382" width="575" height="72" rx="18" fill="#f28c28"/>
+    <text x="104" y="428" fill="#07142f" font-size="28" font-weight="800">CLAUDE + CODEX + HACKTRON</text>
+    <text x="72" y="538" fill="#d8e4ff" font-size="24">Фактчек · цепочка атаки · чек-лист для бизнеса</text>
+  </g>
+  <g fill="#f28c28">
+    <circle cx="1035" cy="486" r="9"/>
+    <circle cx="1082" cy="486" r="9" opacity=".65"/>
+    <circle cx="1129" cy="486" r="9" opacity=".35"/>
+  </g>
+</svg>

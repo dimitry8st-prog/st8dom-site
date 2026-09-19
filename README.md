@@ -28,6 +28,9 @@ Bootstrap сознательно не подключался: он сломал 
 Пилотный пакет контент-завода NightEagle (статья, источники, SEO, адаптации и
 Obsidian-карточка): [`docs/content-packages/nighteagle-2026-09.md`](docs/content-packages/nighteagle-2026-09.md).
 
+Опубликованный фактчек новости «Anthropic взломала OpenAI» и план продвижения портала:
+[`docs/content-packages/openai-claude-2026-09.md`](docs/content-packages/openai-claude-2026-09.md).
+
 ## Локальный запуск
 
 ```bash

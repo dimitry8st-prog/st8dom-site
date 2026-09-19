@@ -148,6 +148,7 @@ class Article(db.Model):
     def cover_image(self) -> str | None:
         return {
             "nighteagle-vredonos-pod-vidom-1c-adobe": "images/material-nighteagle.svg",
+            "ne-anthropic-vzlomala-openai-claude-hacktron": "images/material-openai-claude-security.svg",
         }.get(self.slug)
 
     @property
