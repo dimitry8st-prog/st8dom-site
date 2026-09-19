@@ -1,0 +1,5 @@
+interface:
+  display_name: "ДИС · Диспетчер работы"
+  short_description: "Выбирает режим и навык под задачу Дмитрия"
+  brand_color: "#F28C28"
+  default_prompt: "Используй $dis-work-dispatcher, чтобы выбрать режим работы и предложить необязательный skill перед выполнением моей задачи."
