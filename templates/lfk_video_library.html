@@ -1,0 +1,52 @@
+{% from "macros/material_card.html" import material_card %}
+{% extends "base.html" %}
+{% block title %}Лечебная физкультура — видео и материалы — портал ДИС{% endblock %}
+{% block description %}Проверенные видео и материалы по лечебной физкультуре, восстановлению движения, координации и домашним занятиям.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('lfk_video_library') }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero direction-hero topic-hero">
+    <p class="eyebrow"><a href="{{ url_for('direction_detail', slug='medicine') }}">Медицина</a> / <a href="{{ url_for('topic_detail', section_slug='medicine', topic_slug='rehabilitation') }}">Реабилитация</a></p>
+    <h1>Лечебная физкультура</h1>
+    <p class="hero-sub">Видео и памятки для восстановления движения. Каждый материал проходит авторскую проверку перед публикацией.</p>
+    <a class="btn btn-primary" href="#materials">Смотреть материалы</a>
+  </section>
+
+  <section class="s" aria-labelledby="lfk-directions-title">
+    <div class="s-label"><span>//</span> направления ЛФК</div>
+    <h2 id="lfk-directions-title">Выберите задачу</h2>
+    <div class="rubric-grid">
+      <article class="rubric-card"><span class="rubric-card__count">01</span><h3>После инсульта</h3><p>Положение тела, безопасная активизация и восстановление бытовых движений.</p></article>
+      <article class="rubric-card"><span class="rubric-card__count">02</span><h3>Движение и координация</h3><p>Равновесие, ходьба, контроль движений и снижение риска падений.</p></article>
+      <article class="rubric-card"><span class="rubric-card__count">03</span><h3>Домашние занятия</h3><p>Понятные комплексы с указанием сложности, длительности и ограничений.</p></article>
+      <article class="rubric-card"><span class="rubric-card__count">04</span><h3>Для близких и помощников</h3><p>Как безопасно помогать во время упражнений и когда остановить занятие.</p></article>
+    </div>
+  </section>
+
+  <aside class="medical-notice" aria-label="Важное медицинское предупреждение">
+    <strong>Важно</strong>
+    <p>Упражнения подбираются с учётом диагноза и состояния человека. Материалы не заменяют очную оценку врача или специалиста по реабилитации. При боли, резком ухудшении самочувствия, одышке или головокружении занятие необходимо прекратить.</p>
+  </aside>
+
+  <section class="s" id="materials">
+    <div class="s-label"><span>//</span> видеотека и памятки</div>
+    <h2>Материалы по лечебной физкультуре</h2>
+    {% if materials %}
+    <div class="materials-grid materials-grid--compact">
+      {% for article in materials %}{{ material_card(article) }}{% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <h3>Первые ролики готовятся</h3>
+      <p>Здесь появятся только проверенные материалы с описанием цели, уровня сложности, противопоказаний и даты авторской проверки.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="topic-follow">
+    <div><strong>Предложить материал</strong><p>Видео сначала проходит медицинскую и редакционную проверку.</p></div>
+    <a class="btn btn-ghost" href="{{ url_for('contact') }}">Связаться с автором</a>
+  </section>
+</div>
+{% endblock %}
