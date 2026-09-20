@@ -106,6 +106,7 @@ PROJECTS = [
     {"name": "Life-OS", "summary": "Сбор, классификация и поиск связанных знаний в Obsidian.", "group": "flagship", "areas": ["knowledge", "rag"], "repo": "Life-Os"},
     {"name": "DIS-Meeting-360", "summary": "Транскрибация встреч, выделение решений, рисков и следующих действий.", "group": "flagship", "areas": ["ai", "automation"], "repo": "meeting-360"},
     {"name": "DIS-Reputation-360", "summary": "Анализ отзывов и подготовка ответа с контролем оператора.", "group": "flagship", "areas": ["ai", "automation"], "repo": "-_-360", "case_slug": "dis-reputatsiya-360", "video": "dis-reputatsiya-360-16x9.mp4", "poster": "dis-reputatsiya-360-poster.jpg"},
+    {"name": "KnightCat", "summary": "Контент-завод готовит текст и визуал, показывает черновик в Telegram и публикует только после подтверждения человеком.", "group": "quality", "areas": ["ai", "automation"], "repo": "KnightCat-AI-Studio", "case_slug": "knightcat-content-factory", "video": "knightcat-content-factory-16x9.mp4", "poster": "knightcat-content-factory-poster.jpg"},
     {"name": "DIS-AI-Mentor-360", "summary": "Персональное обучение, практика и проверка знаний.", "group": "quality", "areas": ["ai", "education"], "repo": "-AI--360", "case_slug": "ai-nastavnik-360", "video": "ai-nastavnik-360-16x9.mp4", "poster": "ai-nastavnik-360-poster.png"},
     {"name": "DIS-Analytics-360", "summary": "Разбор таблиц и документов с локальной визуализацией.", "group": "quality", "areas": ["analytics", "ai"], "repo": "-360", "case_slug": "dis-analyst-360", "video": "dis-analyst-360-16x9.mp4", "poster": "dis-analyst-360-poster.png"},
     {"name": "DocPulse-AI", "summary": "Структурированный разбор документов и медицинских PDF в Telegram.", "group": "quality", "areas": ["medicine", "rag"], "repo": "DocPulse---", "case_slug": "docpulse", "video": "docpulse-demo.mp4", "poster": "docpulse-demo-poster.png"},
@@ -119,7 +120,7 @@ PROJECTS = [
 ]
 
 PROJECT_FILTERS = [
-    ("all", "Все 16"),
+    ("all", "Все 17"),
     ("flagship", "6 флагманов"),
     ("medicine", "Медицина"),
     ("ai", "AI"),

@@ -217,8 +217,8 @@ def test_life_os_and_library_use_distinct_names(client):
 def test_selected_projects_catalog(client):
     page = client.get("/projects/")
     assert page.status_code == 200
-    assert "16 проектов".encode("utf-8") in page.data
-    assert page.data.count(b'class="portal-project-card') == 16
+    assert "17 проектов".encode("utf-8") in page.data
+    assert page.data.count(b'class="portal-project-card') == 17
     assert b"st8dom-site" not in page.data
     for name in [
         "AutoSfera-AI",
@@ -230,7 +230,8 @@ def test_selected_projects_catalog(client):
         "OnboardFlow-AI",
     ]:
         assert name.encode("utf-8") in page.data
-    assert page.data.count(b"project-video-trigger") == 9
+    assert page.data.count(b"project-video-trigger") == 10
+    assert b"knightcat-content-factory-16x9.mp4" in page.data
     assert b"autosfera-ai-defense.mp4" in page.data
     assert b"dis-reputatsiya-360-16x9.mp4" in page.data
     assert b"ai-nastavnik-360-16x9.mp4" in page.data
