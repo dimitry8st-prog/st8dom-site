@@ -315,6 +315,8 @@ def create_app() -> Flask:
             rubric = rubric_by_slug.get(full_slug)
             count = published_articles().filter_by(rubric_id=rubric.id).count() if rubric else 0
             href = url_for("materials_catalog", section=section_slug, rubric=full_slug)
+            if section_slug == "medicine" and topic_slug == "rehabilitation" and short_slug == "lfk":
+                href = url_for("lfk_video_library")
             if topic_slug == "clinical-guidelines" and short_slug in {
                 "russian-guidelines",
                 "international-guidelines",
@@ -359,6 +361,23 @@ def create_app() -> Flask:
             materials=articles,
             guidelines=guidelines,
             page_id=f"direction-{section_slug}",
+        )
+
+    @app.route("/directions/medicine/rehabilitation/lfk/")
+    def lfk_video_library():
+        rubric = Rubric.query.filter_by(slug="rehabilitation-lfk").first()
+        materials = (
+            published_articles()
+            .filter_by(rubric_id=rubric.id)
+            .order_by(Article.published_at.desc())
+            .all()
+            if rubric
+            else []
+        )
+        return render_template(
+            "lfk_video_library.html",
+            materials=materials,
+            page_id="direction-medicine",
         )
 
     @app.route("/clinical-guidelines/")
@@ -918,6 +937,7 @@ def create_app() -> Flask:
             for section_slug, section in SECTIONS.items()
             for topic in section["topics"]
         )
+        pages.append(origin + url_for("lfk_video_library"))
         pages.extend(origin + url_for("case_detail", slug=case["slug"]) for case in get_all_cases())
         pages.append(origin + url_for("materials_catalog"))
         pages.extend(
