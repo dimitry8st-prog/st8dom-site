@@ -67,6 +67,23 @@ def test_topic_cards_link_to_rubric_pages(client):
     assert client.get("/directions/medicine/not-found/").status_code == 404
 
 
+def test_lfk_video_library_is_linked_from_rehabilitation(client):
+    rehabilitation = client.get("/directions/medicine/rehabilitation/")
+    assert rehabilitation.status_code == 200
+    assert b"/directions/medicine/rehabilitation/lfk/" in rehabilitation.data
+    assert "Лечебная физкультура и видео".encode("utf-8") in rehabilitation.data
+
+    page = client.get("/directions/medicine/rehabilitation/lfk/")
+    assert page.status_code == 200
+    assert "Лечебная физкультура".encode("utf-8") in page.data
+    assert "После инсульта".encode("utf-8") in page.data
+    assert "Первые ролики готовятся".encode("utf-8") in page.data
+    assert "не заменяют очную оценку врача".encode("utf-8") in page.data
+
+    sitemap = client.get("/sitemap.xml")
+    assert b"/directions/medicine/rehabilitation/lfk/" in sitemap.data
+
+
 def test_telegram_uses_internal_placeholder(client):
     page = client.get("/telegram/")
     assert page.status_code == 200
