@@ -1,5 +1,13 @@
 # Видео проектов
 
+## KnightCat
+
+- `knightcat-content-factory-16x9.mp4` — демонстрационный ролик, 42 секунды, 16:9.
+- `knightcat-content-factory-poster.jpg` — обложка ролика.
+- `../subtitles/knightcat-content-factory-ru.vtt` — русские субтитры.
+- Основа: реальные экраны Telegram; боковая панель и данные браузера исключены из кадра.
+- Музыка: используется уже размещённая в проекте запись Баха, описание лицензии — в `static/audio/README.md`.
+
 ## ÉLAN
 
 - `elan-promo-16x9.mp4` — презентационный ролик лендинга, 42 секунды, 16:9.

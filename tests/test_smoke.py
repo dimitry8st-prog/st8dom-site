@@ -29,6 +29,7 @@ def test_cases_and_details(client):
     listing = client.get("/cases/")
     assert listing.status_code == 200
     slugs = [
+        "knightcat-content-factory",
         "autosfera-ai",
         "vitalis-medical-ai",
         "healthy-store",
@@ -52,7 +53,15 @@ def test_cases_and_details(client):
     for slug in slugs:
         page = client.get(f"/cases/{slug}/")
         assert page.status_code == 200, slug
-        assert "Репозиторий".encode("utf-8") in page.data
+        if slug != "knightcat-content-factory":
+            assert "Репозиторий".encode("utf-8") in page.data
+
+    knightcat = client.get("/cases/knightcat-content-factory/")
+    assert b"knightcat-content-factory-16x9.mp4" in knightcat.data
+    assert b"knightcat-content-factory-poster.jpg" in knightcat.data
+    assert b"knightcat-content-factory-ru.vtt" in knightcat.data
+    assert "демо / прототип".encode("utf-8") in knightcat.data
+    assert "решение человеку".encode("utf-8") in knightcat.data
 
     autosfera = client.get("/cases/autosfera-ai/")
     assert b"AutoSfera-AI-" in autosfera.data
