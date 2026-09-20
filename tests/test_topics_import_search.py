@@ -137,6 +137,45 @@ def test_lifeos_import_rejects_unsafe_source(client):
         assert Article.query.filter_by(slug=slug).first() is None
 
 
+def test_lfk_medical_package_imports_only_as_private_draft(client):
+    package_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "content-packages"
+        / "lfk-video-selection-after-stroke-2026-09.json"
+    )
+    package = json.loads(package_path.read_text(encoding="utf-8"))
+    package_id = f'{package["package_id"]}-test'
+    slug = f'{package["article"]["slug"]}-test'
+    package["package_id"] = package_id
+    package["article"]["slug"] = slug
+    cleanup_import(package_id, slug)
+
+    assert package["workflow_status"] == "draft"
+    assert package["quality_control"]["medical_review_required"] is True
+    assert package["quality_control"]["publication_allowed"] is False
+    assert len(package["sources"]) == 4
+
+    login_as_admin(client)
+    response = client.post(
+        "/admin/imports/life-os/",
+        data={"package": json.dumps(package, ensure_ascii=False)},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Создан только черновик".encode("utf-8") in response.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        assert article.status == "draft"
+        assert article.rubric.slug == "rehabilitation-lfk"
+        assert article.section == "medicine"
+        assert len(article.sources) == 4
+
+    assert client.get(f"/materials/{slug}/").status_code == 404
+    cleanup_import(package_id, slug)
+
+
 def test_nighteagle_content_package_imports_as_private_draft(client):
     package_path = (
         Path(__file__).resolve().parents[1]
