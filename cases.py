@@ -40,8 +40,7 @@ CASES = [
         ),
         "verification": (
             "Ролик на этой странице собран из реальных экранов демонстрационного бота: "
-            "три разных материала, изображения и подтверждение автором. Исходные файлы "
-            "workflow и инструкция опубликованы в репозитории KnightCat-AI-Studio."
+            "три разных материала, изображения и подтверждение автором."
         ),
         "limitations": (
             "Это прототип, а не промышленный контент-сервис. Качество текста и изображения "
@@ -50,7 +49,7 @@ CASES = [
         ),
         "status": "демо / прототип",
         "tech": ["n8n", "Telegram Bot API", "OpenRouter", "HTTP API", "Human-in-the-loop"],
-        "repo_url": "https://github.com/dimitry8st-prog/KnightCat-AI-Studio",
+        "repo_url": None,
         "related_repos": [],
         "demo_url": None,
         "video": "knightcat-content-factory-16x9.mp4",
