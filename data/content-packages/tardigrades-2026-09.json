@@ -74,13 +74,15 @@
   ],
   "seo": {
     "title": "Тихоходки и пределы выживания — ДИС",
-    "description": "Криптобиоз, Dsup, радиационная защита, медицина и связь исследований тихоходок с долголетием и AI-бессмертием."
+    "description": "Криптобиоз, Dsup, радиационная защита, медицина и связь исследований тихоходок с долголетием и AI-бессмертием.",
+    "cover_asset": "static/images/material-tardigrades.svg"
   },
   "quality_control": {
     "fact_checked": true,
     "primary_sources_checked": true,
     "medical_claims_limited": true,
     "approved_by": "Степанов Д.А.",
-    "checked_at": "2026-09-21"
+    "checked_at": "2026-09-21",
+    "human_approval_required": true
   }
 }
