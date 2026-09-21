@@ -11,10 +11,10 @@
     {% if item.file %}
       <div class="library-card__actions">
         <a class="btn btn-ghost btn-sm" href="{{ url_for('library_detail', slug=item.slug) }}">Читать онлайн</a>
-        <a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+        {% if library_downloads_enabled %}<a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>{% endif %}
       </div>
     {% else %}
-      <span class="library-card__pending">Скачивание откроется после проверки</span>
+      <span class="library-card__pending">Онлайн-версия откроется после проверки</span>
     {% endif %}
   </div>
 </article>

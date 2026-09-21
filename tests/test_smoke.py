@@ -25,6 +25,18 @@ def test_home_ok(client):
     assert b'id="chat-launcher"' in response.data
 
 
+def test_security_headers_are_present(client):
+    response = client.get("/")
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+    assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
+    assert "camera=()" in response.headers["Permissions-Policy"]
+
+    admin = client.get("/admin/login/")
+    assert admin.headers["Cache-Control"] == "no-store"
+
+
 def test_cases_and_details(client):
     listing = client.get("/cases/")
     assert listing.status_code == 200
@@ -143,7 +155,7 @@ def test_portal_directions(client):
     assert client.get("/directions/unknown/").status_code == 404
 
 
-def test_library_catalog_groups_and_downloads(client):
+def test_library_catalog_is_online_only(client):
     page = client.get("/library/")
     assert page.status_code == 200
     assert "Библиотека ДИС".encode("utf-8") in page.data
@@ -157,7 +169,8 @@ def test_library_catalog_groups_and_downloads(client):
     ]:
         assert title.encode("utf-8") in page.data
     assert page.data.count(b'class="library-card"') == 17
-    assert b"/static/downloads/ai-law-brand-protection.docx" in page.data
+    assert b"/static/downloads/ai-law-brand-protection.docx" not in page.data
+    assert "Скачать DOCX".encode("utf-8") not in page.data
     assert b"/library/ai-law-brand-protection/" in page.data
     assert "Читать онлайн".encode("utf-8") in page.data
     assert "На редактуре".encode("utf-8") in page.data
@@ -170,17 +183,29 @@ def test_library_catalog_groups_and_downloads(client):
     assert "Искусственный интеллект в правовом поле".encode("utf-8") in filtered.data
 
     download = client.get("/static/downloads/ai-law-brand-protection.docx")
-    assert download.status_code == 200
-    assert download.data.startswith(b"PK")
+    assert download.status_code == 404
 
     reader = client.get("/library/ai-law-brand-protection/")
     assert reader.status_code == 200
     assert "Искусственный интеллект в правовом поле".encode("utf-8") in reader.data
     assert "Как пользоваться брошюрой".encode("utf-8") in reader.data
-    assert "Скачать DOCX".encode("utf-8") in reader.data
+    assert "Скачать DOCX".encode("utf-8") not in reader.data
 
     assert client.get("/library/ai-audit-pilot/").status_code == 404
     assert client.get("/library/not-found/").status_code == 404
+
+
+def test_library_downloads_can_only_be_enabled_explicitly(client):
+    original = app.config["LIBRARY_DOWNLOADS_ENABLED"]
+    try:
+        app.config["LIBRARY_DOWNLOADS_ENABLED"] = True
+        page = client.get("/library/")
+        assert "Скачать DOCX".encode("utf-8") in page.data
+        download = client.get("/static/downloads/ai-law-brand-protection.docx")
+        assert download.status_code == 200
+        assert download.data.startswith(b"PK")
+    finally:
+        app.config["LIBRARY_DOWNLOADS_ENABLED"] = original
 
 
 def test_editorial_workshop_is_public_and_source_grounded(client):

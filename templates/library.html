@@ -1,4 +1,4 @@
-{% from "macros/library_card.html" import library_card %}
+{% from "macros/library_card.html" import library_card with context %}
 {% extends "base.html" %}
 {% block title %}Библиотека ДИС — методички и брошюры{% endblock %}
 {% block description %}Авторские методички и брошюры Степанова Д.А. об AI, бизнесе, праве, бренде и командной работе.{% endblock %}
@@ -9,7 +9,7 @@
   <section class="hero library-hero">
     <p class="eyebrow">// библиотека ДИС</p>
     <h1>Методички и практические брошюры</h1>
-    <p class="hero-sub">{{ total }} уникальных материалов по пяти направлениям. Опубликовано для скачивания: {{ published }}.</p>
+    <p class="hero-sub">{{ total }} уникальных материалов по пяти направлениям. Доступно для чтения онлайн: {{ published }}.</p>
     <div class="hero-cta">
       <a class="btn btn-primary" href="#library-groups">Открыть библиотеку</a>
       <a class="btn btn-ghost" href="{{ url_for('materials_catalog') }}">Статьи и обзоры</a>
@@ -21,7 +21,7 @@
       <p class="eyebrow">// без дублей</p>
       <h2 id="library-model-title">Один материал — одна публикация</h2>
     </div>
-    <p><strong>Life‑OS</strong> собирает источники, заметки и черновики во внутренней базе знаний. После авторской проверки готовый материал один раз публикуется здесь, а другие разделы портала ссылаются на эту же карточку и файл.</p>
+    <p><strong>Life‑OS</strong> собирает источники, заметки и черновики во внутренней базе знаний. После авторской проверки готовый материал один раз публикуется здесь для чтения онлайн, а другие разделы портала ссылаются на эту же страницу.</p>
   </section>
 
   <section class="editorial-entry" aria-labelledby="editorial-entry-title">

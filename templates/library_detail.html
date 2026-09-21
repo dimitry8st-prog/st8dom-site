@@ -19,7 +19,7 @@
       </div>
       <div class="publication-actions">
         <a class="btn btn-ghost" href="{{ url_for('library_catalog') }}">← Вернуться в библиотеку</a>
-        <a class="btn btn-primary" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+        {% if library_downloads_enabled %}<a class="btn btn-primary" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>{% endif %}
       </div>
     </header>
 
@@ -46,7 +46,7 @@
 
     <div class="publication-actions library-reader__bottom-actions">
       <a class="btn btn-ghost" href="{{ url_for('library_catalog') }}">← Все материалы</a>
-      <a class="btn btn-primary" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>
+      {% if library_downloads_enabled %}<a class="btn btn-primary" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>{% endif %}
     </div>
   </article>
 </div>
