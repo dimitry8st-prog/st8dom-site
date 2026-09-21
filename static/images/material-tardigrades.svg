@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Тихоходки и пределы выживания</title>
+  <desc id="desc">Тёмно-синяя обложка ДИС с оранжевой стилизованной тихоходкой, клетками и спиралью ДНК.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071a45"/>
+      <stop offset="1" stop-color="#163b91"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#020817" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1018" cy="112" r="205" fill="#ff8a1f" opacity=".12"/>
+  <g opacity=".45" fill="none" stroke="#86a9ff" stroke-width="3">
+    <path d="M785 100c92 58 92 144 0 202s-92 144 0 202"/>
+    <path d="M870 100c-92 58-92 144 0 202s92 144 0 202"/>
+    <path d="M806 139h43M790 199h74M790 259h74M806 319h43M790 379h74M790 439h74"/>
+  </g>
+  <g transform="translate(920 210)" filter="url(#shadow)">
+    <ellipse cx="92" cy="125" rx="95" ry="150" fill="#ff8a1f"/>
+    <ellipse cx="80" cy="92" rx="58" ry="92" fill="#ffad5c" opacity=".55"/>
+    <g fill="#ff8a1f" stroke="#071a45" stroke-width="10" stroke-linecap="round">
+      <path d="M25 38C-22 20-46 44-42 82"/>
+      <path d="M12 91C-42 82-58 111-45 145"/>
+      <path d="M15 157C-40 166-47 199-25 226"/>
+      <path d="M39 218C-6 250 5 281 40 292"/>
+      <path d="M155 38c47-18 71 6 67 44"/>
+      <path d="M168 91c54-9 70 20 57 54"/>
+      <path d="M165 157c55 9 62 42 40 69"/>
+      <path d="M141 218c45 32 34 63-1 74"/>
+    </g>
+    <circle cx="58" cy="55" r="9" fill="#071a45"/>
+    <circle cx="122" cy="55" r="9" fill="#071a45"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="72" y="64" width="650" height="500" rx="34" fill="#0b245c" stroke="#315bb6"/>
+    <text x="122" y="132" fill="#ff8a1f" font-family="Arial, sans-serif" font-size="27" font-weight="700">ДИС · ДОЛГОЛЕТИЕ И БУДУЩЕЕ</text>
+    <text x="122" y="224" fill="#ffffff" font-family="Arial, sans-serif" font-size="58" font-weight="700">Тихоходки</text>
+    <text x="122" y="292" fill="#ffffff" font-family="Arial, sans-serif" font-size="43" font-weight="700">и пределы</text>
+    <text x="122" y="356" fill="#ff9a3d" font-family="Arial, sans-serif" font-size="50" font-weight="700">выживания</text>
+    <text x="122" y="422" fill="#c8d5f4" font-family="Arial, sans-serif" font-size="24">Криптобиоз, Dsup, медицина</text>
+    <text x="122" y="457" fill="#c8d5f4" font-family="Arial, sans-serif" font-size="24">и связь с AI-бессмертием</text>
+    <rect x="122" y="493" width="278" height="52" rx="26" fill="#ff8a1f"/>
+    <text x="153" y="528" fill="#071a45" font-family="Arial, sans-serif" font-size="21" font-weight="700">НАУЧНЫЙ РАЗБОР</text>
+  </g>
+</svg>

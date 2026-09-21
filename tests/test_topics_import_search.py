@@ -256,3 +256,32 @@ def test_openai_claude_factcheck_is_public_and_searchable(client):
         assert article.is_public is True
         assert len(article.sources) == 7
         assert record.status == "published"
+
+def test_tardigrades_article_is_public_searchable_and_sourced(client):
+    slug = "tihokhodki-i-predely-vyzhivaniya"
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "Тихоходки и пределы выживания".encode("utf-8") in page.data
+    assert "Связь с AI бессмертием".encode("utf-8") in page.data
+    assert "Как alphaXiv и OpenResearch могут помочь".encode("utf-8") in page.data
+    assert b"material-tardigrades.svg" in page.data
+
+    search = client.get("/search/?q=тихоходки")
+    assert search.status_code == 200
+    assert slug.encode() in search.data
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        record = ImportPackage.query.filter_by(
+            package_id="dis-content-factory-tardigrades-2026-09"
+        ).one()
+        assert article.status == "published"
+        assert article.is_public is True
+        assert article.section == "longevity"
+        assert article.rubric.slug == "aging-science-research"
+        assert article.author == "Степанов Д.А."
+        assert len(article.sources) == 11
+        assert record.status == "published"
+
