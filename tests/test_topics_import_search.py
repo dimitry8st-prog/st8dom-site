@@ -240,6 +240,7 @@ def test_ai_agent_sandbox_article_is_public_with_diagram(client):
     assert "Почему AI-агентам нужна песочница".encode("utf-8") in page.data
     assert "Обезличенная схема безопасного AI-агента".encode("utf-8") in page.data
     assert b"material-ai-agent-sandbox.svg" in page.data
+    assert b"publication__cover--contain" in page.data
 
     search = client.get("/search/?q=песочница")
     assert search.status_code == 200

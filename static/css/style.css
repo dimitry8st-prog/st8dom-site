@@ -2321,6 +2321,11 @@ section.s {
   object-fit: cover;
 }
 
+.publication__cover--contain img {
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
 .verified-mark {
   color: var(--green);
 }

@@ -154,6 +154,13 @@ class Article(db.Model):
         }.get(self.slug)
 
     @property
+    def cover_display_mode(self) -> str:
+        """Return the presentation mode for an article cover."""
+        if self.slug == "pochemu-ai-agentam-nuzhna-pesochnitsa":
+            return "contain"
+        return "cover"
+
+    @property
     def body_paragraphs(self) -> list[str]:
         return [part.strip() for part in self.body.split("\n\n") if part.strip()]
 
