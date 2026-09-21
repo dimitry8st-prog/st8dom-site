@@ -149,6 +149,7 @@ class Article(db.Model):
         return {
             "nighteagle-vredonos-pod-vidom-1c-adobe": "images/material-nighteagle.svg",
             "ne-anthropic-vzlomala-openai-claude-hacktron": "images/material-openai-claude-security.svg",
+            "pochemu-ai-agentam-nuzhna-pesochnitsa": "images/material-ai-agent-sandbox.svg",
             "tihokhodki-i-predely-vyzhivaniya": "images/material-tardigrades.svg",
         }.get(self.slug)
 

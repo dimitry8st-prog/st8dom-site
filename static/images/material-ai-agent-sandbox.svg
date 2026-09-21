@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
+  <title id="title">Безопасный контур AI-агента</title>
+  <desc id="desc">Схема движения запроса через очистку, управляющий слой, модель, контроль действия, человека, песочницу, инструмент, журнал и оценку качества.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071426"/>
+      <stop offset="0.55" stop-color="#0b2344"/>
+      <stop offset="1" stop-color="#101a33"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#184f9e"/>
+      <stop offset="1" stop-color="#12376f"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffad32"/>
+      <stop offset="1" stop-color="#f47721"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17c6d6"/>
+      <stop offset="1" stop-color="#1386b5"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#36c98f"/>
+      <stop offset="1" stop-color="#168264"/>
+    </linearGradient>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M 42 0 L 0 0 0 42" fill="none" stroke="#86b7ff" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000814" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#7dd3fc"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#ff9d28"/>
+    </marker>
+    <style>
+      .title{font:700 52px Inter,Segoe UI,Arial,sans-serif;fill:#f8fbff;letter-spacing:-1px}
+      .subtitle{font:400 25px Inter,Segoe UI,Arial,sans-serif;fill:#b9cbe3}
+      .phase{font:700 19px Inter,Segoe UI,Arial,sans-serif;fill:#ff9d28;letter-spacing:2.2px}
+      .nodeTitle{font:700 25px Inter,Segoe UI,Arial,sans-serif;fill:#fff;text-anchor:middle}
+      .nodeText{font:400 17px Inter,Segoe UI,Arial,sans-serif;fill:#cbdcf0;text-anchor:middle}
+      .darkTitle{font:700 25px Inter,Segoe UI,Arial,sans-serif;fill:#14233d;text-anchor:middle}
+      .darkText{font:500 17px Inter,Segoe UI,Arial,sans-serif;fill:#34435b;text-anchor:middle}
+      .edge{fill:none;stroke:#7dd3fc;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}
+      .feedback{fill:none;stroke:#ff9d28;stroke-width:4;stroke-dasharray:12 12;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowOrange)}
+      .edgeLabel{font:600 17px Inter,Segoe UI,Arial,sans-serif;fill:#d7e8fa;text-anchor:middle}
+      .smallLabel{font:500 15px Inter,Segoe UI,Arial,sans-serif;fill:#ffbd63;text-anchor:middle}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1120" rx="34" fill="url(#bg)"/>
+  <rect width="1600" height="1120" rx="34" fill="url(#grid)"/>
+  <circle cx="1435" cy="115" r="230" fill="#2164c4" opacity="0.1"/>
+  <circle cx="148" cy="980" r="260" fill="#ff8a1f" opacity="0.07"/>
+
+  <text class="title" x="90" y="92">Безопасный контур AI-агента</text>
+  <text class="subtitle" x="90" y="137">Модель предлагает действие. Система проверяет, ограничивает и только затем исполняет.</text>
+
+  <text class="phase" x="90" y="205">01 · ВХОД И ПОДГОТОВКА</text>
+  <g filter="url(#shadow)">
+    <rect x="90" y="232" width="390" height="126" rx="24" fill="url(#blue)" stroke="#5d91d9" stroke-width="2"/>
+    <text class="nodeTitle" x="285" y="282">Запрос и внешние данные</text>
+    <text class="nodeText" x="285" y="319">пользователь · сайты · документы · API</text>
+
+    <rect x="605" y="232" width="390" height="126" rx="24" fill="url(#blue)" stroke="#5d91d9" stroke-width="2"/>
+    <text class="nodeTitle" x="800" y="282">Очистка и проверка входа</text>
+    <text class="nodeText" x="800" y="319">структура · источники · фильтры · инъекции</text>
+
+    <rect x="1120" y="232" width="390" height="126" rx="24" fill="url(#cyan)" stroke="#67e8f9" stroke-width="2"/>
+    <text class="nodeTitle" x="1315" y="282">Управляющий слой</text>
+    <text class="nodeText" x="1315" y="319">контекст · маршрутизация · лимиты</text>
+  </g>
+  <path class="edge" d="M480 295 H605"/>
+  <path class="edge" d="M995 295 H1120"/>
+
+  <text class="phase" x="90" y="447">02 · РЕШЕНИЕ И КОНТРОЛЬ</text>
+  <path class="edge" d="M1315 358 V405 H1110 V470"/>
+  <g filter="url(#shadow)">
+    <rect x="915" y="470" width="390" height="126" rx="24" fill="url(#cyan)" stroke="#67e8f9" stroke-width="2"/>
+    <text class="nodeTitle" x="1110" y="520">Модель предлагает действие</text>
+    <text class="nodeText" x="1110" y="557">инструмент · параметры · ожидаемый результат</text>
+  </g>
+  <path class="edge" d="M915 533 H805"/>
+  <g filter="url(#shadow)">
+    <path d="M585 457 L805 533 L585 609 L365 533 Z" fill="url(#orange)" stroke="#ffd089" stroke-width="2"/>
+    <text class="darkTitle" x="585" y="523">Контроль действия</text>
+    <text class="darkText" x="585" y="558">права · риск · политика · параметры</text>
+  </g>
+  <path class="edge" d="M365 533 H255"/>
+  <text class="edgeLabel" x="306" y="514">проверка</text>
+  <g filter="url(#shadow)">
+    <rect x="90" y="470" width="265" height="126" rx="24" fill="#293b58" stroke="#91a5c1" stroke-width="2"/>
+    <text class="nodeTitle" x="222" y="520">Человек</text>
+    <text class="nodeText" x="222" y="557">одобрить или отклонить</text>
+  </g>
+
+  <path class="feedback" d="M222 470 V395 H1315 V358"/>
+  <text class="smallLabel" x="880" y="383">отклонено → вернуть на доработку</text>
+
+  <text class="phase" x="90" y="690">03 · ИЗОЛИРОВАННОЕ ИСПОЛНЕНИЕ</text>
+  <path class="edge" d="M585 609 V722"/>
+  <text class="edgeLabel" x="655" y="669">разрешено</text>
+  <path class="edge" d="M222 596 V650 H447 V722"/>
+  <text class="edgeLabel" x="320" y="641">одобрено</text>
+  <g filter="url(#shadow)">
+    <rect x="245" y="722" width="405" height="126" rx="24" fill="url(#green)" stroke="#73e7bd" stroke-width="2"/>
+    <text class="nodeTitle" x="447" y="772">Песочница</text>
+    <text class="nodeText" x="447" y="809">изоляция · сеть · ресурсы · секреты</text>
+
+    <rect x="760" y="722" width="330" height="126" rx="24" fill="url(#green)" stroke="#73e7bd" stroke-width="2"/>
+    <text class="nodeTitle" x="925" y="772">Инструмент или API</text>
+    <text class="nodeText" x="925" y="809">только разрешённый вызов</text>
+
+    <rect x="1200" y="722" width="310" height="126" rx="24" fill="#30486c" stroke="#8db7ee" stroke-width="2"/>
+    <text class="nodeTitle" x="1355" y="772">Результат и журнал</text>
+    <text class="nodeText" x="1355" y="809">ответ · трасса · ошибки · время</text>
+  </g>
+  <path class="edge" d="M650 785 H760"/>
+  <path class="edge" d="M1090 785 H1200"/>
+
+  <text class="phase" x="90" y="927">04 · ОЦЕНКА И УЛУЧШЕНИЕ</text>
+  <path class="edge" d="M1355 848 V884 H1050 V952"/>
+  <g filter="url(#shadow)">
+    <rect x="830" y="952" width="440" height="112" rx="24" fill="#30486c" stroke="#8db7ee" stroke-width="2"/>
+    <text class="nodeTitle" x="1050" y="997">Оценка качества</text>
+    <text class="nodeText" x="1050" y="1034">валидаторы · тесты · grader · инциденты</text>
+
+    <rect x="275" y="952" width="440" height="112" rx="24" fill="#30486c" stroke="#8db7ee" stroke-width="2"/>
+    <text class="nodeTitle" x="495" y="997">Улучшение правил и сценариев</text>
+    <text class="nodeText" x="495" y="1034">промпты · политики · тестовые наборы</text>
+  </g>
+  <path class="edge" d="M830 1008 H715"/>
+  <path class="feedback" d="M275 1008 H48 V178 H1315 V232"/>
+  <text class="smallLabel" x="800" y="168">обратная связь без самообучения «на лету»</text>
+
+  <g transform="translate(1360 995)">
+    <circle cx="65" cy="38" r="51" fill="#f47721" opacity="0.95"/>
+    <text x="65" y="49" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#101a33">ДИС</text>
+  </g>
+</svg>

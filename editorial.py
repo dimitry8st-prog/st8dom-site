@@ -285,6 +285,10 @@ def ensure_editorial_seed() -> None:
         "post-stroke-cognitive-tech-2026-09.json",
         datetime(2026, 9, 21, tzinfo=timezone.utc),
     )
+    ensure_published_content_package(
+        "ai-agent-sandbox-2026-09.json",
+        datetime(2026, 9, 21, 18, 30, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
