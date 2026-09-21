@@ -85,6 +85,32 @@ def test_botulinum_orofacial_pain_article_is_published_and_sourced(client):
         assert len(article.sources) == 11
 
 
+def test_post_stroke_cognitive_technology_article_is_published_and_sourced(client):
+    slug = "tekhnologii-vosstanovleniya-kognitivnyh-funktsiy-posle-insulta"
+    page = client.get(f"/materials/{slug}/")
+
+    assert page.status_code == 200
+    assert "Технологии восстановления когнитивных функций после инсульта".encode("utf-8") in page.data
+    assert "Продолжение серии".encode("utf-8") in page.data
+    assert "Медицинская проверка: Степанов Д.А.".encode("utf-8") in page.data
+    assert b"<table>" in page.data
+    assert b"10.1186/s13643-026-03076-2" in page.data
+
+    listing = client.get("/materials/")
+    assert slug.encode() in listing.data
+    search = client.get("/search/?q=%D0%BA%D0%BE%D0%B3%D0%BD%D0%B8%D1%82%D0%B8%D0%B2%D0%BD%D0%B0%D1%8F+%D1%80%D0%B5%D0%B0%D0%B1%D0%B8%D0%BB%D0%B8%D1%82%D0%B0%D1%86%D0%B8%D1%8F")
+    assert slug.encode() in search.data
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        assert article.status == "published"
+        assert article.medical_reviewer == "Степанов Д.А."
+        assert article.rubric.slug == "neurology-neurosurgery-neurology-rehabilitation"
+        assert len(article.sources) == 11
+
+
 def test_draft_is_private_but_admin_can_preview(client):
     slug = "test-private-draft"
     remove_article(slug)
