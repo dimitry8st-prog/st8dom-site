@@ -32,7 +32,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from assistant.answer import MAX_MESSAGE_LEN, answer_question
-from assistant.rate_limit import limiter
+from assistant.rate_limit import SlidingWindowLimiter, limiter
 from cases import FILTERS, get_all_cases, get_case
 from clinical_guidelines import (
     GuidelineValidationError,
@@ -79,6 +79,7 @@ from models import (
 from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get_topic
 
 logger = logging.getLogger("st8dom")
+login_limiter = SlidingWindowLimiter(max_hits=10, window_sec=900)
 
 
 def configure_logging(app: Flask) -> None:
@@ -217,11 +218,59 @@ def create_app() -> Flask:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
         if app.config["SECRET_KEY"] == "dev-change-me-in-production":
             raise RuntimeError("Задайте SECRET_KEY в окружении перед продакшен-запуском.")
+        if app.config["ADMIN_PASSWORD"] == "change-me-now":
+            raise RuntimeError("Задайте ADMIN_PASSWORD в окружении перед продакшен-запуском.")
 
     configure_logging(app)
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
+
+    @app.before_request
+    def protect_library_files():
+        """Не отдаёт исходные DOCX, пока загрузки явно не разрешены."""
+        if (
+            request.path.startswith("/static/downloads/")
+            and not app.config.get("LIBRARY_DOWNLOADS_ENABLED", False)
+        ):
+            abort(404)
+
+    @app.after_request
+    def add_security_headers(response):
+        """Добавляет базовые браузерные ограничения ко всем ответам сайта."""
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        response.headers.setdefault(
+            "Permissions-Policy",
+            "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+        )
+        response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+        response.headers.setdefault(
+            "Content-Security-Policy",
+            "; ".join(
+                [
+                    "default-src 'self'",
+                    "base-uri 'self'",
+                    "object-src 'none'",
+                    "frame-ancestors 'none'",
+                    "form-action 'self'",
+                    "script-src 'self' 'unsafe-inline'",
+                    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                    "font-src 'self' https://fonts.gstatic.com data:",
+                    "img-src 'self' data:",
+                    "media-src 'self'",
+                    "connect-src 'self'",
+                ]
+            ),
+        )
+        if request.is_secure and not app.debug:
+            response.headers.setdefault(
+                "Strict-Transport-Security", "max-age=31536000"
+            )
+        if request.path.startswith("/admin/"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
 
     @login_manager.user_loader
     def load_user(user_id: str):
@@ -249,6 +298,9 @@ def create_app() -> Flask:
             "email_address": app.config["INQUIRY_EMAIL"],
             "static_exists": static_exists,
             "chat_enabled": bool(app.config.get("CHAT_ENABLED")),
+            "library_downloads_enabled": bool(
+                app.config.get("LIBRARY_DOWNLOADS_ENABLED", False)
+            ),
         }
 
     @app.route("/")
@@ -651,7 +703,7 @@ def create_app() -> Flask:
     def chat():
         if not app.config.get("CHAT_ENABLED"):
             return jsonify({"error": "chat_disabled"}), 503
-        client_key = hash_ip(request.headers.get("X-Forwarded-For", request.remote_addr)) or "anon"
+        client_key = hash_ip(request.remote_addr) or "anon"
         if not limiter.allow(f"chat:{client_key}"):
             return jsonify(
                 {
@@ -679,6 +731,17 @@ def create_app() -> Flask:
         if current_user.is_authenticated:
             return redirect(url_for("admin_inquiries"))
         form = LoginForm()
+        client_key = hash_ip(request.remote_addr) or "anon"
+        if request.method == "POST" and not login_limiter.allow(
+            f"admin-login:{client_key}"
+        ):
+            logger.warning("Лимит попыток входа превышен: %s", client_key)
+            flash("Слишком много попыток входа. Повторите через 15 минут.", "error")
+            return (
+                render_template("admin/login.html", form=form, page_id="admin"),
+                429,
+                {"Retry-After": "900"},
+            )
         if form.validate_on_submit():
             user = AdminUser.query.filter_by(username=form.username.data.strip()).first()
             if user and user.check_password(form.password.data):

@@ -20,6 +20,14 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = 3600
+    MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", "1048576"))
+
+    # Файлы методичек остаются источником для онлайн-читалки, но по умолчанию
+    # не выдаются посетителям напрямую. Переключатель пригодится для будущего
+    # личного кабинета или платной загрузки.
+    LIBRARY_DOWNLOADS_ENABLED = os.environ.get(
+        "LIBRARY_DOWNLOADS_ENABLED", "0"
+    ).strip().lower() in {"1", "true", "on", "yes"}
 
     # Администратор создаётся при первом запуске, если пользователя ещё нет.
     ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
