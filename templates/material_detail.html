@@ -26,7 +26,7 @@
     </header>
 
     {% if article.cover_image %}
-    <figure class="publication__cover">
+    <figure class="publication__cover{% if article.cover_display_mode == 'contain' %} publication__cover--contain{% endif %}">
       <img src="{{ url_for('static', filename=article.cover_image) }}" alt="Обложка материала: {{ article.title }}" width="1200" height="630">
     </figure>
     {% endif %}
