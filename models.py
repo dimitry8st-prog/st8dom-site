@@ -150,6 +150,7 @@ class Article(db.Model):
             "nighteagle-vredonos-pod-vidom-1c-adobe": "images/material-nighteagle.svg",
             "ne-anthropic-vzlomala-openai-claude-hacktron": "images/material-openai-claude-security.svg",
             "pochemu-ai-agentam-nuzhna-pesochnitsa": "images/material-ai-agent-sandbox.svg",
+            "gpt-6-i-claude-opus-5-5": "images/material-gpt6-claude-opus55.svg",
             "tihokhodki-i-predely-vyzhivaniya": "images/material-tardigrades.svg",
         }.get(self.slug)
 

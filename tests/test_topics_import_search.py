@@ -256,6 +256,32 @@ def test_ai_agent_sandbox_article_is_public_with_diagram(client):
         assert len(article.sources) == 13
 
 
+def test_gpt6_claude_opus_article_is_public_and_searchable(client):
+    slug = "gpt-6-i-claude-opus-5-5"
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "GPT-6 и Claude Opus 5.5".encode("utf-8") in page.data
+    assert "Цена токена больше не показывает".encode("utf-8") in page.data
+    assert b"material-gpt6-claude-opus55.svg" in page.data
+
+    search = client.get("/search/?q=Claude+Opus+5.5")
+    assert search.status_code == 200
+    assert slug.encode() in search.data
+
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        record = ImportPackage.query.filter_by(
+            package_id="dis-content-factory-gpt-6-claude-opus-5-5-2026-09"
+        ).one()
+        assert article.status == "published"
+        assert article.author == "Степанов Д.А."
+        assert len(article.sources) == 5
+        assert record.status == "published"
+
+
 def test_openai_claude_factcheck_is_public_and_searchable(client):
     slug = "ne-anthropic-vzlomala-openai-claude-hacktron"
     page = client.get(f"/materials/{slug}/")
