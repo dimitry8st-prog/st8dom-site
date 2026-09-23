@@ -262,7 +262,7 @@ def test_gpt6_claude_opus_article_is_public_and_searchable(client):
     assert page.status_code == 200
     assert "GPT-6 и Claude Opus 5.5".encode("utf-8") in page.data
     assert "Цена токена больше не показывает".encode("utf-8") in page.data
-    assert b"material-gpt6-claude-opus55.svg" in page.data
+    assert b"material-gpt6-claude-opus55.svg" not in page.data
 
     search = client.get("/search/?q=Claude+Opus+5.5")
     assert search.status_code == 200
