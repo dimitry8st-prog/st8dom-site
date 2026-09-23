@@ -66,10 +66,7 @@ class Config:
         "no",
     }
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-    CLAUDE_API_KEY = os.environ.get("CLAUDE_API_KEY", "")
-    LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "openai").strip().lower()
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-    CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 
     LOG_FILE = os.environ.get("LOG_FILE", str(BASE_DIR / "logs" / "app.log"))
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")

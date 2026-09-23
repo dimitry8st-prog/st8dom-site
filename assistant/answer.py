@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from assistant.knowledge import load_knowledge
+from assistant.intents import route_intent
 from assistant.llm import generate_answer
 from assistant.retrieve import is_relevant, normalize, retrieve, tokenize
 
@@ -156,6 +157,10 @@ def answer_question(question: str, app_config: dict | None = None) -> dict[str, 
         }
 
     knowledge = load_knowledge()
+    intent_response = route_intent(text, knowledge)
+    if intent_response:
+        return intent_response
+
     library_listing = _library_listing(text, knowledge)
     if library_listing:
         return library_listing
