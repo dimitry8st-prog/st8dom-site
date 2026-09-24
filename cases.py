@@ -9,8 +9,8 @@ CASES = [
         "filters": ["ai-agents", "telegram", "automation"],
         "badge": "Content · AI",
         "badge_class": "badge-ai",
-        "image": "case-knightcat.jpg",
-        "image_alt": "Обложка демонстрационного контура KnightCat для подготовки контента",
+        "image": "case-knightcat-v2.webp",
+        "image_alt": "Кот-рыцарь KnightCat управляет подготовкой контента и аналитикой",
         "card_summary": (
             "Демонстрационный контент-завод на n8n готовит текст и изображение, показывает черновик "
             "в Telegram и оставляет финальное решение человеку."
@@ -297,8 +297,8 @@ CASES = [
         "filters": ["ai-agents", "telegram", "backend"],
         "badge": "Репутация · AI",
         "badge_class": "badge-ai",
-        "image": "case-reputatsiya360.svg",
-        "image_alt": "Схема ДИС Репутация 360: отзыв с сайта, анализ тона, ответ и очередь оператора",
+        "image": "case-reputatsiya360-v2.webp",
+        "image_alt": "AI-аналитик ДИС Репутация 360 отслеживает отзывы и тональность",
         "card_summary": (
             "Сайт принимает отзыв, OpenAI определяет тон и готовит черновик. "
             "Похвала публикуется сразу, претензия уходит оператору в панель и Telegram. "
@@ -376,8 +376,8 @@ CASES = [
         "filters": ["telegram", "rag", "ai-agents"],
         "badge": "Legal · RAG",
         "badge_class": "badge-rag",
-        "image": "case-legalbot.svg",
-        "image_alt": "Схема LegalBot: PDF судебного акта, извлечение текста, нормы РФ и черновик жалобы",
+        "image": "case-legalbot-v2.webp",
+        "image_alt": "LegalBot анализирует судебные документы и проверяет правовые источники",
         "card_summary": (
             "Telegram-бот принимает судебный акт в PDF, извлекает текст, "
             "ищет нормы РФ и собирает черновик апелляции в DOCX. "
@@ -459,8 +459,8 @@ CASES = [
         "filters": ["telegram", "ai-agents"],
         "badge": "PDF · Telegram",
         "badge_class": "badge-bot",
-        "image": "case-docpulse.svg",
-        "image_alt": "Схема DocPulse: PDF, режимы медицина и право, отчёт в Telegram",
+        "image": "case-docpulse-v2.webp",
+        "image_alt": "DocPulse извлекает данные из документов и передаёт результат на проверку",
         "card_summary": (
             "Telegram-бот разбирает PDF: медицинское заключение или договор. "
             "Два режима, структурированный отчёт и дисклеймер. "
@@ -532,8 +532,8 @@ CASES = [
         "filters": ["telegram", "ai-agents", "backend"],
         "badge": "HR · обучение",
         "badge_class": "badge-bot",
-        "image": "case-mentor360.svg",
-        "image_alt": "Схема AI-наставник 360: курсы в Telegram, web-панель прогресса и разделение ролей AI",
+        "image": "case-mentor360-v2.webp",
+        "image_alt": "AI-наставник ведёт ученика по персональному маршруту обучения",
         "card_summary": (
             "Корпоративный MVP: сотрудник учится в Telegram, методист и руководитель "
             "ведут программы в web-панели. Наставник и экзаменатор разделены, "
@@ -615,8 +615,8 @@ CASES = [
         "filters": ["ai-agents", "backend"],
         "badge": "Data · AI",
         "badge_class": "badge-py",
-        "image": "case-analyst360.svg",
-        "image_alt": "Схема ДИС Аналитик 360: загрузка CSV или PDF, чат по данным и график",
+        "image": "case-analyst360-v2.webp",
+        "image_alt": "ДИС Аналитик 360 исследует документы, таблицы и показатели",
         "card_summary": (
             "Веб-кабинет: загрузите таблицу или PDF, задайте вопрос своими словами "
             "и получите локальный разбор плюс интерактивный график. "
@@ -700,8 +700,8 @@ CASES = [
         "filters": ["ai-agents", "rag", "telegram"],
         "badge": "FAQ · RAG",
         "badge_class": "badge-rag",
-        "image": "case-faq.svg",
-        "image_alt": "Схема FAQ-ассистента: база знаний, ответ клиенту и передача специалисту",
+        "image": "case-faq-v2.webp",
+        "image_alt": "FAQ-ассистент отвечает по базе знаний и передаёт вопрос специалисту",
         "card_summary": (
             "Ассистент отвечает на типовые вопросы по проверенной базе знаний, "
             "держит корпоративный стиль и передаёт сложные обращения человеку. "
@@ -790,8 +790,8 @@ CASES = [
         "filters": ["telegram", "rag"],
         "badge": "Bot · FAQ",
         "badge_class": "badge-bot",
-        "image": "case-telegram.svg",
-        "image_alt": "Схема Telegram-бота: FAQ, эскалация оператору и резервный ответ модели",
+        "image": "case-telegram-v2.webp",
+        "image_alt": "Бизнес-бот обрабатывает сообщения и передаёт сложные вопросы оператору",
         "card_summary": (
             "Бот первой линии ищет ответ в FAQ, ловит негатив и передаёт сложные "
             "обращения человеку. Есть рабочий репозиторий и учебный n8n-сценарий "
@@ -853,8 +853,8 @@ CASES = [
         "filters": ["automation", "backend"],
         "badge": "Python · KPI",
         "badge_class": "badge-py",
-        "image": "case-store.svg",
-        "image_alt": "Схема выгрузки данных с витрин и сборки KPI-отчёта",
+        "image": "case-store-v2.webp",
+        "image_alt": "AI-аналитик собирает показатели магазина, витрин и складских остатков",
         "card_summary": (
             "Не интернет-магазин «под ключ», а контур вокруг продаж на витринах: "
             "выгрузка revenue и бонусов + локальный AI-агент KPI Pulse для "
@@ -914,8 +914,8 @@ CASES = [
         "filters": ["automation", "ai-agents", "backend"],
         "badge": "n8n · CRM",
         "badge_class": "badge-ai",
-        "image": "case-crm.svg",
-        "image_alt": "Схема маршрутизации лида: форма, агент, заявка, согласование человеком",
+        "image": "case-crm-v2.webp",
+        "image_alt": "AI-маршрутизация лидов и задач в управляемом CRM-конвейере",
         "card_summary": (
             "Обращение не теряется в чате: оркестратор выбирает агента, "
             "создаёт заявку и отдаёт критичные действия на подтверждение "
@@ -975,8 +975,8 @@ CASES = [
         "filters": ["backend"],
         "badge": "Cosmetology · Web",
         "badge_class": "badge-py",
-        "image": "case-elan.jpg",
-        "image_alt": "Главный экран адаптивного лендинга ÉLAN",
+        "image": "case-elan-v2.webp",
+        "image_alt": "Специалист ÉLAN работает с интерфейсом доказательной косметологии",
         "card_summary": (
             "Адаптивный сайт кабинета доказательной косметологии: направления "
             "услуг, понятные ориентировочные цены, этапы консультации, FAQ и "
@@ -1037,8 +1037,8 @@ CASES = [
         "filters": ["backend"],
         "badge": "Landing",
         "badge_class": "badge-py",
-        "image": "case-site.svg",
-        "image_alt": "Макет корпоративного лендинга с блоками услуг и формой заявки",
+        "image": "case-site-v2.webp",
+        "image_alt": "Адаптивный корпоративный сайт на компьютере, планшете и телефоне",
         "card_summary": (
             "Адаптивные лендинги, которые объясняют услугу и собирают заявку: "
             "спортивный клуб Force Team и кабинет ÉLAN. Это портфолио-кейсы "
@@ -1097,8 +1097,8 @@ CASES = [
         "filters": ["ai-agents", "rag", "telegram"],
         "badge": "Multi-agent · RAG",
         "badge_class": "badge-rag",
-        "image": "case-ai.svg",
-        "image_alt": "Мультиагентный ассистент: оркестратор, база знаний и разбор документа",
+        "image": "case-ai-support-v2.webp",
+        "image_alt": "AI-ассистент соединяет базу знаний, обращения и оператора поддержки",
         "card_summary": (
             "Мультиагентный ассистент автодилера AutoSfera AI: оркестратор, "
             "база знаний и маршруты заявок. Проверяемое демо, не внедрение у клиента."
@@ -1157,8 +1157,8 @@ CASES = [
         "filters": ["ai-agents", "automation", "backend"],
         "badge": "B2B · research",
         "badge_class": "badge-ai",
-        "image": "case-ai.svg",
-        "image_alt": "Схема RedCat AI: сайт компании, факты с цитатами и три черновика письма",
+        "image": "case-redcat-v2.webp",
+        "image_alt": "RedCat AI исследует сайт компании и готовит персональное обращение",
         "card_summary": (
             "Сервис читает сайт лида, достаёт проверяемые факты с цитатами "
             "и пишет три черновика первого письма. Если факта нет — письмо "
@@ -1227,8 +1227,8 @@ CASES = [
         "filters": ["telegram", "ai-agents", "backend"],
         "badge": "Meetings · AI",
         "badge_class": "badge-bot",
-        "image": "case-telegram.svg",
-        "image_alt": "Схема Встреча 360: видео в Telegram, расшифровка по спикерам и отчёт",
+        "image": "case-meeting360-v2.webp",
+        "image_alt": "Встреча 360 распознаёт спикеров и превращает разговор в задачи",
         "card_summary": (
             "В Telegram отправляете видео или аудио встречи — бот возвращает "
             "расшифровку со спикерами, оценку по 11 критериям, решения, "
@@ -1294,8 +1294,8 @@ CASES = [
         "filters": ["ai-agents", "rag", "backend"],
         "badge": "Lingua · RAG",
         "badge_class": "badge-rag",
-        "image": "case-mentor360.svg",
-        "image_alt": "Схема ДИС Lingua 360: кабинет, маршрут CEFR и RAG по заметкам",
+        "image": "case-lingua360-v2.webp",
+        "image_alt": "ДИС Lingua 360 помогает тренировать речь, чтение и произношение",
         "card_summary": (
             "Персональный кабинет: английский и испанский, маршрут CEFR, "
             "цикл «изучи → отработай → примени», RAG по заметкам Obsidian "
@@ -1354,8 +1354,8 @@ CASES = [
         "filters": ["ai-agents", "backend"],
         "badge": "HR · onboarding",
         "badge_class": "badge-bot",
-        "image": "case-faq.svg",
-        "image_alt": "Схема OnboardFlow AI: вопрос новичка, CSV-база и эскалация человеку",
+        "image": "case-onboardflow-v2.webp",
+        "image_alt": "OnboardFlow AI ведёт нового сотрудника по маршруту адаптации",
         "card_summary": (
             "Ассистент адаптации отвечает по контролируемой CSV-базе, "
             "показывает чек-листы первого дня/недели/месяца и отдаёт "
