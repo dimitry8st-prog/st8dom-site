@@ -76,8 +76,8 @@ CASES = [
         "filters": ["ai-agents", "rag", "automation", "backend"],
         "badge": "Автодилер · AI",
         "badge_class": "badge-ai",
-        "image": "case-autosfera-ai.png",
-        "image_alt": "Фирменный маскот ДИС — синий лис AutoSfera AI",
+        "image": "case-autosfera-ai-v2.webp",
+        "image_alt": "AutoSfera AI: четыре специализированных агента и маскот ДИС",
         "card_summary": (
             "Ассистент автодилера распределяет вопросы между продажами, "
             "поддержкой, сервисом и внутренним контуром, ищет факты в базе знаний "

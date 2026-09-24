@@ -94,7 +94,7 @@ def test_cases_and_details(client):
     assert b"biobalance-promo-poster.webp" in healthy_store.data
     assert b"biobalance-promo-ru.vtt" in healthy_store.data
     assert b'preload="metadata"' in healthy_store.data
-    assert b"case-autosfera-ai.png" in autosfera.data
+    assert b"case-autosfera-ai-v2.webp" in autosfera.data
     assert b"autosfera-ai-defense.mp4" in autosfera.data
     assert b"autosfera-ai-defense-poster.png" in autosfera.data
 
