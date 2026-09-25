@@ -297,6 +297,10 @@ def ensure_editorial_seed() -> None:
         "nemotron-3-diarization-2026-09.json",
         datetime(2026, 9, 25, 5, 45, tzinfo=timezone.utc),
     )
+    ensure_published_content_package(
+        "inflammaging-2026-09.json",
+        datetime(2026, 9, 25, 9, 29, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
