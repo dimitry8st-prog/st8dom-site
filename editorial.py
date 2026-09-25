@@ -164,6 +164,8 @@ def ensure_published_content_package(
         db.session.add(article)
     else:
         article.sources.clear()
+        # Удаляем старые URL до вставки новых: на (article_id, url) есть UNIQUE.
+        db.session.flush()
 
     article.title = article_data["title"]
     article.summary = article_data["summary"]
