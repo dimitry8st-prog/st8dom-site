@@ -20,6 +20,16 @@
     </div>
   </div>
 
+  <section class="visit-dashboard" aria-label="Статистика посещений">
+    <h2>Посещения портала</h2>
+    <p>Один визит за 30 минут. Время подсчёта — московское. Статистика собирается с момента установки счётчика.</p>
+    <div class="visit-dashboard__numbers">
+      <div><strong>{{ visit_stats.today }}</strong><span>Сегодня</span></div>
+      <div><strong>{{ visit_stats.last_30_days }}</strong><span>За 30 дней</span></div>
+      <div><strong>{{ visit_stats.total }}</strong><span>Всего</span></div>
+    </div>
+  </section>
+
   {% if not inquiries %}
     <p class="lead">Заявок пока нет.</p>
   {% else %}

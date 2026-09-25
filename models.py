@@ -50,6 +50,16 @@ class Inquiry(db.Model):
         self.is_read = True
 
 
+class PortalVisit(db.Model):
+    """Один визит браузера; персональные данные и IP не сохраняются."""
+
+    __tablename__ = "portal_visits"
+
+    id = db.Column(db.Integer, primary_key=True)
+    visit_key = db.Column(db.String(64), unique=True, nullable=False)
+    started_at = db.Column(db.DateTime, nullable=False, index=True)
+
+
 article_tags = db.Table(
     "article_tags",
     db.Column(

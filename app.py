@@ -12,9 +12,12 @@ import hmac
 import logging
 import os
 import smtplib
+import secrets
+from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import requests
 from sqlalchemy import or_
@@ -22,13 +25,16 @@ from flask import (
     Flask,
     abort,
     flash,
+    g,
     jsonify,
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from flask_login import current_user, login_required, login_user, logout_user
+from sqlalchemy.exc import IntegrityError
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from assistant.answer import MAX_MESSAGE_LEN, answer_question
@@ -73,6 +79,7 @@ from models import (
     ClinicalGuideline,
     ImportPackage,
     Inquiry,
+    PortalVisit,
     Rubric,
     Tag,
 )
@@ -80,6 +87,21 @@ from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get
 
 logger = logging.getLogger("st8dom")
 login_limiter = SlidingWindowLimiter(max_hits=10, window_sec=900)
+MOSCOW = ZoneInfo("Europe/Moscow")
+BOT_MARKERS = ("bot", "crawler", "spider", "headless", "lighthouse", "preview", "monitor")
+
+
+def visit_stats() -> dict[str, int]:
+    """Визиты, начавшиеся сегодня и за 30 дней по московскому времени."""
+    now = datetime.now(MOSCOW)
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_utc = today.astimezone(timezone.utc).replace(tzinfo=None)
+    month_utc = (today - timedelta(days=29)).astimezone(timezone.utc).replace(tzinfo=None)
+    return {
+        "today": PortalVisit.query.filter(PortalVisit.started_at >= today_utc).count(),
+        "last_30_days": PortalVisit.query.filter(PortalVisit.started_at >= month_utc).count(),
+        "total": PortalVisit.query.count(),
+    }
 
 
 def configure_logging(app: Flask) -> None:
@@ -235,6 +257,31 @@ def create_app() -> Flask:
         ):
             abort(404)
 
+    @app.before_request
+    def count_public_visit():
+        """Один визит на 30 минут, независимо от числа просмотренных страниц."""
+        endpoint = request.endpoint or ""
+        if (
+            request.method != "GET"
+            or not endpoint
+            or endpoint.startswith(("admin_", "static", "api_"))
+            or endpoint in {"robots", "sitemap"}
+            or current_user.is_authenticated
+            or any(marker in request.user_agent.string.lower() for marker in BOT_MARKERS)
+        ):
+            return
+        now = datetime.now(timezone.utc)
+        if session.get("visit_key") and session.get("visit_until", 0) > now.timestamp():
+            return
+        key = secrets.token_hex(24)
+        session["visit_key"] = key
+        session["visit_until"] = (now + timedelta(minutes=30)).timestamp()
+        try:
+            db.session.add(PortalVisit(visit_key=key, started_at=now.replace(tzinfo=None)))
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
     @app.after_request
     def add_security_headers(response):
         """Добавляет базовые браузерные ограничения ко всем ответам сайта."""
@@ -301,6 +348,7 @@ def create_app() -> Flask:
             "library_downloads_enabled": bool(
                 app.config.get("LIBRARY_DOWNLOADS_ENABLED", False)
             ),
+            "visit_stats": visit_stats(),
         }
 
     @app.route("/")

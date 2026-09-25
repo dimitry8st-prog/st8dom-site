@@ -2843,6 +2843,29 @@ footer.foot span {
   color: var(--accent2);
 }
 
+footer.foot .visit-counter {
+  margin: 8px 0 12px;
+}
+
+.visit-counter strong {
+  color: var(--accent2);
+  font-size: 18px;
+}
+
+.visit-dashboard {
+  padding: 20px 24px;
+  margin: 24px 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.visit-dashboard h2 { margin: 0 0 8px; }
+.visit-dashboard p { color: var(--muted); margin: 0 0 18px; }
+.visit-dashboard__numbers { display: flex; gap: 32px; flex-wrap: wrap; }
+.visit-dashboard__numbers div { display: grid; gap: 4px; }
+.visit-dashboard__numbers strong { font-size: 28px; color: var(--accent2); }
+.visit-dashboard__numbers span { color: var(--muted); }
+
 .foot-links {
   display: flex;
   gap: 16px;
