@@ -293,6 +293,10 @@ def ensure_editorial_seed() -> None:
         "gpt-6-claude-opus-5-5-2026-09.json",
         datetime(2026, 9, 23, 13, 0, tzinfo=timezone.utc),
     )
+    ensure_published_content_package(
+        "nemotron-3-diarization-2026-09.json",
+        datetime(2026, 9, 25, 5, 45, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
