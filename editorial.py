@@ -144,7 +144,7 @@ def ensure_published_content_package(
         if record is None:
             record = ImportPackage(package_id=payload["package_id"], article=article)
             db.session.add(record)
-        if not update_published or record.checksum == checksum:
+        if not update_published or (record.checksum == checksum and article.body == article_data["body"]):
             record.checksum = checksum
             record.generator_version = payload["generator_version"]
             record.status = "published"
