@@ -64,12 +64,22 @@ jobs:
             set -e
             cd /srv/st8dom
 
-            PREV=$(grep '^APP_TAG=' .env | tail -1 | cut -d= -f2 || true)
+            # Берём версию из работающего контейнера: .env мог измениться
+            # во время неудачной загрузки образа в предыдущем запуске.
+            PREV=$(docker inspect -f '{{.Config.Image}}' "$(docker compose ps -q app)" 2>/dev/null || true)
+            PREV=${PREV##*:}
+            [ -z "$PREV" ] && PREV=$(grep '^APP_TAG=' .env | tail -1 | cut -d= -f2 || true)
             [ -z "$PREV" ] && PREV=latest
             set_tag() { sed -i '/^APP_TAG=/d' .env; echo "APP_TAG=$1" >> .env; }
 
+            # На VPS хранились старые, уже не используемые образы.
+            # Docker сохраняет образ каждого запущенного контейнера и все тома.
+            docker image prune -a -f
             set_tag "${{ github.sha }}"
-            docker compose pull app
+            if ! docker compose pull app; then
+              set_tag "$PREV"
+              exit 1
+            fi
 
             # Схема и админ создаются при импорте приложения. Делаем это одним
             # процессом до старта, чтобы два воркера gunicorn не гонялись за этим.
