@@ -32,5 +32,10 @@ def test_visits_are_deduplicated_and_visible_to_admin(client):
     dashboard = client.get("/admin/")
     assert dashboard.status_code == 200
     assert "Посещения портала" in dashboard.get_data(as_text=True)
+    assert "За выбранный период:" in dashboard.get_data(as_text=True)
+    future = client.get("/admin/?visits_from=2099-01-01&visits_to=2099-01-07")
+    assert "За выбранный период: <strong>0</strong>" in future.get_data(as_text=True)
+    invalid = client.get("/admin/?visits_from=2099-02-01&visits_to=2099-01-01")
+    assert "Выберите даты по порядку" in invalid.get_data(as_text=True)
     with app.app_context():
         assert visit_stats()["total"] == before + 2
