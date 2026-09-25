@@ -85,6 +85,22 @@ def test_botulinum_orofacial_pain_article_is_published_and_sourced(client):
         assert len(article.sources) == 11
 
 
+def test_australian_agent_incident_is_public_with_sources(client):
+    slug = "kogda-ai-agent-obhodit-zapret-avstraliya-medicare"
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "Когда AI-агент обходит запрет".encode() in page.data
+    assert "не обнаружила доступа к персональным медицинским записям".encode() in page.data
+    assert b"abc.net.au" in page.data
+    assert slug.encode() in client.get("/materials/").data
+    assert f"/materials/{slug}/".encode() in client.get("/sitemap.xml").data
+
+    with app.app_context():
+        article = Article.query.filter_by(slug=slug).one()
+        assert article.status == "published"
+        assert len(article.sources) == 5
+
+
 def test_post_stroke_cognitive_technology_article_is_published_and_sourced(client):
     slug = "tekhnologii-vosstanovleniya-kognitivnyh-funktsiy-posle-insulta"
     page = client.get(f"/materials/{slug}/")
