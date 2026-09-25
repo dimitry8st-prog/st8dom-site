@@ -2865,6 +2865,12 @@ footer.foot .visit-counter {
 .visit-dashboard__numbers div { display: grid; gap: 4px; }
 .visit-dashboard__numbers strong { font-size: 28px; color: var(--accent2); }
 .visit-dashboard__numbers span { color: var(--muted); }
+.visit-range { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+.visit-range label { display: grid; gap: 6px; font-size: 13px; }
+.visit-range input { color: var(--text); background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
+.visit-dashboard .visit-range__result, .visit-dashboard .visit-range__error { margin: 14px 0 0; }
+.visit-range__result strong { color: var(--accent2); }
+.visit-range__error { color: var(--orange); }
 
 .foot-links {
   display: flex;

@@ -13,7 +13,7 @@ import logging
 import os
 import smtplib
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from email.message import EmailMessage
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -812,6 +812,24 @@ def create_app() -> Flask:
     @login_required
     def admin_inquiries():
         status = request.args.get("status", "all")
+        today = datetime.now(MOSCOW).date()
+        start_raw = request.args.get("visits_from", today.replace(day=1).isoformat())
+        end_raw = request.args.get("visits_to", today.isoformat())
+        range_error = None
+        visits_in_range = None
+        try:
+            start_day = date.fromisoformat(start_raw)
+            end_day = date.fromisoformat(end_raw)
+            if start_day > end_day or (end_day - start_day).days > 366:
+                raise ValueError("Неверный период")
+            start_utc = datetime.combine(start_day, datetime.min.time(), MOSCOW).astimezone(timezone.utc).replace(tzinfo=None)
+            end_utc = datetime.combine(end_day + timedelta(days=1), datetime.min.time(), MOSCOW).astimezone(timezone.utc).replace(tzinfo=None)
+            visits_in_range = PortalVisit.query.filter(
+                PortalVisit.started_at >= start_utc,
+                PortalVisit.started_at < end_utc,
+            ).count()
+        except (ValueError, OverflowError):
+            range_error = "Выберите даты по порядку; период не длиннее одного года."
         query = Inquiry.query.order_by(Inquiry.created_at.desc())
         if status == "unread":
             query = query.filter_by(is_read=False)
@@ -824,6 +842,10 @@ def create_app() -> Flask:
             inquiries=inquiries,
             status=status,
             unread_count=unread_count,
+            visits_from=start_raw,
+            visits_to=end_raw,
+            visits_in_range=visits_in_range,
+            range_error=range_error,
             page_id="admin",
         )
 

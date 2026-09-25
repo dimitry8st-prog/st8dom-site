@@ -28,6 +28,16 @@
       <div><strong>{{ visit_stats.last_30_days }}</strong><span>За 30 дней</span></div>
       <div><strong>{{ visit_stats.total }}</strong><span>Всего</span></div>
     </div>
+    <form class="visit-range" method="get" action="{{ url_for('admin_inquiries') }}">
+      <label>С <input type="date" name="visits_from" value="{{ visits_from }}" required></label>
+      <label>По <input type="date" name="visits_to" value="{{ visits_to }}" required></label>
+      <button class="btn btn-primary btn-sm" type="submit">Показать посещения</button>
+    </form>
+    {% if range_error %}
+      <p class="visit-range__error" role="alert">{{ range_error }}</p>
+    {% else %}
+      <p class="visit-range__result" role="status">За выбранный период: <strong>{{ visits_in_range }}</strong> посещений</p>
+    {% endif %}
   </section>
 
   {% if not inquiries %}
