@@ -307,6 +307,10 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 9, 25, 9, 29, tzinfo=timezone.utc),
         update_published=True,
     )
+    ensure_published_content_package(
+        "openai-australia-agent-2026-09.json",
+        datetime(2026, 9, 25, 16, 7, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
