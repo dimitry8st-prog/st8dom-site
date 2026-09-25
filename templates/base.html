@@ -106,6 +106,9 @@
         <a href="{{ url_for('materials_catalog') }}">Статьи</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
       </div>
+      {% if page_id != 'admin' %}
+        <p class="visit-counter">Посещений сегодня: <strong>{{ visit_stats.today }}</strong></p>
+      {% endif %}
       <p>© 2026 <span>Степанов Д.А.</span> · Портал «ДИС» · Медицина, AI и будущее человека</p>
     </div>
   </footer>
