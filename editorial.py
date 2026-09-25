@@ -122,7 +122,9 @@ def apply_article_form(article: Article, form) -> list[str]:
     return []
 
 
-def ensure_published_content_package(filename: str, published_at: datetime) -> None:
+def ensure_published_content_package(
+    filename: str, published_at: datetime, *, update_published: bool = False
+) -> None:
     """Публикует одобренный пакет и безопасно подхватывает прежний черновик."""
     package_path = CONTENT_PACKAGES_DIR / filename
     payload = json.loads(package_path.read_text(encoding="utf-8"))
@@ -142,10 +144,11 @@ def ensure_published_content_package(filename: str, published_at: datetime) -> N
         if record is None:
             record = ImportPackage(package_id=payload["package_id"], article=article)
             db.session.add(record)
-        record.checksum = checksum
-        record.generator_version = payload["generator_version"]
-        record.status = "published"
-        return
+        if not update_published or record.checksum == checksum:
+            record.checksum = checksum
+            record.generator_version = payload["generator_version"]
+            record.status = "published"
+            return
 
     tags = []
     for name in article_data["tags"]:
@@ -300,6 +303,7 @@ def ensure_editorial_seed() -> None:
     ensure_published_content_package(
         "inflammaging-2026-09.json",
         datetime(2026, 9, 25, 9, 29, tzinfo=timezone.utc),
+        update_published=True,
     )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
