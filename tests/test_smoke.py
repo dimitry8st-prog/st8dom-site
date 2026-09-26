@@ -1,6 +1,7 @@
 """Дымовые проверки маршрутов, формы и админки."""
 
 from app import app
+from extensions import db
 from models import Inquiry
 
 
@@ -316,6 +317,9 @@ def test_contact_prefills_express_topic(client):
 
 
 def test_contact_validation_and_save(client):
+    from uuid import uuid4
+
+    email = f"ivan-{uuid4().hex}@example.com"
     bad = client.post("/contact/", data={"name": "А"}, follow_redirects=True)
     assert bad.status_code == 200
 
@@ -323,7 +327,7 @@ def test_contact_validation_and_save(client):
         "/contact/",
         data={
             "name": "Иван Петров",
-            "email": "ivan@example.com",
+            "email": email,
             "phone": "+7 900 000-00-00",
             "topic": "audit",
             "message": "Нужно разобрать процесс поддержки и собрать MVP.",
@@ -337,8 +341,10 @@ def test_contact_validation_and_save(client):
         or "Заявка сохранена".encode("utf-8") in ok.data
     )
     with app.app_context():
-        saved = Inquiry.query.filter_by(email="ivan@example.com").first()
+        saved = Inquiry.query.filter_by(email=email).first()
         assert saved is not None
+        db.session.delete(saved)
+        db.session.commit()
 
 
 def test_admin_requires_login(client):
