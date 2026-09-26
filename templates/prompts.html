@@ -9,6 +9,7 @@
     <p class="eyebrow"><a href="{{ url_for('direction_detail', slug='ai') }}">{{ section.title }}</a> / тема</p>
     <h1>Практические промпты</h1>
     <p class="hero-sub">{{ total }} шаблонов из коллекции: выберите рубрику, откройте промпт и замените поля в квадратных скобках своими данными.</p>
+    <p class="prompt-note">Для промптов с фотографией нужен генератор, принимающий изображение. Проверяйте ответы и надписи на картинках: результат зависит от модели и исходных данных.</p>
     <form class="topic-search" action="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts') }}" method="get" role="search">
       {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
       <input type="search" name="q" value="{{ search }}" placeholder="Найти промпт" aria-label="Поиск по промптам">

@@ -1,5 +1,7 @@
 """Проверяем навигацию и безопасность публичного каталога промптов."""
 
+import json
+
 from prompt_library import CATEGORIES, all_prompts
 
 
@@ -32,3 +34,11 @@ def test_prompts_in_sitemap_and_escaped(client):
     page = client.get("/directions/ai/prompts/verification/answer-with-sources/")
     assert b"&lt;" not in page.data  # The curated template is plain text.
     assert b"<pre class=\"prompt-text\"" in page.data
+
+
+def test_copyable_cocktail_templates_are_valid_json():
+    templates = {item["slug"]: item for item in all_prompts()}
+    for slug in ("cocktail-card", "cocktail-presentation"):
+        recipe = json.loads(templates[slug]["body"])
+        assert recipe["cocktail"]["ingredients"]
+        assert recipe["render"]["composition"]
