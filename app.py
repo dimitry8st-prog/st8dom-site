@@ -64,6 +64,7 @@ from editorial import (
 from editorial_workshop import EDITORIAL_SOURCES, EDITORIAL_STEPS
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
+from inquiry_autoreply import send_price_auto_reply
 from lifeos_import import ImportValidationError, import_lifeos_package
 from library_content import (
     LIBRARY_CATEGORIES,
@@ -79,6 +80,7 @@ from models import (
     ClinicalGuideline,
     ImportPackage,
     Inquiry,
+    InquiryAutoReply,
     InquirySpam,
     PortalVisit,
     Rubric,
@@ -799,6 +801,7 @@ def create_app() -> Flask:
             logger.info("Новая заявка #%s сохранена", inquiry.id)
             email_sent = notify_email(inquiry, app)
             notify_telegram(inquiry, app)
+            send_price_auto_reply(inquiry, app, requested=bool(form.reply_requested.data))
             if email_sent:
                 flash("Заявка отправлена. Отвечу в рабочее время на указанный email.", "success")
             else:
@@ -907,12 +910,19 @@ def create_app() -> Flask:
         inquiries = query.all()
         unread_count = Inquiry.query.filter_by(is_read=False).filter(~Inquiry.spam_flag.has()).count()
         spam_count = InquirySpam.query.count()
+        auto_reply_today = InquiryAutoReply.query.filter(
+            InquiryAutoReply.attempted_at >= datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=1)
+        )
         return render_template(
             "admin/inquiries.html",
             inquiries=inquiries,
             status=status,
             unread_count=unread_count,
             spam_count=spam_count,
+            auto_reply_sent=auto_reply_today.filter_by(sent=True).count(),
+            auto_reply_failed=auto_reply_today.filter_by(sent=False).count(),
+            auto_reply_enabled=bool(app.config.get("INQUIRY_AUTO_REPLY_ENABLED")),
+            smtp_ready=bool(app.config.get("SMTP_USERNAME") and app.config.get("SMTP_PASSWORD")),
             visits_from=start_raw,
             visits_to=end_raw,
             visits_in_range=visits_in_range,

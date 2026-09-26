@@ -10,6 +10,7 @@
       <p class="eyebrow">// заявки</p>
       <h1>Обращения</h1>
       <p class="lead">Непрочитанных: {{ unread_count }}</p>
+      <p class="admin-mail-status">Автоответ: {{ 'включён' if auto_reply_enabled and smtp_ready else 'неактивен — проверьте настройки почты' }}. За 24 часа: {{ auto_reply_sent }} отправлено, {{ auto_reply_failed }} не отправлено.</p>
     </div>
     <div class="row-actions">
       <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='all') }}">Все</a>

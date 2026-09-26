@@ -50,6 +50,10 @@ class Config:
     SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip().lower() not in {
         "0", "false", "off", "no"
     }
+    # Только ответы на новые заявки с явным запросом ответа. Нужен рабочий SMTP.
+    INQUIRY_AUTO_REPLY_ENABLED = os.environ.get(
+        "INQUIRY_AUTO_REPLY_ENABLED", "1"
+    ).strip().lower() in {"1", "true", "on", "yes"}
 
     # Опциональная аналитика. Пустое значение = скрипт-заглушка без внешних вызовов.
     ANALYTICS_ID = os.environ.get("ANALYTICS_ID", "")

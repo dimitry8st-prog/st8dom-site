@@ -74,6 +74,7 @@ class InquiryForm(FlaskForm):
         "Согласен на обработку персональных данных",
         validators=[DataRequired(message="Нужно согласие на обработку данных.")],
     )
+    reply_requested = BooleanField("Получить ответ по email на вопрос о стоимости")
     # Скрытое поле-ловушка: боты его заполняют, люди — нет.
     website = HiddenField("website")
 
