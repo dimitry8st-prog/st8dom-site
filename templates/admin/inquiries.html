@@ -44,7 +44,7 @@
     <p class="lead">Заявок пока нет.</p>
   {% else %}
   <div class="table-wrap">
-    <table class="data">
+    <table class="data inquiries-table" aria-label="Заявки с сайта">
       <thead>
         <tr>
           <th>Дата</th>
@@ -53,25 +53,25 @@
           <th>Тема</th>
           <th>Сообщение</th>
           <th>Статус</th>
-          <th></th>
+          <th>Действия</th>
         </tr>
       </thead>
       <tbody>
         {% for item in inquiries %}
         <tr class="{{ 'is-unread' if not item.is_read else '' }}">
-          <td>{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
-          <td>
+          <td data-label="Дата">{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+          <td data-label="Имя">
             <strong>{{ item.name }}</strong>
             {% if item.company %}<div class="contact-label">{{ item.company }}</div>{% endif %}
           </td>
-          <td>
+          <td data-label="Контакт">
             <a href="mailto:{{ item.email }}">{{ item.email }}</a>
             {% if item.phone %}<div>{{ item.phone }}</div>{% endif %}
           </td>
-          <td>{{ item.topic }}</td>
-          <td>{{ item.message }}</td>
-          <td>{{ 'прочитано' if item.is_read else 'новое' }}</td>
-          <td>
+          <td data-label="Тема">{{ item.topic }}</td>
+          <td data-label="Сообщение">{{ item.message }}</td>
+          <td data-label="Статус">{{ 'прочитано' if item.is_read else 'новое' }}</td>
+          <td data-label="Действия">
             <div class="row-actions">
               {% if not item.is_read %}
               <form method="post" action="{{ url_for('admin_mark_read', inquiry_id=item.id, status=status) }}">
