@@ -67,6 +67,18 @@ class InquirySpam(db.Model):
     inquiry = db.relationship("Inquiry", back_populates="spam_flag")
 
 
+class InquiryAutoReply(db.Model):
+    """Резервирует один автоответ на адрес в неделю без хранения адреса."""
+
+    __tablename__ = "inquiry_auto_replies"
+
+    id = db.Column(db.Integer, primary_key=True)
+    recipient_key = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    inquiry_id = db.Column(db.Integer, nullable=False)
+    attempted_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
+    sent = db.Column(db.Boolean, default=False, nullable=False)
+
+
 class PortalVisit(db.Model):
     """Один визит браузера; персональные данные и IP не сохраняются."""
 
