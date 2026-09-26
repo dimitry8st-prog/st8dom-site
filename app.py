@@ -79,6 +79,7 @@ from models import (
     ClinicalGuideline,
     ImportPackage,
     Inquiry,
+    InquirySpam,
     PortalVisit,
     Rubric,
     Tag,
@@ -753,14 +754,45 @@ def create_app() -> Flask:
             if topic in allowed:
                 form.topic.data = topic
         if form.validate_on_submit():
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
+            client_ip = hash_ip(request.remote_addr)
+            email = form.email.data.strip().lower()
+            message = form.message.data.strip()
+            # Считаем по БД: лимит общий для всех процессов gunicorn.
+            hourly = Inquiry.created_at >= now - timedelta(hours=1)
+            too_many_from_ip = bool(client_ip) and Inquiry.query.filter(
+                Inquiry.ip_hash == client_ip, hourly
+            ).count() >= 3
+            too_many_from_email = Inquiry.query.filter(
+                Inquiry.email == email, hourly
+            ).count() >= 3
+            if too_many_from_ip or too_many_from_email:
+                flash("Слишком много заявок. Попробуйте через час.", "error")
+                return (
+                    render_template("contact.html", form=form, page_id="contact"),
+                    429,
+                    {"Retry-After": "3600"},
+                )
+            # Сравнение за сутки не требует хранения ещё одного идентификатора.
+            recent_messages = db.session.query(Inquiry.message).filter(
+                Inquiry.email == email,
+                Inquiry.created_at >= now - timedelta(days=1),
+            ).all()
+            normalized_message = " ".join(message.split()).casefold()
+            if any(
+                " ".join(saved.split()).casefold() == normalized_message
+                for (saved,) in recent_messages
+            ):
+                flash("Такая заявка уже получена. Отправлять её повторно не нужно.", "info")
+                return render_template("contact.html", form=form, page_id="contact"), 409
             inquiry = Inquiry(
                 name=form.name.data.strip(),
-                email=form.email.data.strip().lower(),
+                email=email,
                 phone=(form.phone.data or "").strip() or None,
                 company=(form.company.data or "").strip() or None,
                 topic=form.topic.data,
-                message=form.message.data.strip(),
-                ip_hash=hash_ip(request.headers.get("X-Forwarded-For", request.remote_addr)),
+                message=message,
+                ip_hash=client_ip,
             )
             db.session.add(inquiry)
             db.session.commit()
@@ -864,17 +896,23 @@ def create_app() -> Flask:
         except (ValueError, OverflowError):
             range_error = "Выберите даты по порядку; период не длиннее одного года."
         query = Inquiry.query.order_by(Inquiry.created_at.desc())
+        if status == "spam":
+            query = query.filter(Inquiry.spam_flag.has())
+        else:
+            query = query.filter(~Inquiry.spam_flag.has())
         if status == "unread":
             query = query.filter_by(is_read=False)
         elif status == "read":
             query = query.filter_by(is_read=True)
         inquiries = query.all()
-        unread_count = Inquiry.query.filter_by(is_read=False).count()
+        unread_count = Inquiry.query.filter_by(is_read=False).filter(~Inquiry.spam_flag.has()).count()
+        spam_count = InquirySpam.query.count()
         return render_template(
             "admin/inquiries.html",
             inquiries=inquiries,
             status=status,
             unread_count=unread_count,
+            spam_count=spam_count,
             visits_from=start_raw,
             visits_to=end_raw,
             visits_in_range=visits_in_range,
@@ -1038,6 +1076,33 @@ def create_app() -> Flask:
         db.session.commit()
         logger.info("Заявка #%s отмечена прочитанной", inquiry_id)
         flash("Заявка отмечена как прочитанная.", "success")
+        return redirect(url_for("admin_inquiries", status=request.args.get("status", "all")))
+
+    @app.post("/admin/inquiries/<int:inquiry_id>/spam/")
+    @login_required
+    def admin_mark_spam(inquiry_id: int):
+        inquiry = db.session.get(Inquiry, inquiry_id)
+        if not inquiry:
+            abort(404)
+        if inquiry.spam_flag is None:
+            inquiry.spam_flag = InquirySpam()
+            inquiry.mark_read()
+            db.session.commit()
+        logger.info("Заявка #%s помечена как спам", inquiry_id)
+        flash("Заявка перемещена в спам.", "success")
+        return redirect(url_for("admin_inquiries", status=request.args.get("status", "all")))
+
+    @app.post("/admin/inquiries/<int:inquiry_id>/restore/")
+    @login_required
+    def admin_restore_inquiry(inquiry_id: int):
+        inquiry = db.session.get(Inquiry, inquiry_id)
+        if not inquiry:
+            abort(404)
+        if inquiry.spam_flag is not None:
+            inquiry.spam_flag = None
+            db.session.commit()
+        logger.info("Заявка #%s восстановлена из спама", inquiry_id)
+        flash("Заявка возвращена в список.", "success")
         return redirect(url_for("admin_inquiries", status=request.args.get("status", "all")))
 
     @app.post("/admin/inquiries/<int:inquiry_id>/delete/")
