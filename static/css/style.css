@@ -734,6 +734,20 @@ nav {
 .topic-search { display: flex; gap: 10px; max-width: 720px; margin-top: 26px; }
 .topic-search input { flex: 1; min-width: 0; padding: 13px 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--text); font: inherit; }
 .topic-search input:focus { border-color: var(--accent2); outline: 2px solid rgba(59,130,246,.2); }
+.prompt-selected { border-color: var(--accent2); background: rgba(24, 36, 60, .96); }
+.prompt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px; margin-top: 22px; }
+.prompt-card { display: flex; flex-direction: column; gap: 12px; padding: 24px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); }
+.prompt-card h3, .prompt-card p { margin: 0; }
+.prompt-card h3 a { color: var(--text); text-decoration: none; }
+.prompt-card p { color: var(--muted); flex: 1; }
+.prompt-card > a { align-self: flex-start; color: var(--accent2); }
+.prompt-card__meta { color: var(--orange); font-size: 13px; }
+.prompt-detail { max-width: 1000px; }
+.prompt-copy-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.prompt-copy-heading h2 { margin: 0; }
+.prompt-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 65vh; overflow: auto; padding: 22px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); color: var(--text); line-height: 1.65; font: inherit; user-select: text; }
+.prompt-copy-status { min-height: 1.5em; color: var(--accent2); }
+.prompt-note { color: var(--muted); font-size: 14px; }
 .topic-hero .eyebrow a { color: var(--orange); }
 .placeholder-page { min-height: 62vh; }
 

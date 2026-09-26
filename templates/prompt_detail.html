@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} — Практические промпты — портал ДИС{% endblock %}
+{% block description %}{{ item.summary }}{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('prompt_detail', category=item.category, slug=item.slug) }}{% endblock %}
+
+{% block content %}
+<div class="container prompt-detail">
+  <section class="hero direction-hero topic-hero">
+    <p class="eyebrow"><a href="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts') }}">Практические промпты</a> / <a href="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts', category=item.category) }}">{{ category_name }}</a></p>
+    <h1>{{ item.title }}</h1>
+    <p class="hero-sub">{{ item.summary }}</p>
+    <p class="prompt-card__meta">{{ item.group }}</p>
+  </section>
+  <section class="s">
+    <div class="s-label"><span>//</span> шаблон</div>
+    <div class="prompt-copy-heading"><h2>Текст промпта</h2><button type="button" class="btn btn-primary btn-sm" id="copy-prompt">Скопировать</button></div>
+    <pre class="prompt-text" id="prompt-text">{{ item.body }}</pre>
+    <p class="prompt-copy-status" id="copy-status" role="status" aria-live="polite"></p>
+    <h3>Как использовать</h3><p>{{ item.usage }}</p>
+    <h3>Что проверить</h3><p>{{ item.check }}</p>
+    <p class="prompt-note">Шаблон из личной коллекции, отредактирован для каталога. Результат генерации проверяйте самостоятельно.</p>
+    <a href="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts', category=item.category) }}">← Вернуться к рубрике</a>
+  </section>
+</div>
+<script>
+  document.getElementById('copy-prompt').addEventListener('click', async function () {
+    const text = document.getElementById('prompt-text').textContent;
+    const status = document.getElementById('copy-status');
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = 'Промпт скопирован';
+    } catch (error) {
+      status.textContent = 'Не удалось скопировать автоматически. Выделите текст промпта и скопируйте его вручную.';
+    }
+  });
+</script>
+{% endblock %}
