@@ -48,6 +48,10 @@
     <span>Согласен на <a href="{{ url_for('consent') }}">обработку персональных данных</a> и принимаю <a href="{{ url_for('privacy') }}">политику конфиденциальности</a>. <span class="req">*</span></span>
   </label>
   {{ field_errors(form.consent) }}
+  <label class="consent">
+    {{ form.reply_requested() }}
+    <span>Если спрашиваете о стоимости, пришлите короткий автоматический ответ по email. Я уточню задачу и подготовлю цену лично.</span>
+  </label>
   <button class="btn btn-primary" type="submit">Отправить заявку</button>
   <p class="form-status" aria-live="polite"></p>
 </form>
