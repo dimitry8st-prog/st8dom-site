@@ -15,6 +15,7 @@
       <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='all') }}">Все</a>
       <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='unread') }}">Непрочитанные</a>
       <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='read') }}">Прочитанные</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries', status='spam') }}">Спам ({{ spam_count }})</a>
       <a class="btn btn-primary btn-sm" href="{{ url_for('admin_articles') }}">Публикации</a>
       <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_logout') }}">Выйти</a>
     </div>
@@ -41,7 +42,7 @@
   </section>
 
   {% if not inquiries %}
-    <p class="lead">Заявок пока нет.</p>
+    <p class="lead">{{ 'В спаме заявок нет.' if status == 'spam' else 'Заявок пока нет.' }}</p>
   {% else %}
   <div class="table-wrap">
     <table class="data inquiries-table" aria-label="Заявки с сайта">
@@ -70,13 +71,24 @@
           </td>
           <td data-label="Тема">{{ item.topic }}</td>
           <td data-label="Сообщение">{{ item.message }}</td>
-          <td data-label="Статус">{{ 'прочитано' if item.is_read else 'новое' }}</td>
+          <td data-label="Статус">{{ 'спам' if item.spam_flag else ('прочитано' if item.is_read else 'новое') }}</td>
           <td data-label="Действия">
             <div class="row-actions">
+              {% if item.spam_flag %}
+              <form method="post" action="{{ url_for('admin_restore_inquiry', inquiry_id=item.id, status=status) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-ghost btn-sm" type="submit">Восстановить</button>
+              </form>
+              {% else %}
               {% if not item.is_read %}
               <form method="post" action="{{ url_for('admin_mark_read', inquiry_id=item.id, status=status) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button class="btn btn-ghost btn-sm" type="submit">Прочитано</button>
+              </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin_mark_spam', inquiry_id=item.id, status=status) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-ghost btn-sm" type="submit">В спам</button>
               </form>
               {% endif %}
               <form method="post" action="{{ url_for('admin_delete', inquiry_id=item.id, status=status) }}" onsubmit="return confirm('Удалить заявку?');">
