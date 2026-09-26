@@ -45,9 +45,26 @@ class Inquiry(db.Model):
     is_read = db.Column(db.Boolean, default=False, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
     ip_hash = db.Column(db.String(64), nullable=True)
+    spam_flag = db.relationship(
+        "InquirySpam", back_populates="inquiry", uselist=False,
+        cascade="all, delete-orphan",
+    )
 
     def mark_read(self) -> None:
         self.is_read = True
+
+
+class InquirySpam(db.Model):
+    """Отдельная пометка, чтобы сохранить существующую схему заявок."""
+
+    __tablename__ = "inquiry_spam"
+
+    inquiry_id = db.Column(
+        db.Integer, db.ForeignKey("inquiries.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    flagged_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+    inquiry = db.relationship("Inquiry", back_populates="spam_flag")
 
 
 class PortalVisit(db.Model):
