@@ -84,6 +84,7 @@ from models import (
     Tag,
 )
 from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get_topic
+from prompt_library import CATEGORIES as PROMPT_CATEGORIES, CATEGORY_NAMES as PROMPT_CATEGORY_NAMES, all_prompts, find_prompt
 
 logger = logging.getLogger("st8dom")
 login_limiter = SlidingWindowLimiter(max_hits=10, window_sec=900)
@@ -406,6 +407,28 @@ def create_app() -> Flask:
         topic = get_topic(section_slug, topic_slug)
         if not section or not topic:
             abort(404)
+        if section_slug == "ai" and topic_slug == "prompts":
+            catalog = all_prompts()
+            category = request.args.get("category", "").strip()
+            if category not in PROMPT_CATEGORY_NAMES:
+                category = ""
+            search = request.args.get("q", "").strip()
+            displayed = [
+                item for item in catalog
+                if (not category or item["category"] == category)
+                and (not search or search.casefold() in " ".join(
+                    (item["title"], item["summary"], item["group"], item["body"])
+                ).casefold())
+            ]
+            return render_template(
+                "prompts.html", section=section, topic=topic, section_slug=section_slug,
+                categories=[{"slug": slug, "name": name, "count": sum(
+                    item["category"] == slug for item in catalog
+                )} for slug, name in PROMPT_CATEGORIES],
+                prompts=displayed, category=category, search=search, total=len(catalog),
+                category_names=PROMPT_CATEGORY_NAMES,
+                page_id="direction-ai",
+            )
         rubric_slugs = [f"{topic_slug}-{slug}" for slug, _name in topic["rubrics"]]
         rubrics = Rubric.query.filter(Rubric.slug.in_(rubric_slugs)).all()
         rubric_by_slug = {rubric.slug: rubric for rubric in rubrics}
@@ -459,6 +482,16 @@ def create_app() -> Flask:
             materials=articles,
             guidelines=guidelines,
             page_id=f"direction-{section_slug}",
+        )
+
+    @app.route("/directions/ai/prompts/<category>/<slug>/")
+    def prompt_detail(category: str, slug: str):
+        item = find_prompt(category, slug)
+        if item is None:
+            abort(404)
+        return render_template(
+            "prompt_detail.html", item=item, category_name=PROMPT_CATEGORY_NAMES[category],
+            page_id="direction-ai",
         )
 
     @app.route("/clinical-guidelines/")
@@ -1050,6 +1083,10 @@ def create_app() -> Flask:
             origin + url_for("topic_detail", section_slug=section_slug, topic_slug=topic["slug"])
             for section_slug, section in SECTIONS.items()
             for topic in section["topics"]
+        )
+        pages.extend(
+            origin + url_for("prompt_detail", category=item["category"], slug=item["slug"])
+            for item in all_prompts()
         )
         pages.extend(origin + url_for("case_detail", slug=case["slug"]) for case in get_all_cases())
         pages.append(origin + url_for("materials_catalog"))

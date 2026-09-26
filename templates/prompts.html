@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Практические промпты — портал ДИС{% endblock %}
+{% block description %}Промпты для работы, анализа, контента и проверки результата. Текст шаблонов и инструкции по применению.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts') }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <section class="hero direction-hero topic-hero">
+    <p class="eyebrow"><a href="{{ url_for('direction_detail', slug='ai') }}">{{ section.title }}</a> / тема</p>
+    <h1>Практические промпты</h1>
+    <p class="hero-sub">{{ total }} шаблонов из коллекции: выберите рубрику, откройте промпт и замените поля в квадратных скобках своими данными.</p>
+    <form class="topic-search" action="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts') }}" method="get" role="search">
+      {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+      <input type="search" name="q" value="{{ search }}" placeholder="Найти промпт" aria-label="Поиск по промптам">
+      <button class="btn btn-primary btn-sm" type="submit">Найти</button>
+    </form>
+  </section>
+
+  <section class="s">
+    <div class="s-label"><span>//</span> рубрики темы</div>
+    <h2>Выберите рубрику</h2>
+    <div class="rubric-grid">
+      {% for rubric in categories %}
+      <a class="rubric-card{% if category == rubric.slug %} prompt-selected{% endif %}" href="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts', category=rubric.slug) }}">
+        <span class="rubric-card__count">{{ rubric.count }}</span>
+        <h3>{{ rubric.name }}</h3>
+        <p>Промптов в рубрике</p>
+        <span class="rubric-card__arrow" aria-hidden="true">→</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="s">
+    <div class="s-label"><span>//</span> каталог</div>
+    <h2>{{ category_names[category] if category else 'Все промпты' }} <small>({{ prompts|length }})</small></h2>
+    {% if category or search %}<p><a href="{{ url_for('topic_detail', section_slug='ai', topic_slug='prompts') }}">Показать все рубрики и промпты</a></p>{% endif %}
+    {% if prompts %}
+    <div class="prompt-grid">
+      {% for item in prompts %}
+      <article class="prompt-card">
+        <div class="prompt-card__meta">{{ item.group }} · {{ category_names[item.category] }}</div>
+        <h3><a href="{{ url_for('prompt_detail', category=item.category, slug=item.slug) }}">{{ item.title }}</a></h3>
+        <p>{{ item.summary }}</p>
+        <a href="{{ url_for('prompt_detail', category=item.category, slug=item.slug) }}">Открыть и скопировать <span aria-hidden="true">→</span></a>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}<div class="empty-state"><h3>Совпадений нет</h3><p>Попробуйте другой запрос или откройте все рубрики.</p></div>{% endif %}
+  </section>
+</div>
+{% endblock %}
