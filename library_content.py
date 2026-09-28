@@ -10,6 +10,11 @@ from __future__ import annotations
 
 LIBRARY_CATEGORIES = [
     {
+        "slug": "medicine",
+        "title": "Медицина",
+        "description": "Неврология, клинические рекомендации, практические обзоры и материалы для врачей и пациентов.",
+    },
+    {
         "slug": "ai-architecture",
         "title": "AI и архитектура",
         "description": "Проектирование, модели, интеграции, пилоты и контроль качества AI-систем.",
@@ -38,6 +43,19 @@ LIBRARY_CATEGORIES = [
 
 
 LIBRARY_ITEMS = [
+    {
+        "slug": "migraine-brochure-2026",
+        "title": "Мигрень: современная диагностика, лечение и профилактика — 2026",
+        "summary": "Практическая брошюра: диагностика, красные флаги, лечение приступа, профилактика, CGRP-МАТ, гепанты, ботулинотерапия и особые формы мигрени.",
+        "category": "medicine",
+        "kind": "Брошюра",
+        "date": "28.09.2026",
+        "file": None,
+        "article_slug": "migraine-brochure-2026",
+        "status": "Опубликовано",
+        "featured": True,
+        "directions": ["medicine"],
+    },
     {
         "slug": "ai-law-brand-protection",
         "title": "Искусственный интеллект в правовом поле",
