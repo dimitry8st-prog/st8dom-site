@@ -678,6 +678,7 @@ def create_app() -> Flask:
                 "tag": tag,
                 "q": search,
             },
+            medical_context=(section == "medicine"),
             page_id="materials",
         )
 
@@ -694,6 +695,7 @@ def create_app() -> Flask:
             selected_category=category,
             total=len(LIBRARY_ITEMS),
             published=sum(1 for item in LIBRARY_ITEMS if item["file"] or item.get("article_slug")),
+            medical_context=(category == "medicine"),
             page_id="library",
         )
 
