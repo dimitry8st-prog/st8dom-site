@@ -51,7 +51,7 @@ def test_topic_cards_link_to_rubric_pages(client):
     page = client.get("/directions/medicine/")
     assert page.status_code == 200
     assert b"/directions/medicine/neurology-neurosurgery/" in page.data
-    assert page.data.count(b'class="topic-card reveal"') == 4
+    assert page.data.count(b'class="topic-card reveal"') == 5
 
     topic = client.get("/directions/medicine/neurology-neurosurgery/")
     assert topic.status_code == 200
