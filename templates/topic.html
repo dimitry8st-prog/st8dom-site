@@ -80,9 +80,11 @@
     {% else %}<div class="empty-state"><h3>Публикации готовятся</h3><p>Новые материалы появятся здесь после редакционной проверки.</p></div>{% endif %}
   </section>
 
+  {% if section_slug != 'medicine' %}
   <section class="topic-follow">
     <div><strong>Следить за темой</strong><p>Новый Telegram-бот готовится.</p></div>
     <a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a>
   </section>
+  {% endif %}
 </div>
 {% endblock %}

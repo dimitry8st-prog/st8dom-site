@@ -16,7 +16,7 @@
       <p class="hero-sub">{{ section.summary }}</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="#topics">Выбрать тему</a>
-        <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
+        {% if slug != 'medicine' %}<a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>{% endif %}
       </div>
     </div>
     {% if slug == 'medicine' %}
@@ -40,7 +40,7 @@
     <div class="materials-grid materials-grid--compact{% if slug == 'medicine' %} materials-grid--medicine{% endif %}">
       {% for article in latest_materials %}{{ material_card(article) }}{% endfor %}
     </div>
-    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog', section=slug) }}">Все материалы раздела</a><a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a></div>
+    <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog', section=slug) }}">Все материалы раздела</a>{% if slug != 'medicine' %}<a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a>{% endif %}</div>
   </section>
   {% endif %}
 
@@ -81,7 +81,7 @@
   </section>
   {% endif %}
 
-  {% if related_projects %}
+  {% if related_projects and slug != 'medicine' %}
   <section class="s">
     <div class="s-label"><span>//</span> связанные проекты</div>
     <h2>Практика по теме</h2>
