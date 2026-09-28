@@ -7,11 +7,15 @@
   <h3>{{ item.title }}</h3>
   <p>{{ item.summary }}</p>
   <div class="library-card__footer">
-    <span class="library-status{% if not item.file %} library-status--draft{% endif %}">{{ item.status }}</span>
-    {% if item.file %}
+    <span class="library-status{% if not item.file and not item.get('article_slug') %} library-status--draft{% endif %}">{{ item.status }}</span>
+    {% if item.file or item.get('article_slug') %}
       <div class="library-card__actions">
-        <a class="btn btn-ghost btn-sm" href="{{ url_for('library_detail', slug=item.slug) }}">Читать онлайн</a>
-        {% if library_downloads_enabled %}<a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>{% endif %}
+        {% if item.get('article_slug') %}
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('material_detail', slug=item.article_slug) }}">Читать онлайн</a>
+        {% else %}
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('library_detail', slug=item.slug) }}">Читать онлайн</a>
+        {% endif %}
+        {% if library_downloads_enabled and item.file %}<a class="btn btn-primary btn-sm" href="{{ url_for('static', filename='downloads/' + item.file) }}" download>Скачать DOCX</a>{% endif %}
       </div>
     {% else %}
       <span class="library-card__pending">Онлайн-версия откроется после проверки</span>
