@@ -412,6 +412,7 @@ def create_app() -> Flask:
             .limit(6)
             .all(),
             library_items=library_items_for_direction(slug),
+            medical_context=(slug == "medicine"),
             page_id=f"direction-{slug}",
         )
 
@@ -495,6 +496,7 @@ def create_app() -> Flask:
             grouped_rubrics=grouped_rubrics,
             materials=articles,
             guidelines=guidelines,
+            medical_context=(section_slug == "medicine"),
             page_id=f"direction-{section_slug}",
         )
 
@@ -539,6 +541,7 @@ def create_app() -> Flask:
             guidelines=guidelines,
             official_sources=OFFICIAL_SOURCES,
             selected={"kind": kind, "source": source_key, "q": search},
+            medical_context=True,
             page_id="clinical-guidelines",
         )
 
@@ -729,6 +732,7 @@ def create_app() -> Flask:
         return render_template(
             "material_detail.html",
             article=article,
+            medical_context=article.is_medical,
             related=related_articles(article),
             content_type_labels=CONTENT_TYPE_LABELS,
             preview=False,
