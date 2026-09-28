@@ -92,34 +92,83 @@ OFFICIAL_SOURCES = {
     },
 }
 
+# Сначала смотрим на название документа. Это намеренно строже, чем поиск
+# любого кода G/F/I в списке МКБ: смежная рекомендация должна быть посвящена
+# неврологической/нейрохирургической проблеме, а не просто содержать её как
+# сопутствующее состояние.
 NEURO_TITLE_TERMS = (
     "неврол",
     "нейрохир",
-    "головн",
-    "спинн",
+    "нервной систем",
+    "головная боль",
+    "мигрень",
+    "кластерн",
     "инсульт",
+    "инфаркт мозга",
     "церебр",
+    "субарахноид",
+    "внутричереп",
+    "головного мозга",
+    "спинного мозга",
+    "черепно-мозг",
+    "сотрясен",
     "эпилеп",
     "паркинсон",
     "деменц",
     "альцгеймер",
-    "мигрень",
-    "головная боль",
     "рассеянн",
     "миастен",
+    "мононевроп",
     "полинейроп",
+    "нейропат",
     "радикул",
     "позвоноч",
     "межпозвон",
-    "черепно-мозг",
-    "субарахноид",
-    "внутричереп",
     "гидроцеф",
     "аневризм",
     "нейроонк",
     "глиом",
     "менингиом",
     "шванном",
+    "нейрофибром",
+    "менингит",
+    "энцефалит",
+    "нейроинф",
+    "мышечная дистроф",
+    "мышечные дистроф",
+    "спинальная мышечная атроф",
+    "амиотроф",
+    "мотонейрон",
+    "атакси",
+    "дистони",
+    "хоре",
+    "сирингомиел",
+    "церебральный паралич",
+    "детский церебральный паралич",
+    "болезнь вильсона",
+)
+
+# Узкий резервный список кодов для документов, название которых может быть
+# коротким, но профиль однозначно нейрохирургический/неврологический.
+NEURO_CODE_PREFIXES = (
+    "G00", "G01", "G02", "G03", "G04", "G05", "G06", "G08",
+    "G10", "G11", "G12", "G20", "G21", "G23", "G24", "G25",
+    "G30", "G31", "G35", "G36", "G37", "G40", "G41", "G43", "G44",
+    "G50", "G51", "G52", "G53", "G54", "G55", "G56", "G57", "G58", "G59",
+    "G60", "G61", "G62", "G63", "G64", "G70", "G71", "G72", "G73",
+    "G80", "G81", "G82", "G83", "G90", "G91", "G92", "G93", "G94", "G95", "G96", "G97",
+    "I60", "I61", "I62", "I63", "I64", "I65", "I66", "I67", "I68", "I69",
+    "S06", "C70", "C71", "C72", "D32", "D33", "Q00", "Q01", "Q02", "Q03", "Q04", "Q05", "Q06",
+)
+
+NEURO_DEVELOPER_TERMS = (
+    "общество невролог",
+    "ассоциация невролог",
+    "нейрохирург",
+    "нейрорадиолог",
+    "нервно-мышеч",
+    "клинической нейрофизиолог",
+    "головной боли",
 )
 
 
@@ -178,23 +227,39 @@ def _official_url(source_key: str, value: str) -> str:
 
 
 def is_neurology_or_neurosurgery(item: dict) -> bool:
-    """Консервативно отбирает профильные документы по названию и кодам МКБ."""
-    text_parts = [str(item.get("Name") or "")]
-    text_parts.extend(str(row.get("MkbName") or "") for row in item.get("Mkbs") or [])
-    text_parts.extend(str(row.get("NkoName") or "") for row in item.get("Developers") or [])
-    haystack = " ".join(text_parts).casefold()
-    if any(term in haystack for term in NEURO_TITLE_TERMS):
+    """Отбирает только профильные и действительно смежные рекомендации.
+
+    Не считаем документ неврологическим только потому, что среди множества
+    диагнозов встречается один код G/F/I или в МКБ-описании есть слово
+    «неврологический». Основной сигнал — название рекомендации.
+    """
+    title = str(item.get("Name") or "").casefold()
+    if any(term in title for term in NEURO_TITLE_TERMS):
         return True
 
-    codes = [str(row.get("MkbCode") or "").upper() for row in item.get("Mkbs") or []]
-    for code in codes:
-        if code.startswith("G"):
-            return True
-        if re.match(r"I6[0-9]", code):
-            return True
-        if code.startswith(("S06", "C70", "C71", "C72", "D32", "D33", "Q0")):
-            return True
-    return False
+    codes = [
+        str(row.get("MkbCode") or "").upper().replace(" ", "")
+        for row in item.get("Mkbs") or []
+        if row.get("MkbCode")
+    ]
+    if not codes:
+        return False
+
+    neuro_codes = [
+        code for code in codes
+        if code.startswith(NEURO_CODE_PREFIXES)
+    ]
+    if not neuro_codes:
+        return False
+
+    # Кодовый fallback допускается только при профильном разработчике и когда
+    # значимая часть кодов документа относится к неврологии/нейрохирургии.
+    developers = " ".join(
+        str(row.get("NkoName") or "") for row in item.get("Developers") or []
+    ).casefold()
+    has_neuro_developer = any(term in developers for term in NEURO_DEVELOPER_TERMS)
+    neuro_share = len(neuro_codes) / len(codes)
+    return has_neuro_developer and neuro_share >= 0.5
 
 
 def fetch_minzdrav_page(
