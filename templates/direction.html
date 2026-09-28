@@ -8,7 +8,7 @@
 {% block og_description %}{{ section.summary }}{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container{% if slug == 'medicine' %} container--medicine{% endif %}">
   <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% endif %}">
     <div class="direction-hero__copy">
       <p class="eyebrow">{{ section.eyebrow }}</p>
@@ -23,8 +23,13 @@
     <figure class="direction-hero__visual">
       <img src="{{ url_for('static', filename='images/medicine-hero-dmitry.svg') }}"
            alt="Дмитрий Степанов в медицинском кабинете"
-           width="480" height="266" loading="eager" fetchpriority="high">
+           width="720" height="399" loading="eager" fetchpriority="high">
     </figure>
+    <div class="medicine-proof" aria-label="Ключевые принципы раздела">
+      <span><strong>◉</strong> Доказательная медицина</span>
+      <span><strong>◎</strong> Клинический опыт</span>
+      <span><strong>▣</strong> Знания для жизни</span>
+    </div>
     {% endif %}
   </section>
 
@@ -32,7 +37,7 @@
   <section class="s">
     <div class="s-label"><span>//</span> новые публикации</div>
     <h2>Материалы раздела</h2>
-    <div class="materials-grid materials-grid--compact">
+    <div class="materials-grid materials-grid--compact{% if slug == 'medicine' %} materials-grid--medicine{% endif %}">
       {% for article in latest_materials %}{{ material_card(article) }}{% endfor %}
     </div>
     <div class="section-actions"><a class="btn btn-ghost" href="{{ url_for('materials_catalog', section=slug) }}">Все материалы раздела</a><a class="btn btn-tg" href="{{ telegram_url }}">Telegram-бот готовится</a></div>
