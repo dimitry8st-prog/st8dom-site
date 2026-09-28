@@ -75,10 +75,14 @@
         <a href="{{ url_for('direction_detail', slug='life-os') }}" {% if page_id == 'direction-life-os' %}aria-current="page"{% endif %}>Life‑OS</a>
         <a href="{{ url_for('library_catalog') }}" {% if page_id == 'library' %}aria-current="page"{% endif %}>Библиотека</a>
         <a href="{{ url_for('unified_search') }}" {% if page_id == 'search' %}aria-current="page"{% endif %}>Поиск</a>
+        {% if not medical_context|default(false) %}
         <a href="{{ url_for('projects_catalog') }}" {% if page_id in ['projects', 'cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
         <a href="{{ url_for('products_catalog') }}" {% if page_id == 'products' %}aria-current="page"{% endif %}>Продукты</a>
+        {% endif %}
         <a href="{{ url_for('index') }}#about">Об авторе</a>
+        {% if not medical_context|default(false) %}
         <a href="{{ url_for('contact') }}" class="nav-cta" {% if page_id == 'contact' %}aria-current="page"{% endif %}>Контакты</a>
+        {% endif %}
       </div>
     </div>
   </nav>
@@ -105,8 +109,10 @@
         <a href="{{ url_for('library_catalog') }}">Библиотека ДИС</a>
         <a href="{{ url_for('editorial_workshop') }}">Редакционная мастерская</a>
         <a href="{{ url_for('materials_catalog') }}">Статьи</a>
+        {% if not medical_context|default(false) %}
         <a href="{{ url_for('products_catalog') }}">Продукты</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
+        {% endif %}
       </div>
       {% if page_id != 'admin' %}
         <p class="visit-counter">Посещений сегодня: <strong>{{ visit_stats.today }}</strong></p>
@@ -114,13 +120,13 @@
       <p>© 2026 <span>Степанов Д.А.</span> · Портал «ДИС» · Медицина, AI и будущее человека</p>
     </div>
   </footer>
-  {% if chat_enabled and page_id != 'admin' %}
+  {% if chat_enabled and page_id != 'admin' and not medical_context|default(false) %}
     {% include "macros/chat_widget.html" %}
   {% endif %}
   <script>window.ST8DOM_ANALYTICS_ID = {{ analytics_id|tojson }};</script>
   <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
-  {% if chat_enabled and page_id != 'admin' %}
+  {% if chat_enabled and page_id != 'admin' and not medical_context|default(false) %}
   <script src="{{ url_for('static', filename='js/chat-widget.js') }}" defer></script>
   {% endif %}
   {% block extra_js %}{% endblock %}
