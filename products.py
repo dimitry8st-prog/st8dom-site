@@ -1,4 +1,4 @@
-"""Коммерческие продукты портала ДИС."""
+"""Коммерческие услуги и AI-решения портала ДИС."""
 
 PRODUCTS = [
     {
@@ -9,6 +9,9 @@ PRODUCTS = [
         "summary": "Разбор задачи, рекомендации и план следующих шагов.",
         "payment_object": "service",
         "sellable": True,
+        "service_class": "fixed",
+        "service_class_label": "Готовая услуга",
+        "delivery_label": "до 3 рабочих дней",
     },
     {
         "slug": "ai-audit",
@@ -18,6 +21,9 @@ PRODUCTS = [
         "summary": "Разбор процесса, точки автоматизации, архитектура и дорожная карта.",
         "payment_object": "service",
         "sellable": True,
+        "service_class": "fixed",
+        "service_class_label": "Готовая услуга",
+        "delivery_label": "до 5 рабочих дней",
     },
     {
         "slug": "meeting-intelligence",
@@ -27,6 +33,9 @@ PRODUCTS = [
         "summary": "Настройка рабочего контура для расшифровки встреч, решений и задач.",
         "payment_object": "service",
         "sellable": True,
+        "service_class": "fixed",
+        "service_class_label": "Готовая услуга",
+        "delivery_label": "до 7 рабочих дней",
     },
     {
         "slug": "reputation-assistant",
@@ -36,6 +45,9 @@ PRODUCTS = [
         "summary": "Анализ отзывов, проекты ответов и контроль человеком.",
         "payment_object": "service",
         "sellable": True,
+        "service_class": "fixed",
+        "service_class_label": "Готовая услуга",
+        "delivery_label": "до 7 рабочих дней",
     },
     {
         "slug": "knightcat-content-factory",
@@ -45,6 +57,9 @@ PRODUCTS = [
         "summary": "Контент-завод: идея → тексты → изображение → согласование → публикация.",
         "payment_object": "service",
         "sellable": True,
+        "service_class": "fixed",
+        "service_class_label": "Готовая услуга",
+        "delivery_label": "до 10 рабочих дней",
     },
     {
         "slug": "kpi-pulse",
@@ -54,6 +69,9 @@ PRODUCTS = [
         "summary": "Сбор показателей, автоматизация отчётности и понятные управленческие сводки.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "adapted",
+        "service_class_label": "Готовое AI-решение с адаптацией",
+        "delivery_label": "от 10 рабочих дней",
     },
     {
         "slug": "telegram-bot-mvp",
@@ -63,6 +81,9 @@ PRODUCTS = [
         "summary": "Рабочий Telegram-бот под конкретный бизнес-процесс с базовой автоматизацией.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "adapted",
+        "service_class_label": "Готовое AI-решение с адаптацией",
+        "delivery_label": "от 10 рабочих дней",
     },
     {
         "slug": "onboardflow-ai",
@@ -72,6 +93,9 @@ PRODUCTS = [
         "summary": "AI-онбординг сотрудников по проверенной корпоративной базе знаний.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "adapted",
+        "service_class_label": "Готовое AI-решение с адаптацией",
+        "delivery_label": "от 10 рабочих дней",
     },
     {
         "slug": "docpulse-ai",
@@ -81,6 +105,9 @@ PRODUCTS = [
         "summary": "Структурированный разбор документов и PDF с выводами и навигацией по источникам.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "adapted",
+        "service_class_label": "Готовое AI-решение с адаптацией",
+        "delivery_label": "от 10 рабочих дней",
     },
     {
         "slug": "rag-documents",
@@ -90,6 +117,9 @@ PRODUCTS = [
         "summary": "Поиск и ответы по собственной базе документов с цитированием источников.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "custom",
+        "service_class_label": "AI-решение под ключ",
+        "delivery_label": "от 20 рабочих дней",
     },
     {
         "slug": "ai-assistant-integrations",
@@ -99,6 +129,9 @@ PRODUCTS = [
         "summary": "AI-ассистент с подключением API, CRM, баз данных, Telegram и рабочих сервисов.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "custom",
+        "service_class_label": "AI-решение под ключ",
+        "delivery_label": "от 15 рабочих дней",
     },
     {
         "slug": "autosfera-ai",
@@ -108,6 +141,9 @@ PRODUCTS = [
         "summary": "Мультиагентный контур продаж и сервиса: маршрутизация, база знаний, CRM и передача оператору.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "custom",
+        "service_class_label": "AI-решение под ключ",
+        "delivery_label": "от 20–30 рабочих дней",
     },
     {
         "slug": "custom-ai",
@@ -117,6 +153,9 @@ PRODUCTS = [
         "summary": "RAG, агенты, CRM, интеграции, базы данных и несколько каналов под конкретный процесс.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "custom",
+        "service_class_label": "AI-решение под ключ",
+        "delivery_label": "от 20–30 рабочих дней",
     },
     {
         "slug": "support",
@@ -126,6 +165,9 @@ PRODUCTS = [
         "summary": "Поддержка работающего решения, небольшие изменения, контроль и консультации.",
         "payment_object": "service",
         "sellable": False,
+        "service_class": "support",
+        "service_class_label": "Сопровождение",
+        "delivery_label": "ежемесячно",
     },
 ]
 
