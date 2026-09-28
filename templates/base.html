@@ -76,6 +76,7 @@
         <a href="{{ url_for('library_catalog') }}" {% if page_id == 'library' %}aria-current="page"{% endif %}>Библиотека</a>
         <a href="{{ url_for('unified_search') }}" {% if page_id == 'search' %}aria-current="page"{% endif %}>Поиск</a>
         <a href="{{ url_for('projects_catalog') }}" {% if page_id in ['projects', 'cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
+        <a href="{{ url_for('products_catalog') }}" {% if page_id == 'products' %}aria-current="page"{% endif %}>Продукты</a>
         <a href="{{ url_for('index') }}#about">Об авторе</a>
         <a href="{{ url_for('contact') }}" class="nav-cta" {% if page_id == 'contact' %}aria-current="page"{% endif %}>Контакты</a>
       </div>
@@ -104,6 +105,7 @@
         <a href="{{ url_for('library_catalog') }}">Библиотека ДИС</a>
         <a href="{{ url_for('editorial_workshop') }}">Редакционная мастерская</a>
         <a href="{{ url_for('materials_catalog') }}">Статьи</a>
+        <a href="{{ url_for('products_catalog') }}">Продукты</a>
         <a href="{{ url_for('contact') }}">Заявка</a>
       </div>
       {% if page_id != 'admin' %}
