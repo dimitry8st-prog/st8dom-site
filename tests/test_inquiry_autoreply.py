@@ -135,3 +135,39 @@ def test_contact_form_passes_explicit_reply_request(client, monkeypatch):
         with app.app_context():
             Inquiry.query.filter_by(email=email).delete()
             db.session.commit()
+
+
+def test_automatic_price_reply_does_not_require_checkbox(app_ctx, monkeypatch):
+    from types import SimpleNamespace
+    import inquiry_autoreply
+
+    app = app_ctx
+    app.config["INQUIRY_AUTO_REPLY_ENABLED"] = True
+    app.config["SMTP_USERNAME"] = "sender@example.com"
+    app.config["SMTP_PASSWORD"] = "secret"
+    app.config["SMTP_FROM"] = "sender@example.com"
+    app.config["INQUIRY_EMAIL"] = "owner@example.com"
+    app.config["SECRET_KEY"] = "test-secret"
+
+    class DummySMTP:
+        def __init__(self, *args, **kwargs): pass
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def ehlo(self): pass
+        def starttls(self): pass
+        def login(self, *args): pass
+        def send_message(self, *args): pass
+
+    monkeypatch.setattr(inquiry_autoreply.smtplib, "SMTP", DummySMTP)
+
+    inquiry = SimpleNamespace(
+        id=987654,
+        email="client-auto@example.com",
+        message="Здравствуйте, сколько стоит разработка Telegram-бота?",
+    )
+    assert inquiry_autoreply.send_price_auto_reply(inquiry, app) is True
+
+
+def test_promotion_is_not_auto_replied():
+    from inquiry_autoreply import is_price_question
+    assert is_price_question("Submit st8dom.ru to Google, pricing at example.com") is False
