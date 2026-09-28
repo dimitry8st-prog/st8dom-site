@@ -31,11 +31,22 @@
       <span><strong>▣</strong> Знания для жизни</span>
     </div>
     {% elif slug == 'ai' %}
-    <figure class="direction-hero__visual direction-hero__visual--ai">
-      <img src="{{ url_for('static', filename='images/ai-practice-human-loop.jpg') }}"
-           alt="AI на практике: человек ставит задачу, ИИ помогает, человек проверяет и принимает решение"
-           width="800" height="450" loading="eager" fetchpriority="high">
-    </figure>
+    <div class="ai-hero-scene" role="img" aria-label="AI на практике: человек ставит задачу, ИИ помогает, человек проверяет и принимает решение">
+      <img class="ai-hero-scene__portrait" src="{{ url_for('static', filename='images/medicine-hero-dmitry.jpg') }}" alt="" width="720" height="399">
+      <img class="ai-hero-scene__mascot" src="{{ url_for('static', filename='images/dis-fox-cat.webp') }}" alt="" width="160" height="160">
+      <div class="ai-hero-flow" aria-hidden="true">
+        <div class="ai-flow-card ai-flow-card--human"><strong>Человек</strong><span>Задача</span></div>
+        <div class="ai-flow-arrow">→</div>
+        <div class="ai-flow-card"><strong>AI Orchestrator</strong><span>LLM · RAG · Tools</span></div>
+        <div class="ai-flow-arrow">→</div>
+        <div class="ai-flow-card"><strong>Черновой результат</strong><span>Анализ · варианты</span></div>
+        <div class="ai-flow-arrow">→</div>
+        <div class="ai-flow-card ai-flow-card--review"><strong>Проверка человеком</strong><span>Понять · адаптировать · критиковать</span></div>
+        <div class="ai-flow-arrow">→</div>
+        <div class="ai-flow-card ai-flow-card--decision"><strong>Решение</strong><span>Внедрить · улучшить · отклонить</span></div>
+      </div>
+      <div class="ai-hero-scene__caption">ЧЕЛОВЕК → ИИ → ЧЕЛОВЕК</div>
+    </div>
     {% endif %}
   </section>
 
