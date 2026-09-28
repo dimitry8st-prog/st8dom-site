@@ -283,6 +283,8 @@ def test_selected_projects_catalog(client):
 
 
 def test_legal_and_seo(client):
+    assert client.get("/offer/").status_code == 200
+    assert client.get("/payment-and-refunds/").status_code == 200
     assert client.get("/privacy/").status_code == 200
     assert client.get("/consent/").status_code == 200
     robots = client.get("/robots.txt")
@@ -302,6 +304,8 @@ def test_legal_and_seo(client):
     assert b"/directions/ai/" in sitemap.data
     assert b"/directions/longevity/" in sitemap.data
     assert b"/directions/life-os/" in sitemap.data
+    assert b"/offer/" in sitemap.data
+    assert b"/payment-and-refunds/" in sitemap.data
     assert client.get("/no-such-page/").status_code == 404
 
 
