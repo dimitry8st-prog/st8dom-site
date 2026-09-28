@@ -59,4 +59,22 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/clinical_guidelines.json obsidian-vault/
           git commit -m "Обновить клинические рекомендации"
-          git push
+
+          # Пока workflow работал, main мог измениться другим коммитом.
+          # Подтягиваем свежий main перед push, чтобы не падать на non-fast-forward.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+              echo "Конфликт при обновлении main — повторная синхронизация будет выполнена позже"
+              exit 1
+            fi
+            echo "Push не прошёл, попытка $attempt из 3"
+            sleep $((attempt * 3))
+          done
+          echo "Не удалось отправить обновление после 3 попыток"
+          exit 1
