@@ -801,7 +801,7 @@ def create_app() -> Flask:
             logger.info("Новая заявка #%s сохранена", inquiry.id)
             email_sent = notify_email(inquiry, app)
             notify_telegram(inquiry, app)
-            send_price_auto_reply(inquiry, app, requested=bool(form.reply_requested.data))
+            send_price_auto_reply(inquiry, app)
             if email_sent:
                 flash("Заявка отправлена. Отвечу в рабочее время на указанный email.", "success")
             else:

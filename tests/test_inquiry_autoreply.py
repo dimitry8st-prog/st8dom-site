@@ -32,7 +32,7 @@ def test_price_question_selection_is_narrow():
     assert not is_price_question("Our backlinks price: https://example.com")
 
 
-def test_auto_reply_requires_request_and_sends_only_once_per_week(monkeypatch):
+def test_auto_reply_is_automatic_and_sends_only_once_per_week(monkeypatch):
     _configure(monkeypatch)
     inquiry_id = 9000000
     email = f"visitor-{uuid4().hex}@example.com"
@@ -40,9 +40,8 @@ def test_auto_reply_requires_request_and_sends_only_once_per_week(monkeypatch):
         with app.app_context(), patch("inquiry_autoreply.smtplib.SMTP") as smtp_class:
             smtp = smtp_class.return_value.__enter__.return_value
             inquiry = _inquiry(email, inquiry_id)
-            assert send_price_auto_reply(inquiry, app, requested=False) is False
-            assert send_price_auto_reply(inquiry, app, requested=True) is True
-            assert send_price_auto_reply(inquiry, app, requested=True) is False
+            assert send_price_auto_reply(inquiry, app) is True
+            assert send_price_auto_reply(inquiry, app) is False
             smtp.send_message.assert_called_once()
             mail = smtp.send_message.call_args.args[0]
             assert mail["To"] == email
@@ -111,14 +110,14 @@ def test_smtp_failure_never_triggers_repeated_automatic_send(monkeypatch):
             db.session.commit()
 
 
-def test_contact_form_passes_explicit_reply_request(client, monkeypatch):
+def test_contact_form_triggers_automatic_price_reply(client, monkeypatch):
     email = f"visitor-{uuid4().hex}@example.com"
     called = []
     monkeypatch.setattr("app.notify_email", lambda inquiry, site: False)
     monkeypatch.setattr("app.notify_telegram", lambda inquiry, site: None)
     monkeypatch.setattr(
         "app.send_price_auto_reply",
-        lambda inquiry, site, *, requested: called.append((inquiry.email, requested)),
+        lambda inquiry, site: called.append(inquiry.email),
     )
     try:
         response = client.post(
@@ -126,12 +125,17 @@ def test_contact_form_passes_explicit_reply_request(client, monkeypatch):
             data={
                 "name": "Иван", "email": email, "phone": "+7 900 000-00-00",
                 "topic": "audit", "message": "Сколько стоит аудит процесса?",
-                "consent": "y", "reply_requested": "y",
+                "consent": "y",
             },
         )
         assert response.status_code == 302
-        assert called == [(email, True)]
+        assert called == [email]
     finally:
         with app.app_context():
             Inquiry.query.filter_by(email=email).delete()
             db.session.commit()
+
+
+def test_promotion_is_not_auto_replied():
+    from inquiry_autoreply import is_price_question
+    assert is_price_question("Submit st8dom.ru to Google, pricing at example.com") is False
