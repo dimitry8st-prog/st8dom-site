@@ -32,9 +32,13 @@ def is_price_question(message: str) -> bool:
     return bool(PRICE_WORDS.search(message)) and not bool(PROMOTION.search(message))
 
 
-def send_price_auto_reply(inquiry, app, *, requested: bool) -> bool:
-    """Одно безопасное письмо на адрес за календарную неделю, до 20 за сутки."""
-    if not requested or not app.config.get("INQUIRY_AUTO_REPLY_ENABLED"):
+def send_price_auto_reply(inquiry, app, *, requested: bool | None = None) -> bool:
+    """Автоматически отвечает на явный вопрос о цене.
+
+    Параметр requested сохранён для обратной совместимости, но пользовательская
+    галочка больше не обязательна: смысл сообщения определяется сервером.
+    """
+    if not app.config.get("INQUIRY_AUTO_REPLY_ENABLED"):
         return False
     if not is_price_question(inquiry.message):
         return False
