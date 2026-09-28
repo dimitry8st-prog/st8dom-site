@@ -3673,9 +3673,9 @@ body:has(.site-chat) .foot {
 .direction-hero--ai {
   max-width: none;
   display: grid;
-  grid-template-columns: minmax(0, .72fr) minmax(560px, 1.28fr);
+  grid-template-columns: minmax(430px, .78fr) minmax(560px, 1.22fr);
   align-items: center;
-  gap: 44px;
+  gap: 42px;
   padding-top: 68px;
   padding-bottom: 54px;
   min-height: 440px;
@@ -3688,7 +3688,8 @@ body:has(.site-chat) .foot {
 }
 
 .direction-hero--ai h1 {
-  font-size: clamp(44px, 4.6vw, 64px);
+  font-size: clamp(42px, 3.8vw, 54px);
+  white-space: nowrap;
 }
 
 .direction-hero--ai .hero-sub {
@@ -3720,6 +3721,10 @@ body:has(.site-chat) .foot {
     grid-template-columns: 1fr;
     gap: 28px;
     min-height: auto;
+  }
+
+  .direction-hero--ai h1 {
+    white-space: normal;
   }
 
   .direction-hero__visual--ai {
