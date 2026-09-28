@@ -35,7 +35,8 @@ def test_seed_material_is_public_and_connected(client):
     assert detail.status_code == 200
     assert "Проверено".encode("utf-8") in detail.data
     assert "Источники".encode("utf-8") in detail.data
-    assert "Следить за темой".encode("utf-8") in detail.data
+    assert "Следить за темой".encode("utf-8") not in detail.data
+    assert b'id="chat-launcher"' not in detail.data
 
     home = client.get("/")
     assert slug.encode() in home.data
