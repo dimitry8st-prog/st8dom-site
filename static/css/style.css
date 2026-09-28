@@ -3486,3 +3486,180 @@ body:has(.site-chat) .foot {
     border-radius: 16px;
   }
 }
+
+
+/* Medicine landing page: align live page with approved visual mockup */
+.container--medicine {
+  max-width: 1180px;
+}
+
+.direction-hero--medicine {
+  grid-template-columns: minmax(0, .88fr) minmax(480px, 1.12fr);
+  gap: 54px;
+  padding-top: 68px;
+  padding-bottom: 54px;
+  min-height: 480px;
+}
+
+.direction-hero--medicine .direction-hero__copy {
+  align-self: center;
+}
+
+.direction-hero--medicine h1 {
+  font-size: clamp(46px, 5vw, 70px);
+  margin-bottom: 20px;
+}
+
+.direction-hero--medicine .hero-sub {
+  max-width: 620px;
+  font-size: 18px;
+  line-height: 1.72;
+  margin-bottom: 28px;
+}
+
+.direction-hero--medicine .hero-cta {
+  gap: 14px;
+}
+
+.direction-hero--medicine .btn {
+  min-height: 52px;
+  padding-inline: 24px;
+  font-weight: 700;
+}
+
+.direction-hero__visual {
+  align-self: center;
+  border-radius: 22px;
+}
+
+.direction-hero__visual img {
+  aspect-ratio: 720 / 399;
+  object-fit: cover;
+  object-position: center;
+}
+
+.medicine-proof {
+  grid-column: 1 / 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: -34px;
+  padding-top: 18px;
+  position: relative;
+  z-index: 3;
+}
+
+.medicine-proof span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #9fb0c8;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.medicine-proof strong {
+  color: var(--orange);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.container--medicine > .s:first-of-type {
+  padding-top: 56px;
+}
+
+.container--medicine .s > h2 {
+  font-size: clamp(28px, 3vw, 38px);
+}
+
+.materials-grid--medicine {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.materials-grid--medicine .material-card {
+  min-height: 285px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(59, 130, 246, .28);
+  background:
+    linear-gradient(180deg, rgba(20, 35, 58, .88), rgba(11, 20, 36, .98));
+}
+
+.materials-grid--medicine .material-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .7;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(59,130,246,.26), transparent 28%),
+    linear-gradient(135deg, transparent 45%, rgba(125,211,252,.07));
+}
+
+.materials-grid--medicine .material-card:nth-child(2)::before {
+  background:
+    radial-gradient(circle at 86% 20%, rgba(245,158,11,.23), transparent 29%),
+    linear-gradient(135deg, transparent 46%, rgba(245,158,11,.06));
+}
+
+.materials-grid--medicine .material-card:nth-child(3)::before {
+  background:
+    radial-gradient(circle at 84% 16%, rgba(45,212,191,.20), transparent 30%),
+    linear-gradient(135deg, transparent 46%, rgba(45,212,191,.05));
+}
+
+.materials-grid--medicine .material-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.materials-grid--medicine .material-card h3 {
+  font-size: 23px;
+  line-height: 1.25;
+}
+
+.materials-grid--medicine .material-card p {
+  color: #92a3ba;
+}
+
+@media (max-width: 980px) {
+  .container--medicine {
+    max-width: 900px;
+  }
+
+  .direction-hero--medicine {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    min-height: auto;
+  }
+
+  .medicine-proof {
+    grid-column: 1;
+    margin-top: 0;
+  }
+
+  .materials-grid--medicine {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .direction-hero--medicine h1 {
+    font-size: clamp(40px, 12vw, 56px);
+  }
+
+  .direction-hero--medicine .hero-sub {
+    font-size: 16px;
+  }
+
+  .medicine-proof {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .materials-grid--medicine {
+    grid-template-columns: 1fr;
+  }
+}
