@@ -56,6 +56,26 @@ OFFICIAL_SOURCES = {
         "kind": "international",
         "domains": {"nice.org.uk", "www.nice.org.uk"},
     },
+    "ahs": {
+        "name": "American Headache Society",
+        "kind": "international",
+        "domains": {"headachejournal.onlinelibrary.wiley.com", "www.neurology.org", "neurology.org"},
+    },
+    "ihs": {
+        "name": "International Headache Society",
+        "kind": "international",
+        "domains": {"journals.sagepub.com", "ihs-headache.org", "www.ihs-headache.org"},
+    },
+    "ehf": {
+        "name": "European Headache Federation",
+        "kind": "international",
+        "domains": {"pubmed.ncbi.nlm.nih.gov", "thejournalofheadacheandpain.biomedcentral.com"},
+    },
+    "bash": {
+        "name": "British Association for the Study of Headache",
+        "kind": "international",
+        "domains": {"bash.org.uk", "www.bash.org.uk"},
+    },
     "who": {
         "name": "World Health Organization",
         "kind": "international",

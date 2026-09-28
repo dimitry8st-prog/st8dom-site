@@ -204,6 +204,78 @@
       "url": "https://cr.minzdrav.gov.ru/view-cr/493_3",
       "published_on": "2026-01-12",
       "status": "active"
+    },
+    {
+      "source_key": "minzdrav",
+      "external_id": "295_4",
+      "title": "Мигрень",
+      "organization": "Всероссийское общество неврологов; Российское общество по изучению головной боли; Союз реабилитологов России",
+      "version": "4",
+      "codes": "G43, G43.0, G43.1, G43.2, G43.3, G43.8, G43.9, G44.0, G44.1, G44.4",
+      "specialties": "Неврология",
+      "url": "https://cr.minzdrav.gov.ru/view-cr/295_4",
+      "published_on": "2024-10-25",
+      "status": "active"
+    },
+    {
+      "source_key": "ahs",
+      "external_id": "AAN-AHS-2026-MIGRAINE-PREVENTION",
+      "title": "Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations",
+      "organization": "American Academy of Neurology / American Headache Society",
+      "version": "2026",
+      "codes": "Migraine prevention",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://www.neurology.org/doi/10.1212/WNL.0000000000214881",
+      "published_on": "2026-08-31",
+      "status": "active"
+    },
+    {
+      "source_key": "ihs",
+      "external_id": "IHS-2024-PREVENTIVE-MIGRAINE",
+      "title": "International Headache Society Global Practice Recommendations for Preventive Pharmacological Treatment of Migraine",
+      "organization": "International Headache Society",
+      "version": "2024",
+      "codes": "Migraine prevention",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://journals.sagepub.com/doi/10.1177/03331024241269735",
+      "published_on": "2024-09-01",
+      "status": "active"
+    },
+    {
+      "source_key": "ehf",
+      "external_id": "EHF-2022-CGRP-MABS",
+      "title": "European Headache Federation guideline on monoclonal antibodies targeting the CGRP pathway for migraine prevention — 2022 update",
+      "organization": "European Headache Federation",
+      "version": "2022",
+      "codes": "Migraine prevention / CGRP",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35690723/",
+      "published_on": "2022-06-11",
+      "status": "active"
+    },
+    {
+      "source_key": "nice",
+      "external_id": "CG150-2025",
+      "title": "Headaches in over 12s: diagnosis and management",
+      "organization": "National Institute for Health and Care Excellence",
+      "version": "CG150, updated 2025",
+      "codes": "Migraine / headache disorders",
+      "specialties": "Neurology / Primary care",
+      "url": "https://www.nice.org.uk/guidance/cg150",
+      "published_on": "2025-06-03",
+      "status": "active"
+    },
+    {
+      "source_key": "bash",
+      "external_id": "BASH-MIGRAINE-GUIDELINES",
+      "title": "BASH Guidelines for Headache Disorders",
+      "organization": "British Association for the Study of Headache",
+      "version": "current",
+      "codes": "Migraine / headache disorders",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://bash.org.uk/guidelines/",
+      "published_on": null,
+      "status": "active"
     }
   ]
 }
