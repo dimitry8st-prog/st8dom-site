@@ -75,8 +75,8 @@
         <a href="{{ url_for('direction_detail', slug='life-os') }}" {% if page_id == 'direction-life-os' %}aria-current="page"{% endif %}>Life‑OS</a>
         <a href="{{ url_for('library_catalog') }}" {% if page_id == 'library' %}aria-current="page"{% endif %}>Библиотека</a>
         <a href="{{ url_for('unified_search') }}" {% if page_id == 'search' %}aria-current="page"{% endif %}>Поиск</a>
-        {% if not medical_context|default(false) %}
         <a href="{{ url_for('projects_catalog') }}" {% if page_id in ['projects', 'cases', 'case'] %}aria-current="page"{% endif %}>Проекты</a>
+        {% if not medical_context|default(false) %}
         <a href="{{ url_for('products_catalog') }}" {% if page_id == 'products' %}aria-current="page"{% endif %}>Продукты</a>
         {% endif %}
         <a href="{{ url_for('index') }}#about">Об авторе</a>
