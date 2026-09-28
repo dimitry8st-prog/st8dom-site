@@ -61,6 +61,7 @@ class Config:
     ROBOKASSA_PASSWORD2 = os.environ.get("ROBOKASSA_PASSWORD2", "")
     ROBOKASSA_PASSWORD3 = os.environ.get("ROBOKASSA_PASSWORD3", "")
     ROBOKASSA_TEST_PASSWORD1 = os.environ.get("ROBOKASSA_TEST_PASSWORD1", "")
+    ROBOKASSA_TEST_PASSWORD2 = os.environ.get("ROBOKASSA_TEST_PASSWORD2", "")
     ROBOKASSA_TEST_MODE = os.environ.get("ROBOKASSA_TEST_MODE", "1").strip().lower() in {
         "1", "true", "on", "yes"
     }
