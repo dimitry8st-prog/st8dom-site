@@ -5,6 +5,7 @@ import json
 from app import app
 from clinical_guidelines import (
     GuidelineValidationError,
+    is_neurology_or_neurosurgery,
     sync_guidelines_registry,
     sync_minzdrav,
     upsert_guideline,
@@ -123,3 +124,36 @@ def test_registry_populates_public_cards(tmp_path):
         assert stats["created"] == 1
         assert stats["scanned"] == 1
     cleanup("minzdrav", external_id)
+
+
+def test_filter_rejects_non_neuro_document_with_incidental_neuro_code():
+    item = {
+        "Name": "Сахарный диабет 1 типа у взрослых",
+        "Developers": [{"NkoName": "Российская ассоциация эндокринологов"}],
+        "Mkbs": [
+            {"MkbName": "Сахарный диабет с неврологическими осложнениями", "MkbCode": "E10.4"},
+            {"MkbName": "Диабетическая полинейропатия", "MkbCode": "G63.2"},
+        ],
+    }
+    assert is_neurology_or_neurosurgery(item) is False
+
+
+def test_filter_accepts_related_neurological_pathology():
+    item = {
+        "Name": "Токсические и метаболические поражения нервной системы",
+        "Developers": [{"NkoName": "Всероссийское общество неврологов"}],
+        "Mkbs": [
+            {"MkbName": "Токсическая полинейропатия", "MkbCode": "G62.2"},
+            {"MkbName": "Энцефалопатия", "MkbCode": "G92"},
+        ],
+    }
+    assert is_neurology_or_neurosurgery(item) is True
+
+
+def test_filter_accepts_neurosurgical_condition():
+    item = {
+        "Name": "Очаговая травма головного мозга",
+        "Developers": [{"NkoName": "Ассоциация нейрохирургов России"}],
+        "Mkbs": [{"MkbName": "Травматическое повреждение мозга", "MkbCode": "S06.3"}],
+    }
+    assert is_neurology_or_neurosurgery(item) is True
