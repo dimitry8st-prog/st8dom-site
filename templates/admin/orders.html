@@ -36,7 +36,13 @@
             <button class="btn btn-danger btn-sm" type="submit" {% if not refund_ready %}disabled{% endif %}>Вернуть оплату</button>
           </form>
           {% elif item.refund_status %}
-            {{ item.refund_status }}{% if item.refund_amount %} · {{ item.refund_amount }} ₽{% endif %}
+            <div>{{ item.refund_status }}{% if item.refund_amount %} · {{ item.refund_amount }} ₽{% endif %}</div>
+            {% if item.refund_request_id and item.status == 'refund_processing' %}
+            <form method="post" action="{{ url_for('admin_order_refund_status', order_id=item.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-ghost btn-sm" type="submit">Проверить возврат</button>
+            </form>
+            {% endif %}
           {% else %}—{% endif %}
         </td>
       </tr>
