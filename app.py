@@ -1031,6 +1031,14 @@ def create_app() -> Flask:
             flash("Возврат не выполнен. Проверьте Password3 и доступность функции REFUND.", "error")
         return redirect(url_for("admin_orders"))
 
+    @app.route("/offer/")
+    def offer():
+        return render_template("offer.html", page_id="legal")
+
+    @app.route("/payment-and-refunds/")
+    def payment_and_refunds():
+        return render_template("payment_terms.html", page_id="legal")
+
     @app.route("/privacy/")
     def privacy():
         return render_template("privacy.html", page_id="legal")
@@ -1344,6 +1352,8 @@ def create_app() -> Flask:
             origin + url_for("library_catalog"),
             origin + url_for("editorial_workshop"),
             origin + url_for("contact"),
+            origin + url_for("offer"),
+            origin + url_for("payment_and_refunds"),
             origin + url_for("privacy"),
             origin + url_for("consent"),
             origin + url_for("clinical_guidelines_catalog"),
