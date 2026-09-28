@@ -3746,3 +3746,185 @@ body:has(.site-chat) .foot {
     border-radius: 16px;
   }
 }
+
+
+/* AI hero: resilient Human-in-the-loop scene built from verified site assets */
+.ai-hero-scene {
+  position: relative;
+  min-height: 400px;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(59, 130, 246, .58);
+  background:
+    linear-gradient(180deg, rgba(8, 18, 35, .18), rgba(8, 18, 35, .78)),
+    #0c1628;
+  box-shadow:
+    0 24px 64px rgba(2, 8, 23, .48),
+    0 0 34px rgba(59, 130, 246, .14),
+    0 0 18px rgba(245, 158, 11, .08);
+}
+
+.ai-hero-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(125,211,252,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125,211,252,.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ai-hero-scene__portrait {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 58%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .78;
+  filter: saturate(.86) brightness(.72) contrast(1.08);
+}
+
+.ai-hero-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(8,18,35,.98) 0%, rgba(8,18,35,.78) 35%, rgba(8,18,35,.18) 70%, rgba(8,18,35,.22) 100%),
+    radial-gradient(circle at 74% 34%, rgba(59,130,246,.22), transparent 38%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ai-hero-scene__mascot {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  z-index: 3;
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 22px;
+  border: 1px solid rgba(245,158,11,.68);
+  box-shadow: 0 10px 26px rgba(2,8,23,.42), 0 0 18px rgba(59,130,246,.20);
+}
+
+.ai-hero-flow {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 70px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr auto 1.15fr auto 1.12fr auto 1.25fr auto .95fr;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.ai-flow-card {
+  min-width: 0;
+  padding: 12px 12px 11px;
+  border: 1px solid rgba(59,130,246,.55);
+  border-radius: 12px;
+  background: rgba(8,18,35,.76);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px rgba(125,211,252,.05);
+}
+
+.ai-flow-card strong,
+.ai-flow-card span {
+  display: block;
+}
+
+.ai-flow-card strong {
+  color: #fff;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.ai-flow-card span {
+  margin-top: 5px;
+  color: #93a6c2;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.ai-flow-card--human,
+.ai-flow-card--decision {
+  border-color: rgba(245,158,11,.74);
+}
+
+.ai-flow-card--review {
+  border-color: rgba(45,212,191,.60);
+}
+
+.ai-flow-arrow {
+  align-self: center;
+  color: var(--orange);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.ai-hero-scene__caption {
+  position: absolute;
+  left: 28px;
+  bottom: 22px;
+  z-index: 4;
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-shadow: 0 2px 18px rgba(0,0,0,.7);
+}
+
+@media (max-width: 1180px) {
+  .ai-hero-flow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ai-flow-arrow {
+    display: none;
+  }
+
+  .ai-hero-scene {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 720px) {
+  .ai-hero-scene {
+    min-height: 520px;
+    border-radius: 16px;
+  }
+
+  .ai-hero-scene__portrait {
+    width: 100%;
+    opacity: .52;
+  }
+
+  .ai-hero-scene::after {
+    background: linear-gradient(180deg, rgba(8,18,35,.30), rgba(8,18,35,.96) 62%);
+  }
+
+  .ai-hero-flow {
+    left: 16px;
+    right: 16px;
+    bottom: 58px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ai-hero-scene__mascot {
+    width: 72px;
+    height: 72px;
+    top: 14px;
+    left: 14px;
+  }
+
+  .ai-hero-scene__caption {
+    left: 16px;
+    bottom: 18px;
+    font-size: 11px;
+  }
+}
