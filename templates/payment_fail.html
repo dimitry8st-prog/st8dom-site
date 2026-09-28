@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Оплата не завершена — ДИС{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block content %}
+<div class="container" style="padding:70px 24px">
+  <section class="s prose">
+    <p class="eyebrow">// оплата</p>
+    <h1>Оплата не завершена</h1>
+    <p>Деньги не были подтверждены как полученные. Вы можете попробовать ещё раз или связаться со мной.</p>
+    <a class="btn btn-primary" href="{{ url_for('products_catalog') }}">Вернуться к продуктам</a>
+  </section>
+</div>
+{% endblock %}

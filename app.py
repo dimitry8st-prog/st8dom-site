@@ -14,6 +14,7 @@ import os
 import smtplib
 import secrets
 from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation
 from email.message import EmailMessage
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -65,6 +66,15 @@ from editorial_workshop import EDITORIAL_SOURCES, EDITORIAL_STEPS
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
 from inquiry_autoreply import send_price_auto_reply
+from payments_robokassa import (
+    create_refund,
+    enabled as robokassa_enabled,
+    payment_form,
+    refund_state,
+    valid_result_signature,
+    valid_success_signature,
+)
+from products import PRODUCTS, PRODUCTS_BY_SLUG
 from lifeos_import import ImportValidationError, import_lifeos_package
 from library_content import (
     LIBRARY_CATEGORIES,
@@ -82,6 +92,7 @@ from models import (
     Inquiry,
     InquiryAutoReply,
     InquirySpam,
+    Order,
     PortalVisit,
     Rubric,
     Tag,
@@ -834,6 +845,186 @@ def create_app() -> Flask:
         logger.info("Чат: source=%s escalated=%s", result.get("source"), result.get("escalated"))
         return jsonify(result)
 
+    @app.route("/products/")
+    def products_catalog():
+        return render_template(
+            "products.html",
+            products=PRODUCTS,
+            payment_enabled=robokassa_enabled(app.config),
+            payment_test_mode=bool(app.config.get("ROBOKASSA_TEST_MODE")),
+            page_id="products",
+        )
+
+    @app.post("/products/<slug>/checkout/")
+    def robokassa_checkout(slug):
+        product = PRODUCTS_BY_SLUG.get(slug)
+        if product is None or not product.get("sellable") or not product.get("price"):
+            abort(404)
+        if not robokassa_enabled(app.config):
+            flash("Онлайн-оплата ещё подключается. Оставьте заявку — я отвечу лично.", "info")
+            return redirect(url_for("contact", topic="other"))
+
+        email = (request.form.get("email") or "").strip().lower()
+        name = (request.form.get("name") or "").strip()
+        if len(email) > 255 or "@" not in email or "\n" in email or "\r" in email:
+            flash("Укажите корректный email для заказа и чека.", "error")
+            return redirect(url_for("products_catalog"))
+
+        order = Order(
+            product_slug=product["slug"],
+            product_name=product["name"],
+            amount=Decimal(str(product["price"])),
+            email=email,
+            name=name[:120] or None,
+            status="payment_pending",
+        )
+        db.session.add(order)
+        db.session.commit()
+        payment = payment_form(order, product, app.config)
+        return render_template(
+            "payment_redirect.html",
+            payment=payment,
+            order=order,
+            product=product,
+            page_id="products",
+        )
+
+    @app.post("/payments/robokassa/result/")
+    @csrf.exempt
+    def robokassa_result():
+        out_sum = request.values.get("OutSum", "")
+        inv_id = request.values.get("InvId", "")
+        signature = request.values.get("SignatureValue", "")
+        if not inv_id.isdigit() or not valid_result_signature(out_sum, inv_id, signature, app.config):
+            logger.warning("Robokassa: некорректная подпись ResultURL, InvId=%s", inv_id)
+            return "bad sign", 400
+        order = db.session.get(Order, int(inv_id))
+        if order is None:
+            return "order not found", 404
+        try:
+            paid_sum = Decimal(out_sum)
+        except InvalidOperation:
+            return "bad sum", 400
+        if paid_sum != Decimal(order.amount):
+            logger.warning("Robokassa: сумма не совпала для заказа #%s", order.id)
+            return "bad sum", 400
+        if order.status != "paid":
+            order.status = "paid"
+            order.paid_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            db.session.commit()
+            logger.info("Robokassa: заказ #%s оплачен", order.id)
+        return f"OK{order.id}"
+
+    @csrf.exempt
+    @app.route("/payments/robokassa/success/", methods=["GET", "POST"])
+    def robokassa_success():
+        out_sum = request.values.get("OutSum", "")
+        inv_id = request.values.get("InvId", "")
+        signature = request.values.get("SignatureValue", "")
+        verified = bool(
+            inv_id.isdigit()
+            and valid_success_signature(out_sum, inv_id, signature, app.config)
+        )
+        order = db.session.get(Order, int(inv_id)) if inv_id.isdigit() else None
+        return render_template(
+            "payment_success.html",
+            order=order,
+            verified=verified,
+            page_id="products",
+        )
+
+    @csrf.exempt
+    @app.route("/payments/robokassa/fail/", methods=["GET", "POST"])
+    def robokassa_fail():
+        inv_id = request.values.get("InvId", "")
+        order = db.session.get(Order, int(inv_id)) if inv_id.isdigit() else None
+        if order is not None and order.status == "payment_pending":
+            order.status = "payment_failed"
+            db.session.commit()
+        return render_template("payment_fail.html", order=order, page_id="products")
+
+    @app.route("/admin/orders/")
+    @login_required
+    def admin_orders():
+        orders = Order.query.order_by(Order.created_at.desc()).all()
+        return render_template(
+            "admin/orders.html",
+            orders=orders,
+            products=PRODUCTS_BY_SLUG,
+            robokassa_ready=robokassa_enabled(app.config),
+            refund_ready=bool(app.config.get("ROBOKASSA_PASSWORD3")),
+            page_id="admin",
+        )
+
+    @app.post("/admin/orders/<int:order_id>/refund-status/")
+    @login_required
+    def admin_order_refund_status(order_id):
+        order = db.session.get(Order, order_id)
+        if order is None or not order.refund_request_id:
+            abort(404)
+        try:
+            state = refund_state(order.refund_request_id)
+            label = state.get("label") or "unknown"
+            order.refund_status = label
+            if label == "finished":
+                order.status = "refunded"
+                order.refunded_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            elif label == "canceled":
+                order.status = "paid"
+            else:
+                order.status = "refund_processing"
+            db.session.commit()
+            flash(f"Статус возврата: {label}.", "success")
+        except Exception:
+            logger.exception("Robokassa: не удалось проверить возврат #%s", order.id)
+            flash("Не удалось проверить статус возврата.", "error")
+        return redirect(url_for("admin_orders"))
+
+    @app.post("/admin/orders/<int:order_id>/refund/")
+    @login_required
+    def admin_order_refund(order_id):
+        order = db.session.get(Order, order_id)
+        if order is None:
+            abort(404)
+        if order.status not in {"paid", "refund_failed"}:
+            flash("Возврат доступен только для оплаченного заказа.", "error")
+            return redirect(url_for("admin_orders"))
+        product = PRODUCTS_BY_SLUG.get(order.product_slug)
+        if product is None:
+            flash("Продукт заказа не найден в каталоге.", "error")
+            return redirect(url_for("admin_orders"))
+
+        raw_amount = (request.form.get("amount") or "").strip().replace(",", ".")
+        refund_amount = None
+        if raw_amount:
+            try:
+                refund_amount = Decimal(raw_amount)
+            except InvalidOperation:
+                flash("Некорректная сумма возврата.", "error")
+                return redirect(url_for("admin_orders"))
+            if refund_amount <= 0 or refund_amount > Decimal(order.amount):
+                flash("Сумма возврата должна быть больше 0 и не больше суммы заказа.", "error")
+                return redirect(url_for("admin_orders"))
+
+        try:
+            result = create_refund(order, product, app.config, refund_amount)
+            order.robokassa_op_key = result["op_key"]
+            order.refund_request_id = result["request_id"]
+            order.refund_amount = refund_amount or order.amount
+            order.refund_status = "processing"
+            order.status = "refund_processing"
+            db.session.commit()
+            flash("Возврат отправлен в Robokassa. Статус: обрабатывается.", "success")
+        except Exception:
+            db.session.rollback()
+            logger.exception("Robokassa: возврат заказа #%s не выполнен", order.id)
+            order = db.session.get(Order, order_id)
+            order.status = "refund_failed"
+            order.refund_status = "error"
+            db.session.commit()
+            flash("Возврат не выполнен. Проверьте Password3 и доступность функции REFUND.", "error")
+        return redirect(url_for("admin_orders"))
+
     @app.route("/privacy/")
     def privacy():
         return render_template("privacy.html", page_id="legal")
@@ -1150,6 +1341,7 @@ def create_app() -> Flask:
             origin + url_for("privacy"),
             origin + url_for("consent"),
             origin + url_for("clinical_guidelines_catalog"),
+            origin + url_for("products_catalog"),
         ]
         pages.extend(
             origin + url_for("direction_detail", slug=slug) for slug in SECTIONS

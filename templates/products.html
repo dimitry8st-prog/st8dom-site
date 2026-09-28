@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Готовые продукты и услуги — ДИС{% endblock %}
+{% block description %}Готовые AI-продукты и услуги Дмитрия Степанова: экспресс-разбор, AI-аудит, Meeting Intelligence, Reputation Assistant, KnightCat и индивидуальные AI/RAG решения.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('products_catalog') }}{% endblock %}
+
+{% block content %}
+<div class="container container--wide">
+  <section class="hero" style="padding-bottom:28px">
+    <p class="eyebrow">// продукты и услуги</p>
+    <h1>Готовые решения</h1>
+    <p class="hero-sub">Фиксированная цена там, где объём заранее понятен. Для сложных интеграций — индивидуальный расчёт после короткого брифа.</p>
+    {% if payment_test_mode and payment_enabled %}
+      <p class="trust-line">Оплата подключена в тестовом режиме — реальные списания не выполняются.</p>
+    {% elif not payment_enabled %}
+      <p class="trust-line">Онлайн-оплата готовится к активации. Заказ можно оставить через форму связи.</p>
+    {% endif %}
+  </section>
+
+  <div class="portal-project-grid portfolio-grid">
+    {% for product in products %}
+    <article class="portal-project-card">
+      <div class="project-card-top">
+        <span class="project-kind">{{ "Готовый продукт" if product.sellable else "Индивидуальный проект" }}</span>
+      </div>
+      <h2>{{ product.name }}</h2>
+      <p>{{ product.summary }}</p>
+      <p style="font-size:1.45rem;font-weight:800;margin:18px 0">{{ product.price_label }}</p>
+      {% if product.sellable %}
+        {% if payment_enabled %}
+        <form method="post" action="{{ url_for('robokassa_checkout', slug=product.slug) }}" class="product-buy-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label>Имя <input type="text" name="name" maxlength="120" autocomplete="name"></label>
+          <label>Email для заказа и чека <input type="email" name="email" maxlength="255" required autocomplete="email"></label>
+          <button class="btn btn-primary" type="submit">{{ "Тестовая оплата" if payment_test_mode else "Купить" }} — {{ product.price_label }}</button>
+        </form>
+        {% else %}
+        <a class="btn btn-primary" href="{{ url_for('contact', topic='other') }}">Заказать</a>
+        {% endif %}
+      {% else %}
+        <a class="btn btn-primary" href="{{ url_for('contact', topic='assistant') }}">Получить расчёт</a>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -383,3 +383,24 @@ class ClinicalGuideline(db.Model):
     @property
     def is_russian(self) -> bool:
         return self.kind == "russian"
+
+
+class Order(db.Model):
+    """Заказ на готовый продукт портала."""
+
+    __tablename__ = "orders"
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_slug = db.Column(db.String(120), nullable=False, index=True)
+    product_name = db.Column(db.String(220), nullable=False)
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
+    email = db.Column(db.String(255), nullable=False, index=True)
+    name = db.Column(db.String(120), nullable=True)
+    status = db.Column(db.String(32), nullable=False, default="new", index=True)
+    robokassa_op_key = db.Column(db.String(120), nullable=True)
+    refund_request_id = db.Column(db.String(120), nullable=True)
+    refund_amount = db.Column(db.Numeric(10, 2), nullable=True)
+    refund_status = db.Column(db.String(32), nullable=True)
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
+    paid_at = db.Column(db.DateTime, nullable=True, index=True)
+    refunded_at = db.Column(db.DateTime, nullable=True)
