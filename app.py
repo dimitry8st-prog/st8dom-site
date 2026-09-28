@@ -1316,6 +1316,7 @@ def create_app() -> Flask:
             origin + url_for("privacy"),
             origin + url_for("consent"),
             origin + url_for("clinical_guidelines_catalog"),
+            origin + url_for("products_catalog"),
         ]
         pages.extend(
             origin + url_for("direction_detail", slug=slug) for slug in SECTIONS
