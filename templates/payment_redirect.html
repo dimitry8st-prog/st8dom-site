@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Переход к оплате — ДИС{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block content %}
+<div class="container" style="padding:70px 24px">
+  <section class="s prose">
+    <p class="eyebrow">// заказ №{{ order.id }}</p>
+    <h1>Переходим к безопасной оплате</h1>
+    <p>{{ product.name }} — <strong>{{ product.price_label }}</strong>.</p>
+    <p>Оплата проводится на стороне Robokassa. После платежа вы вернётесь на st8dom.ru.</p>
+    <form id="robokassa-payment" method="post" action="{{ payment.url }}">
+      {% for key, value in payment.fields.items() %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Перейти в Robokassa</button>
+    </form>
+  </section>
+</div>
+{% endblock %}
