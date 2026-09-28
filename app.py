@@ -1031,6 +1031,14 @@ def create_app() -> Flask:
             flash("Возврат не выполнен. Проверьте Password3 и доступность функции REFUND.", "error")
         return redirect(url_for("admin_orders"))
 
+    @app.route("/offer/")
+    def offer():
+        return render_template("offer.html", page_id="legal")
+
+    @app.route("/payment-and-refunds/")
+    def payment_and_refunds():
+        return render_template("payment_terms.html", page_id="legal")
+
     @app.route("/privacy/")
     def privacy():
         return render_template("privacy.html", page_id="legal")
