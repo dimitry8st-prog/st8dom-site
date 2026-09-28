@@ -318,6 +318,7 @@ def ensure_editorial_seed() -> None:
     ensure_published_content_package(
         "depression-standard-2026-09.json",
         datetime(2026, 9, 28, 6, 33, tzinfo=timezone.utc),
+        update_published=True,
     )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
