@@ -1352,6 +1352,8 @@ def create_app() -> Flask:
             origin + url_for("library_catalog"),
             origin + url_for("editorial_workshop"),
             origin + url_for("contact"),
+            origin + url_for("offer"),
+            origin + url_for("payment_and_refunds"),
             origin + url_for("privacy"),
             origin + url_for("consent"),
             origin + url_for("clinical_guidelines_catalog"),
