@@ -8,8 +8,8 @@
 {% block og_description %}{{ section.summary }}{% endblock %}
 
 {% block content %}
-<div class="container{% if slug == 'medicine' %} container--medicine{% endif %}">
-  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% endif %}">
+<div class="container{% if slug == 'medicine' %} container--medicine{% elif slug == 'ai' %} container--ai{% endif %}">
+  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% elif slug == 'ai' %} direction-hero--ai{% endif %}">
     <div class="direction-hero__copy">
       <p class="eyebrow">{{ section.eyebrow }}</p>
       <h1>{{ section.title }}</h1>
@@ -30,6 +30,12 @@
       <span><strong>◎</strong> Клинический опыт</span>
       <span><strong>▣</strong> Знания для жизни</span>
     </div>
+    {% elif slug == 'ai' %}
+    <figure class="direction-hero__visual direction-hero__visual--ai">
+      <img src="{{ url_for('static', filename='images/ai-practice-human-loop.jpg') }}"
+           alt="AI на практике: человек ставит задачу, ИИ помогает, человек проверяет и принимает решение"
+           width="1199" height="675" loading="eager" fetchpriority="high">
+    </figure>
     {% endif %}
   </section>
 
