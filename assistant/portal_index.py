@@ -204,11 +204,12 @@ def _library_documents() -> list[dict[str, Any]]:
     documents = []
     for item in LIBRARY_ITEMS:
         category_title = category_titles.get(item["category"], "")
-        item_url = (
-            f"/library/{item['slug']}/"
-            if item["file"]
-            else f"/library/#{item['slug']}"
-        )
+        if item.get("article_slug"):
+            item_url = f"/materials/{item['article_slug']}/"
+        elif item["file"]:
+            item_url = f"/library/{item['slug']}/"
+        else:
+            item_url = f"/library/#{item['slug']}"
         aliases = [
             item["kind"],
             category_title,
