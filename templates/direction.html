@@ -16,7 +16,7 @@
       <p class="hero-sub">{{ section.summary }}</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="#topics">Выбрать тему</a>
-        {% if slug != 'medicine' %}<a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>{% endif %}
+        <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
       </div>
     </div>
     {% if slug == 'medicine' %}
