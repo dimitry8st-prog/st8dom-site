@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Заказы — админка ДИС{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block content %}
+<div class="container container--wide" style="padding:40px 24px 80px">
+  <div class="admin-toolbar">
+    <div>
+      <p class="eyebrow">// платежи</p>
+      <h1>Заказы</h1>
+      <p class="lead">Robokassa: {{ "подключена" if robokassa_ready else "не настроена" }} · Возвраты: {{ "готовы" if refund_ready else "нужен Password3" }}</p>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries') }}">Заявки</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_articles') }}">Публикации</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_logout') }}">Выйти</a>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>ID</th><th>Дата</th><th>Продукт</th><th>Покупатель</th><th>Сумма</th><th>Статус</th><th>Возврат</th></tr></thead>
+      <tbody>
+      {% for item in orders %}
+      <tr>
+        <td>#{{ item.id }}</td>
+        <td>{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        <td>{{ item.product_name }}</td>
+        <td>{{ item.name or '—' }}<br><a href="mailto:{{ item.email }}">{{ item.email }}</a></td>
+        <td>{{ '%.2f'|format(item.amount) }} ₽</td>
+        <td>{{ item.status }}</td>
+        <td>
+          {% if item.status in ['paid', 'refund_failed'] %}
+          <form method="post" action="{{ url_for('admin_order_refund', order_id=item.id) }}" onsubmit="return confirm('Отправить возврат через Robokassa?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Сумма <input type="number" name="amount" min="0.01" max="{{ item.amount }}" step="0.01" placeholder="полный возврат"></label>
+            <button class="btn btn-danger btn-sm" type="submit" {% if not refund_ready %}disabled{% endif %}>Вернуть оплату</button>
+          </form>
+          {% elif item.refund_status %}
+            {{ item.refund_status }}{% if item.refund_amount %} · {{ item.refund_amount }} ₽{% endif %}
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7">Заказов пока нет.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
