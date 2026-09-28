@@ -160,8 +160,9 @@ def test_library_catalog_is_online_only(client):
     page = client.get("/library/")
     assert page.status_code == 200
     assert "Библиотека ДИС".encode("utf-8") in page.data
-    assert "17 уникальных материалов".encode("utf-8") in page.data
+    assert "18 уникальных материалов".encode("utf-8") in page.data
     for title in [
+        "Медицина",
         "AI и архитектура",
         "Бизнес и продажи",
         "Право и безопасность",
@@ -169,7 +170,7 @@ def test_library_catalog_is_online_only(client):
         "Командная работа",
     ]:
         assert title.encode("utf-8") in page.data
-    assert page.data.count(b'class="library-card"') == 17
+    assert page.data.count(b'class="library-card"') == 18
     assert b"/static/downloads/ai-law-brand-protection.docx" not in page.data
     assert "Скачать DOCX".encode("utf-8") not in page.data
     assert b"/library/ai-law-brand-protection/" in page.data
