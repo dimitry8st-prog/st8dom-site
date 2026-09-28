@@ -62,6 +62,7 @@ def test_assistant_lists_brochures_instead_of_unrelated_case():
     assert result["source"] == "library"
     assert "3 брошюры" in result["answer"]
     assert {item["url"] for item in result["results"]} == {
+        "/materials/migraine-brochure-2026/",
         "/library/ai-law-brand-protection/",
         "/library/neural-networks-marketing/",
     }
@@ -106,6 +107,7 @@ def test_chat_endpoint_returns_relevant_brochures(client):
     result = response.get_json()
     assert result["source"] == "library"
     assert [item["url"] for item in result["results"]] == [
+        "/materials/migraine-brochure-2026/",
         "/library/ai-law-brand-protection/",
         "/library/neural-networks-marketing/",
     ]
