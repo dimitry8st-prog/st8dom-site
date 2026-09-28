@@ -3419,3 +3419,70 @@ body:has(.site-chat) .foot {
     height: min(520px, calc(100vh - 96px));
   }
 }
+
+
+/* Medicine direction: personal expert portrait in the hero */
+.direction-hero--medicine {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.96fr);
+  align-items: center;
+  gap: 44px;
+}
+
+.direction-hero--medicine .direction-hero__copy {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.direction-hero__visual {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.58);
+  background: #0d1729;
+  box-shadow:
+    0 24px 64px rgba(2, 8, 23, 0.46),
+    0 0 32px rgba(59, 130, 246, 0.16);
+}
+
+.direction-hero__visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.08);
+  border-radius: inherit;
+}
+
+.direction-hero__visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 266;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .direction-hero--medicine {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .direction-hero__visual {
+    width: min(100%, 720px);
+  }
+}
+
+@media (max-width: 720px) {
+  .direction-hero--medicine {
+    gap: 22px;
+  }
+
+  .direction-hero__visual {
+    border-radius: 16px;
+  }
+}
