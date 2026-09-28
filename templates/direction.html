@@ -9,14 +9,23 @@
 
 {% block content %}
 <div class="container">
-  <section class="hero direction-hero">
-    <p class="eyebrow">{{ section.eyebrow }}</p>
-    <h1>{{ section.title }}</h1>
-    <p class="hero-sub">{{ section.summary }}</p>
-    <div class="hero-cta">
-      <a class="btn btn-primary" href="#topics">Выбрать тему</a>
-      <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
+  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% endif %}">
+    <div class="direction-hero__copy">
+      <p class="eyebrow">{{ section.eyebrow }}</p>
+      <h1>{{ section.title }}</h1>
+      <p class="hero-sub">{{ section.summary }}</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#topics">Выбрать тему</a>
+        <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
+      </div>
     </div>
+    {% if slug == 'medicine' %}
+    <figure class="direction-hero__visual">
+      <img src="{{ url_for('static', filename='images/medicine-hero-dmitry.svg') }}"
+           alt="Дмитрий Степанов в медицинском кабинете"
+           width="480" height="266" loading="eager" fetchpriority="high">
+    </figure>
+    {% endif %}
   </section>
 
   {% if latest_materials %}
