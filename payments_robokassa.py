@@ -75,8 +75,13 @@ def payment_form(order, product: dict, config) -> dict:
 
 
 def valid_result_signature(out_sum: str, inv_id: str, signature: str, config) -> bool:
+    password2 = (
+        config.get("ROBOKASSA_TEST_PASSWORD2")
+        if config.get("ROBOKASSA_TEST_MODE")
+        else config["ROBOKASSA_PASSWORD2"]
+    ) or config["ROBOKASSA_PASSWORD2"]
     expected = hashlib.md5(
-        f"{out_sum}:{inv_id}:{config['ROBOKASSA_PASSWORD2']}".encode("utf-8")
+        f"{out_sum}:{inv_id}:{password2}".encode("utf-8")
     ).hexdigest()
     return expected.casefold() == (signature or "").casefold()
 
