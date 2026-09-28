@@ -55,6 +55,16 @@ class Config:
         "INQUIRY_AUTO_REPLY_ENABLED", "1"
     ).strip().lower() in {"1", "true", "on", "yes"}
 
+    # Robokassa. Все секреты задаются только на сервере.
+    ROBOKASSA_MERCHANT_LOGIN = os.environ.get("ROBOKASSA_MERCHANT_LOGIN", "")
+    ROBOKASSA_PASSWORD1 = os.environ.get("ROBOKASSA_PASSWORD1", "")
+    ROBOKASSA_PASSWORD2 = os.environ.get("ROBOKASSA_PASSWORD2", "")
+    ROBOKASSA_PASSWORD3 = os.environ.get("ROBOKASSA_PASSWORD3", "")
+    ROBOKASSA_TEST_PASSWORD1 = os.environ.get("ROBOKASSA_TEST_PASSWORD1", "")
+    ROBOKASSA_TEST_MODE = os.environ.get("ROBOKASSA_TEST_MODE", "1").strip().lower() in {
+        "1", "true", "on", "yes"
+    }
+
     # Опциональная аналитика. Пустое значение = скрипт-заглушка без внешних вызовов.
     ANALYTICS_ID = os.environ.get("ANALYTICS_ID", "")
 
