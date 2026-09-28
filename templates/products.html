@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Готовые продукты и услуги — ДИС{% endblock %}
-{% block description %}Готовые AI-продукты и услуги Дмитрия Степанова: экспресс-разбор, AI-аудит, Meeting Intelligence, Reputation Assistant, KnightCat и индивидуальные AI/RAG решения.{% endblock %}
+{% block title %}Готовые услуги и AI-решения — ДИС{% endblock %}
+{% block description %}Готовые услуги, адаптируемые AI-решения и индивидуальная разработка под ключ.{% endblock %}
 {% block canonical %}{{ site_url }}{{ url_for('products_catalog') }}{% endblock %}
 
 {% block content %}
 <div class="container container--wide">
   <section class="hero" style="padding-bottom:28px">
-    <p class="eyebrow">// продукты и услуги</p>
-    <h1>Готовые решения</h1>
-    <p class="hero-sub">Фиксированная цена там, где объём заранее понятен. Для сложных интеграций — индивидуальный расчёт после короткого брифа.</p>
+    <p class="eyebrow">// услуги и AI-решения</p>
+    <h1>Готовые услуги и решения под ключ</h1>
+    <p class="hero-sub">Фиксированная цена — для услуг с заранее определённым объёмом. Готовые AI-системы адаптируются под клиента. Сложные интеграции выполняются как индивидуальные проекты после согласования ТЗ.</p>
     {% if payment_test_mode and payment_enabled %}
       <p class="trust-line">Оплата подключена в тестовом режиме — реальные списания не выполняются.</p>
     {% elif not payment_enabled %}
@@ -16,31 +16,54 @@
     {% endif %}
   </section>
 
-  <div class="portal-project-grid portfolio-grid">
-    {% for product in products %}
-    <article class="portal-project-card">
-      <div class="project-card-top">
-        <span class="project-kind">{{ "Готовый продукт" if product.sellable else "Индивидуальный проект" }}</span>
-      </div>
-      <h2>{{ product.name }}</h2>
-      <p>{{ product.summary }}</p>
-      <p style="font-size:1.45rem;font-weight:800;margin:18px 0">{{ product.price_label }}</p>
-      {% if product.sellable %}
-        {% if payment_enabled %}
-        <form method="post" action="{{ url_for('robokassa_checkout', slug=product.slug) }}" class="product-buy-form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <label>Имя <input type="text" name="name" maxlength="120" autocomplete="name"></label>
-          <label>Email для заказа и чека <input type="email" name="email" maxlength="255" required autocomplete="email"></label>
-          <button class="btn btn-primary" type="submit">{{ "Тестовая оплата" if payment_test_mode else "Купить" }} — {{ product.price_label }}</button>
-        </form>
+  {% set groups = [
+    ('fixed', 'Готовые услуги', 'Фиксированные цена, объём и максимальный срок исполнения.'),
+    ('adapted', 'Готовые AI-решения с адаптацией', 'Рабочая архитектура уже есть; стоимость и срок уточняются под процессы и инфраструктуру заказчика.'),
+    ('custom', 'AI-решения под ключ', 'Индивидуальное ТЗ, интеграции, базы данных, RAG, CRM и многоэтапная автоматизация.'),
+    ('support', 'Сопровождение', 'Поддержка, контроль и развитие работающих решений.')
+  ] %}
+
+  {% for key, title, description in groups %}
+  {% set items = products|selectattr('service_class', 'equalto', key)|list %}
+  {% if items %}
+  <section class="s">
+    <div class="s-label"><span>//</span> {{ title|lower }}</div>
+    <h2>{{ title }}</h2>
+    <p class="lead">{{ description }}</p>
+    <div class="portal-project-grid portfolio-grid">
+      {% for product in items %}
+      <article class="portal-project-card">
+        <div class="project-card-top">
+          <span class="project-kind">{{ product.service_class_label }}</span>
+        </div>
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.summary }}</p>
+        <p><strong>Срок:</strong> {{ product.delivery_label }}</p>
+        <p style="font-size:1.45rem;font-weight:800;margin:18px 0">{{ product.price_label }}</p>
+        {% if product.sellable %}
+          {% if payment_enabled %}
+          <form method="post" action="{{ url_for('robokassa_checkout', slug=product.slug) }}" class="product-buy-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Имя <input type="text" name="name" maxlength="120" autocomplete="name"></label>
+            <label>Email для заказа и чека <input type="email" name="email" maxlength="255" required autocomplete="email"></label>
+            <p class="pricing-note">Нажимая кнопку оплаты, вы принимаете <a href="{{ url_for('offer') }}">Публичную оферту</a> и подтверждаете ознакомление с <a href="{{ url_for('privacy') }}">Политикой обработки персональных данных</a>.</p>
+            <button class="btn btn-primary" type="submit">{{ "Тестовая оплата" if payment_test_mode else "Купить" }} — {{ product.price_label }}</button>
+          </form>
+          {% else %}
+          <a class="btn btn-primary" href="{{ url_for('contact', topic='other') }}">Заказать</a>
+          {% endif %}
         {% else %}
-        <a class="btn btn-primary" href="{{ url_for('contact', topic='other') }}">Заказать</a>
+          <a class="btn btn-primary" href="{{ url_for('contact', topic='assistant') }}">Получить расчёт</a>
         {% endif %}
-      {% else %}
-        <a class="btn btn-primary" href="{{ url_for('contact', topic='assistant') }}">Получить расчёт</a>
-      {% endif %}
-    </article>
-    {% endfor %}
-  </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% endfor %}
+
+  <section class="source-notice">
+    <strong>Важно:</strong> срок для фиксированной услуги начинает исчисляться со следующего рабочего дня после поступления оплаты и получения всех исходных данных, необходимых для выполнения задачи. Для адаптируемых и индивидуальных AI-решений итоговые цена, объём и срок фиксируются после согласования технического задания.
+  </section>
 </div>
 {% endblock %}
