@@ -70,6 +70,7 @@ from payments_robokassa import (
     create_refund,
     enabled as robokassa_enabled,
     payment_form,
+    refund_state,
     valid_result_signature,
     valid_success_signature,
 )
@@ -954,6 +955,30 @@ def create_app() -> Flask:
             refund_ready=bool(app.config.get("ROBOKASSA_PASSWORD3")),
             page_id="admin",
         )
+
+    @app.post("/admin/orders/<int:order_id>/refund-status/")
+    @login_required
+    def admin_order_refund_status(order_id):
+        order = db.session.get(Order, order_id)
+        if order is None or not order.refund_request_id:
+            abort(404)
+        try:
+            state = refund_state(order.refund_request_id)
+            label = state.get("label") or "unknown"
+            order.refund_status = label
+            if label == "finished":
+                order.status = "refunded"
+                order.refunded_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            elif label == "canceled":
+                order.status = "paid"
+            else:
+                order.status = "refund_processing"
+            db.session.commit()
+            flash(f"Статус возврата: {label}.", "success")
+        except Exception:
+            logger.exception("Robokassa: не удалось проверить возврат #%s", order.id)
+            flash("Не удалось проверить статус возврата.", "error")
+        return redirect(url_for("admin_orders"))
 
     @app.post("/admin/orders/<int:order_id>/refund/")
     @login_required
