@@ -325,6 +325,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 9, 28, 8, 58, tzinfo=timezone.utc),
         update_published=True,
     )
+    ensure_published_content_package(
+        "migraine-brochure-2026-09.json",
+        datetime(2026, 9, 28, 15, 31, tzinfo=timezone.utc),
+        update_published=True,
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():

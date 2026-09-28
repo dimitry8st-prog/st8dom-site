@@ -690,7 +690,7 @@ def create_app() -> Flask:
             categories=LIBRARY_CATEGORIES,
             selected_category=category,
             total=len(LIBRARY_ITEMS),
-            published=sum(1 for item in LIBRARY_ITEMS if item["file"]),
+            published=sum(1 for item in LIBRARY_ITEMS if item["file"] or item.get("article_slug")),
             page_id="library",
         )
 
