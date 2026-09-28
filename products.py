@@ -2,6 +2,18 @@
 
 PRODUCTS = [
     {
+        "slug": "elan",
+        "name": "ÉLAN — сайт косметологического кабинета",
+        "price": None,
+        "price_label": "от 24 900 ₽",
+        "summary": "Готовый адаптивный MVP с услугами, ценами, FAQ и онлайн-записью. Адаптируется под бренд, специалистов и процессы конкретного кабинета.",
+        "payment_object": "service",
+        "sellable": False,
+        "service_class": "adapted",
+        "service_class_label": "Готовое Web-решение с адаптацией",
+        "delivery_label": "от 7–10 рабочих дней",
+    },
+    {
         "slug": "express-review",
         "name": "Экспресс-разбор",
         "price": 4900,
