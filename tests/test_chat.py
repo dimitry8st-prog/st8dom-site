@@ -60,7 +60,7 @@ def test_assistant_lists_brochures_instead_of_unrelated_case():
     result = answer_question("Какие брошюры есть?", {})
     assert result["escalated"] is False
     assert result["source"] == "library"
-    assert "2 брошюры" in result["answer"]
+    assert "3 брошюры" in result["answer"]
     assert {item["url"] for item in result["results"]} == {
         "/library/ai-law-brand-protection/",
         "/library/neural-networks-marketing/",
@@ -96,7 +96,7 @@ def test_assistant_understands_methodics_list_word_form():
 def test_assistant_answers_brochure_count_question():
     result = answer_question("Сколько брошюр доступно?", {})
     assert result["source"] == "library"
-    assert "2 брошюры" in result["answer"]
+    assert "3 брошюры" in result["answer"]
 
 
 def test_chat_endpoint_returns_relevant_brochures(client):
