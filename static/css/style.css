@@ -1725,13 +1725,13 @@ section.s {
 
 
 .case-hero--corporate {
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 520px);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 480px);
   gap: clamp(36px, 5vw, 72px);
   align-items: center;
 }
 
 .case-title--corporate span {
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .case-title--corporate {
@@ -1739,7 +1739,7 @@ section.s {
 }
 
 .case-title--corporate .case-title-line {
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .case-cover--corporate {
@@ -1752,8 +1752,9 @@ section.s {
 
 .case-cover--corporate img {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
 }
 
 @media (max-width: 980px) {
