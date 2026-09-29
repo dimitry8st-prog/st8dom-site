@@ -1734,6 +1734,14 @@ section.s {
   white-space: nowrap;
 }
 
+.case-title--corporate {
+  font-size: clamp(34px, 3vw, 48px);
+}
+
+.case-title--corporate .case-title-line {
+  white-space: nowrap;
+}
+
 .case-cover--corporate {
   width: 100%;
   max-width: 520px;
