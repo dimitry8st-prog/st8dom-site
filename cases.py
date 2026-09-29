@@ -1037,7 +1037,7 @@ CASES = [
         "filters": ["backend"],
         "badge": "Landing",
         "badge_class": "badge-py",
-        "image": "case-site-v2.webp",
+        "image": "case-force-team.svg",
         "image_alt": "Адаптивный корпоративный сайт на компьютере, планшете и телефоне",
         "card_summary": (
             "Адаптивные лендинги, которые объясняют услугу и собирают заявку: "
