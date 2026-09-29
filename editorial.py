@@ -330,6 +330,10 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 9, 28, 15, 31, tzinfo=timezone.utc),
         update_published=True,
     )
+    ensure_published_content_package(
+        "claude-sonnet-5-5-2026-09.json",
+        datetime(2026, 9, 29, 6, 35, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
