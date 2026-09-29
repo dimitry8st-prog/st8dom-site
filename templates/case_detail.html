@@ -11,9 +11,13 @@
 <div class="container">
   <section class="hero">
     <p class="eyebrow"><a href="{{ url_for('cases_list') }}">Кейсы</a> / {{ case.type }}</p>
-    <div class="case-hero">
+    <div class="case-hero{% if case.slug == 'corporate-site' %} case-hero--corporate{% endif %}">
       <div>
-        <h1>{{ case.title }}</h1>
+        {% if case.slug == 'corporate-site' %}
+          <h1 class="case-title--corporate">Корпоративный лендинг<br><span>под заявку</span></h1>
+        {% else %}
+          <h1>{{ case.title }}</h1>
+        {% endif %}
         <p class="hero-sub">{{ case.card_summary }}</p>
         <p class="trust-line">Статус: {{ case.status }}</p>
         <div class="hero-cta">
@@ -27,7 +31,7 @@
           {% endif %}
         </div>
       </div>
-      <figure class="case-cover">
+      <figure class="case-cover{% if case.slug == 'corporate-site' %} case-cover--corporate{% endif %}">
         <img src="{{ url_for('static', filename='images/' + case.image) }}" alt="{{ case.image_alt }}" width="560" height="360">
       </figure>
     </div>
