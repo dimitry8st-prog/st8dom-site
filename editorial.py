@@ -334,6 +334,10 @@ def ensure_editorial_seed() -> None:
         "claude-sonnet-5-5-2026-09.json",
         datetime(2026, 9, 29, 6, 35, tzinfo=timezone.utc),
     )
+    ensure_published_content_package(
+        "anthropic-history-2026-09.json",
+        datetime(2026, 9, 29, 14, 22, tzinfo=timezone.utc),
+    )
 
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
