@@ -7,7 +7,7 @@ from prompt_library import CATEGORIES, all_prompts
 
 def test_prompt_categories_search_and_details(client):
     catalog = all_prompts()
-    assert len(catalog) == 37
+    assert len(catalog) == 38
     page = client.get("/directions/ai/prompts/")
     assert page.status_code == 200
     for slug, name in CATEGORIES:
@@ -26,6 +26,9 @@ def test_prompt_categories_search_and_details(client):
     assert b'id="copy-prompt"' in detail.data
     assert client.get("/directions/ai/prompts/work/unknown/").status_code == 404
     assert client.get("/directions/ai/prompts/unknown/resume-achievements/").status_code == 404
+    video = client.get("/directions/ai/prompts/analysis/video-analysis/")
+    assert video.status_code == 200
+    assert "Универсальный анализ любого видео".encode() in video.data
 
 
 def test_prompts_in_sitemap_and_escaped(client):
