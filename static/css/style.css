@@ -1723,6 +1723,42 @@ section.s {
   display: block;
 }
 
+
+.case-hero--corporate {
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 520px);
+  gap: clamp(36px, 5vw, 72px);
+  align-items: center;
+}
+
+.case-title--corporate span {
+  white-space: nowrap;
+}
+
+.case-cover--corporate {
+  width: 100%;
+  max-width: 520px;
+  justify-self: end;
+  border-radius: 18px;
+  box-shadow: 0 22px 58px rgba(2, 8, 23, 0.42), 0 0 26px rgba(59, 130, 246, 0.12);
+}
+
+.case-cover--corporate img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+@media (max-width: 980px) {
+  .case-hero--corporate {
+    grid-template-columns: 1fr;
+  }
+
+  .case-cover--corporate {
+    max-width: 760px;
+    justify-self: stretch;
+  }
+}
+
 .case-video {
   margin: 8px 0 0;
   border-radius: 12px;
