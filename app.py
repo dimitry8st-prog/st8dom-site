@@ -21,7 +21,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import requests
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from flask import (
     Flask,
     abort,
@@ -87,6 +87,7 @@ from library_content import (
 from models import (
     AdminUser,
     Article,
+    ArticleView,
     ClinicalGuideline,
     ImportPackage,
     Inquiry,
@@ -731,6 +732,21 @@ def create_app() -> Flask:
         article = published_articles().filter_by(slug=slug).first()
         if article is None:
             abort(404)
+
+        # Считаем один просмотр статьи на один визит сайта (окно визита — 30 минут).
+        # Администратор и боты в статистику не попадают.
+        visit_key = session.get("visit_key")
+        if (
+            visit_key
+            and not current_user.is_authenticated
+            and not any(marker in request.user_agent.string.lower() for marker in BOT_MARKERS)
+        ):
+            try:
+                db.session.add(ArticleView(article_id=article.id, visit_key=visit_key))
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+
         return render_template(
             "material_detail.html",
             article=article,
@@ -1156,9 +1172,15 @@ def create_app() -> Flask:
     @login_required
     def admin_articles():
         articles = Article.query.order_by(Article.updated_at.desc()).all()
+        view_counts = dict(
+            db.session.query(ArticleView.article_id, func.count(ArticleView.id))
+            .group_by(ArticleView.article_id)
+            .all()
+        )
         return render_template(
             "admin/articles.html",
             articles=articles,
+            view_counts=view_counts,
             status_labels=STATUS_LABELS,
             page_id="admin",
         )
