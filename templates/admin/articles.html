@@ -17,7 +17,7 @@
   <div class="admin-article-list">
     {% for article in articles %}
     <article class="admin-article-row">
-      <div><span class="status-pill status-{{ article.status }}">{{ status_labels.get(article.status, article.status) }}</span><h2>{{ article.title }}</h2><p>{{ article.rubric.name }} · обновлено {{ article.updated_at.strftime('%d.%m.%Y %H:%M') }}</p></div>
+      <div><span class="status-pill status-{{ article.status }}">{{ status_labels.get(article.status, article.status) }}</span><h2>{{ article.title }}</h2><p>{{ article.rubric.name }} · просмотров {{ view_counts.get(article.id, 0) }} · обновлено {{ article.updated_at.strftime('%d.%m.%Y %H:%M') }}</p></div>
       <div class="project-actions"><a class="btn btn-ghost btn-sm" href="{{ url_for('admin_article_preview', article_id=article.id) }}">Предпросмотр</a><a class="btn btn-primary btn-sm" href="{{ url_for('admin_article_edit', article_id=article.id) }}">Редактировать</a></div>
     </article>
     {% else %}<p>Материалов пока нет.</p>{% endfor %}
