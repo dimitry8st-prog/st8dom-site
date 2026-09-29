@@ -346,6 +346,26 @@ class ImportPackage(db.Model):
     article = db.relationship("Article")
 
 
+class ArticleView(db.Model):
+    """Уникальный просмотр опубликованной статьи в рамках одного визита сайта."""
+
+    __tablename__ = "article_views"
+    __table_args__ = (
+        db.UniqueConstraint("article_id", "visit_key", name="uq_article_view_visit"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    article_id = db.Column(
+        db.Integer,
+        db.ForeignKey("articles.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    visit_key = db.Column(db.String(64), nullable=False, index=True)
+    viewed_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
+
+
+
 class ClinicalGuideline(db.Model):
     """Метаданные клинической рекомендации из официального источника.
 
