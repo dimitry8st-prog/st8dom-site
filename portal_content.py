@@ -107,6 +107,106 @@ SECTIONS = {
         "principles": ["источник сохраняется", "черновик не равен публикации", "медицинский контент проверяет автор"],
         "notice": "На сайт попадают только материалы, которые прошли авторскую проверку.",
         "repo_url": "https://github.com/dimitry8st-prog/Life-Os",
+        "source_streams": [
+            {
+                "title": "AI в медицине",
+                "description": "Clinical AI, medical imaging, decision support, biomedical NLP и digital health.",
+            },
+            {
+                "title": "Нейронауки и когнитивное здоровье",
+                "description": "Neurology, neurosurgery, cognitive science, brain aging, dementia и neurorehabilitation.",
+            },
+            {
+                "title": "Public Health / Epidemiology",
+                "description": "Epidemiology, biostatistics, population health, prevention и health policy.",
+            },
+            {
+                "title": "AI / NeuroAI / Engineering",
+                "description": "AI agents, multimodal AI, brain-computer interfaces, robotics и scientific AI.",
+            },
+            {
+                "title": "Longevity / Geroscience / Rejuvenation",
+                "description": "Biology of aging, healthspan, lifespan, cellular senescence, regeneration, epigenetic reprogramming и biological age.",
+            },
+        ],
+        "source_regions": [
+            {
+                "region": "США",
+                "items": [
+                    ("Johns Hopkins University / Medicine / Bloomberg School / APL", "AI в медицине · нейро · public health · engineering", "A"),
+                    ("Stanford University", "longevity · AI в медицине · neuroscience", "A"),
+                    ("MIT", "AI · aging brain · rejuvenation · engineering", "A"),
+                ],
+            },
+            {
+                "region": "Великобритания",
+                "items": [
+                    ("UCL", "NeuroAI · brain aging · dementia · AI", "A"),
+                    ("University of Cambridge", "neuroscience · mental health · AI · aging", "A"),
+                    ("Imperial College London", "AI medicine · public health · aging", "A"),
+                ],
+            },
+            {
+                "region": "Япония",
+                "items": [
+                    ("Kyoto University", "aging science · cognition · Alzheimer’s · AI", "A"),
+                    ("University of Osaka", "NeuroAI · BCI · neurorehabilitation · AI medicine", "A"),
+                    ("University of Tokyo", "neuroscience · aging · biomedical engineering", "B"),
+                    ("Keio University / Bio2Q", "healthy longevity · microbiome · organoids · AI", "B"),
+                ],
+            },
+            {
+                "region": "Китай",
+                "items": [
+                    ("Tsinghua University", "NeuroAI · BCI · brain-inspired AI · intelligent medicine", "A"),
+                    ("Peking University", "AI · cognitive neuroscience · intelligent medicine · ethics", "A"),
+                ],
+            },
+            {
+                "region": "Россия",
+                "items": [
+                    ("Skoltech / Zelman Center", "neurobiology · cognitive aging · neurorehabilitation · AI", "A"),
+                    ("Сеченовский университет", "медицина · AI · neuroscience", "B"),
+                    ("МГУ", "neuroscience · biology · AI", "B"),
+                ],
+            },
+            {
+                "region": "Германия",
+                "items": [
+                    ("Max Planck Institute for Biology of Ageing", "aging biology · metabolism · brain aging · epigenetics", "A"),
+                    ("Charité Berlin", "clinical AI · neuroscience · dementia · trustworthy AI", "A"),
+                    ("Heidelberg / Institute for Medical AI", "medical AI · diagnostics · computational medicine", "A"),
+                    ("TUM / Munich Medicine Alliance", "AI medicine · prevention · diagnostics · treatment", "A"),
+                    ("DZNE", "neurodegeneration · dementia · brain aging · neuroplasticity", "A"),
+                ],
+            },
+            {
+                "region": "Европа",
+                "items": [
+                    ("Karolinska Institutet", "geroscience · brain aging · dementia · epidemiology", "A"),
+                    ("ETH Zürich", "AI · neuroscience · longevity · digital twins", "A"),
+                ],
+            },
+            {
+                "region": "Сингапур",
+                "items": [
+                    ("National University of Singapore", "healthy longevity · geromedicine · biomarkers · multi-omics", "A"),
+                ],
+            },
+            {
+                "region": "Израиль",
+                "items": [
+                    ("Technion", "healthy aging · biomarkers · brain & cognition · engineering", "A"),
+                    ("Weizmann Institute", "brain sciences · cognition · aging brain · AI", "B"),
+                ],
+            },
+            {
+                "region": "Канада",
+                "items": [
+                    ("University of Toronto", "AI medicine · aging · neurodegeneration · mental health", "A"),
+                ],
+            },
+        ],
     },
 }
 
