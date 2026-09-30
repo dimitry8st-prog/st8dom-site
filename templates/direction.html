@@ -65,6 +65,42 @@
     </div>
   </section>
 
+  {% if slug == 'life-os' and section.source_streams %}
+  <section class="s lifeos-sources">
+    <div class="s-label"><span>//</span> глобальная карта источников</div>
+    <h2>Научные потоки Life-OS</h2>
+    <p class="lead">Life-OS собирает материалы только из проверяемых научных и университетских источников. Источник сохраняется всегда, а публикация на портале проходит отдельную авторскую проверку.</p>
+
+    <div class="topic-grid">
+      {% for stream in section.source_streams %}
+      <article class="topic-card reveal">
+        <span class="topic-number">0{{ loop.index }}</span>
+        <h3>{{ stream.title }}</h3>
+        <p>{{ stream.description }}</p>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="s-label" style="margin-top:32px"><span>//</span> приоритетные университеты и центры</div>
+    <div class="lifeos-source-map">
+      {% for region in section.source_regions %}
+      <article class="portal-project-card reveal">
+        <p class="project-kind">{{ region.region }}</p>
+        {% for name, focus, priority in region.items %}
+        <div class="lifeos-source-item">
+          <h3>{{ name }}</h3>
+          <p>{{ focus }}</p>
+          <span class="content-status">Приоритет {{ priority }}</span>
+        </div>
+        {% endfor %}
+      </article>
+      {% endfor %}
+    </div>
+
+    <p class="editorial-notice">Рубрика «бессмертие» остаётся философским и футурологическим уровнем. Научный контур использует проверяемые направления: biology of aging, geroscience, healthspan, rejuvenation, regeneration и biological age.</p>
+  </section>
+  {% endif %}
+
   <section class="s">
     <div class="s-label"><span>//</span> редакционный стандарт</div>
     <h2>Как проверяются материалы</h2>
