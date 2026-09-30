@@ -3973,3 +3973,24 @@ body:has(.site-chat) .foot {
     font-size: 11px;
   }
 }
+
+
+/* Life-OS global source map */
+.lifeos-source-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.lifeos-source-item + .lifeos-source-item {
+  border-top: 1px solid rgba(255,255,255,.08);
+  margin-top: 16px;
+  padding-top: 16px;
+}
+.lifeos-source-item h3 {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+}
+.lifeos-source-item p {
+  margin: 0 0 8px;
+}
