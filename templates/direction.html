@@ -86,7 +86,7 @@
       {% for region in section.source_regions %}
       <article class="portal-project-card reveal">
         <p class="project-kind">{{ region.region }}</p>
-        {% for name, focus, priority in region.items %}
+        {% for name, focus, priority in region["items"] %}
         <div class="lifeos-source-item">
           <h3>{{ name }}</h3>
           <p>{{ focus }}</p>
