@@ -314,6 +314,7 @@ def ensure_editorial_seed() -> None:
     ensure_published_content_package(
         "human-ai-collaboration-2026-09.json",
         datetime(2026, 9, 27, 7, 26, tzinfo=timezone.utc),
+        update_published=True,
     )
     ensure_published_content_package(
         "depression-standard-2026-09.json",
