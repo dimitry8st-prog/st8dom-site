@@ -33,6 +33,11 @@ class Config:
     ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
     ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "change-me-now")
 
+    # Отдельный доступ к разделу Life-OS. Если отдельный пароль не задан,
+    # используется пароль администратора, чтобы защита работала сразу.
+    LIFEOS_USERNAME = os.environ.get("LIFEOS_USERNAME", "lifeos")
+    LIFEOS_PASSWORD = os.environ.get("LIFEOS_PASSWORD", ADMIN_PASSWORD)
+
     # Публичный канонический URL — для SEO, sitemap и Open Graph.
     SITE_URL = os.environ.get("SITE_URL", "https://st8dom.ru").rstrip("/")
 
