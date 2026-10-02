@@ -274,6 +274,32 @@ def create_app() -> Flask:
             abort(404)
 
     @app.before_request
+    def protect_lifeos_section():
+        """Закрывает публичный раздел Life-OS HTTP Basic-аутентификацией."""
+        if not request.path.startswith("/directions/life-os"):
+            return None
+        if current_user.is_authenticated:
+            return None
+
+        auth = request.authorization
+        expected_user = str(app.config.get("LIFEOS_USERNAME") or "lifeos")
+        expected_password = str(app.config.get("LIFEOS_PASSWORD") or "")
+        supplied_user = auth.username if auth else ""
+        supplied_password = auth.password if auth else ""
+
+        if (
+            expected_password
+            and hmac.compare_digest(supplied_user or "", expected_user)
+            and hmac.compare_digest(supplied_password or "", expected_password)
+        ):
+            return None
+
+        response = app.make_response(("Требуется пароль для раздела Life-OS.", 401))
+        response.headers["WWW-Authenticate"] = 'Basic realm="Life-OS", charset="UTF-8"'
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.before_request
     def count_public_visit():
         """Один визит на 30 минут, независимо от числа просмотренных страниц."""
         endpoint = request.endpoint or ""
