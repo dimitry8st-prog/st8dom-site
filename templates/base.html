@@ -127,7 +127,7 @@
   {% endif %}
   <script>window.ST8DOM_ANALYTICS_ID = {{ analytics_id|tojson }};</script>
   <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/main.js', v='20261003-narration-buffering') }}" defer></script>
   {% if chat_enabled and page_id != 'admin' and not medical_context|default(false) %}
   <script src="{{ url_for('static', filename='js/chat-widget.js') }}" defer></script>
   {% endif %}
