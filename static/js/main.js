@@ -123,17 +123,77 @@
     });
   }
 
-  // Project clips may have music mixed into their audio track.
-  // Keep embedded tracks silent; the FAQ narration uses a separate player.
-  document.querySelectorAll(".case-video video, .project-video-player").forEach(function (video) {
-    function keepProjectSilent() {
+  // Embedded MP4 audio stays muted. Play only a separately cleaned voice track.
+  function setupProjectNarration(video) {
+    const voice = new Audio();
+    voice.preload = "none";
+    let enabled = true;
+    let source = "";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-ghost btn-sm project-voice-toggle";
+    video.insertAdjacentElement("afterend", button);
+
+    function updateButton() {
+      button.hidden = !source;
+      button.textContent = enabled ? "Выключить озвучку" : "Включить озвучку";
+      button.setAttribute("aria-pressed", enabled ? "true" : "false");
+    }
+    function syncVoice() {
+      if (source && Math.abs(voice.currentTime - video.currentTime) > 0.25) {
+        voice.currentTime = video.currentTime;
+      }
+      voice.playbackRate = video.playbackRate;
+      voice.volume = video.volume;
+    }
+    function playVoice() {
+      if (!source || !enabled || video.paused || video.ended) return;
+      syncVoice();
+      const result = voice.play();
+      if (result && typeof result.catch === "function") {
+        result.catch(function () { enabled = false; updateButton(); });
+      }
+    }
+    function setSource() {
+      const next = video.getAttribute("data-clean-voice-src") || "";
+      if (next !== source) {
+        voice.pause();
+        source = next;
+        if (source) voice.src = source;
+        else { voice.removeAttribute("src"); voice.load(); }
+        enabled = true;
+      }
+      updateButton();
+    }
+    function keepEmbeddedSilent() {
       if (!video.muted) video.muted = true;
+      voice.volume = video.volume;
     }
     video.defaultMuted = true;
-    keepProjectSilent();
-    video.addEventListener("play", keepProjectSilent);
-    video.addEventListener("volumechange", keepProjectSilent);
-  });
+    keepEmbeddedSilent();
+    setSource();
+    video.addEventListener("loadstart", setSource);
+    video.addEventListener("play", function () { setSource(); keepEmbeddedSilent(); playVoice(); });
+    video.addEventListener("pause", function () { voice.pause(); });
+    video.addEventListener("ended", function () { voice.pause(); });
+    video.addEventListener("seeking", function () { voice.pause(); });
+    video.addEventListener("seeked", function () { syncVoice(); playVoice(); });
+    video.addEventListener("timeupdate", syncVoice);
+    video.addEventListener("ratechange", syncVoice);
+    video.addEventListener("volumechange", keepEmbeddedSilent);
+    voice.addEventListener("error", function () {
+      enabled = false;
+      updateButton();
+      button.textContent = "Озвучка недоступна";
+    });
+    button.addEventListener("click", function () {
+      enabled = !enabled;
+      if (enabled) playVoice();
+      else voice.pause();
+      updateButton();
+    });
+  }
+  document.querySelectorAll(".case-video video, .project-video-player").forEach(setupProjectNarration);
 
   const videoModal = document.getElementById("project-video-modal");
   if (videoModal) {
@@ -146,6 +206,7 @@
       if (!videoPlayer || !videoSource) return;
       videoPlayer.pause();
       videoPlayer.removeAttribute("poster");
+      videoPlayer.removeAttribute("data-clean-voice-src");
       videoSource.setAttribute("src", "");
       videoPlayer.load();
     }
@@ -153,6 +214,7 @@
     document.querySelectorAll(".project-video-trigger").forEach(function (button) {
       button.addEventListener("click", function () {
         if (!videoPlayer || !videoSource) return;
+        videoPlayer.setAttribute("data-clean-voice-src", button.getAttribute("data-video-voice-src") || "");
         videoSource.setAttribute("src", button.getAttribute("data-video-src") || "");
         videoPlayer.setAttribute("poster", button.getAttribute("data-video-poster") || "");
         if (videoTitle) videoTitle.textContent = button.getAttribute("data-video-title") || "Видео проекта";

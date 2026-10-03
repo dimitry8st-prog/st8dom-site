@@ -48,7 +48,9 @@
   <section class="s prose" aria-labelledby="case-video-heading">
     <h2 id="case-video-heading">Как это выглядит</h2>
     <div class="case-video">
+      {% set clean_voice = 'audio/' + case.video.rsplit('.', 1)[0] + '-voice-only.mp3' %}
       <video
+        {% if static_exists(clean_voice) %}data-clean-voice-src="{{ url_for('static', filename=clean_voice) }}"{% endif %}
         muted
         controls
         playsinline

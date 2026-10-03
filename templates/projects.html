@@ -39,10 +39,12 @@
       </div>
       <div class="project-actions">
         {% if project.video %}
+        {% set clean_voice = 'audio/' + project.video.rsplit('.', 1)[0] + '-voice-only.mp3' %}
         <button
           class="btn btn-primary btn-sm project-video-trigger"
           type="button"
           data-video-src="{{ url_for('static', filename='video/' + project.video) }}"
+          {% if static_exists(clean_voice) %}data-video-voice-src="{{ url_for('static', filename=clean_voice) }}"{% endif %}
           data-video-poster="{{ url_for('static', filename='video/' + project.poster) }}"
           data-video-title="{{ project.name }}"
         >▶ Смотреть видео</button>
