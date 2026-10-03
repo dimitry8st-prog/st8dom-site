@@ -770,7 +770,6 @@ CASES = [
         "video_vertical": "faq-assistant-demo-vertical.mp4",
         "video_poster": "faq-assistant-poster.webp",
         "video_captions": "faq-assistant-ru.vtt",
-        "video_audio": "bach-prelude-c-major-bwv846.mp3",
         "video_voice": "faq-assistant-vo.mp3",
         "video_note": (
             "40 секунд: повторяющиеся вопросы → ответ по базе знаний → "

@@ -10,7 +10,6 @@
   const duration = Number(root.getAttribute("data-duration") || 40);
   const videoSrc = root.getAttribute("data-video-src") || "";
   const videoVerticalSrc = root.getAttribute("data-video-vertical-src") || "";
-  const audioSrc = root.getAttribute("data-audio-src") || "";
   const voiceSrc = root.getAttribute("data-voice-src") || "";
   const captionsSrc = root.getAttribute("data-captions-src") || "";
 
@@ -29,7 +28,6 @@
 
   let cues = [];
 
-  let music = null;
   let voice = null;
   let playing = false;
   let muted = false;
@@ -142,15 +140,6 @@
     });
   }
 
-  function musicGain(time) {
-    if (!music) return;
-    const speaking = Boolean(activeCue(time));
-    let volume = speaking ? 0.07 : 0.1;
-    const fadeIn = Math.min(1, time / 1);
-    const fadeOut = time > duration - 2 ? Math.max(0, (duration - time) / 2) : 1;
-    music.volume = muted ? 0 : volume * fadeIn * fadeOut;
-  }
-
   function render(time) {
     elapsed = Math.max(0, Math.min(duration, time));
     if (timeBox) timeBox.textContent = formatTime(elapsed) + " / " + formatTime(duration);
@@ -158,23 +147,14 @@
     if (progressBar) progressBar.setAttribute("aria-valuenow", String(Math.floor(elapsed)));
     setCaption(elapsed);
     if (!useVideo) showScene(elapsed);
-    musicGain(elapsed);
   }
 
   function pauseMedia() {
     if (video) video.pause();
-    if (music) music.pause();
     if (voice) voice.pause();
   }
 
   function playMediaFrom(time) {
-    if (music) {
-      music.currentTime = Math.min(time, isFinite(music.duration) ? music.duration : time);
-      if (!muted) {
-        const start = music.play();
-        if (start && typeof start.catch === "function") start.catch(function () {});
-      }
-    }
     if (voice) {
       voice.currentTime = Math.min(time, isFinite(voice.duration) ? voice.duration : time);
       voice.muted = muted;
@@ -195,10 +175,6 @@
     pauseMedia();
     if (reset) {
       if (video) video.currentTime = 0;
-      if (music) {
-        music.currentTime = 0;
-        music.volume = 0;
-      }
       if (voice) voice.currentTime = 0;
     }
     if (playBtn) playBtn.textContent = "Воспроизвести";
@@ -315,12 +291,10 @@
     if (video) video.muted = true;
     if (voice) voice.muted = muted;
     if (muted) {
-      if (music) music.pause();
       if (voice) voice.pause();
     } else if (playing) {
       playMediaFrom(nowTime());
     }
-    musicGain(elapsed);
     if (muteBtn) {
       muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
       muteBtn.setAttribute("aria-label", muted ? "Включить звук" : "Выключить звук");
@@ -349,11 +323,6 @@
     return el;
   }
 
-  if (audioSrc) {
-    music = attachAudio(audioSrc, function () {
-      music = null;
-    });
-  }
   if (voiceSrc) {
     voice = attachAudio(voiceSrc, function () {
       voice = null;

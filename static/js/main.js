@@ -123,12 +123,16 @@
     });
   }
 
-  document.querySelectorAll(".case-video video").forEach(function (video) {
-    video.addEventListener("play", function onFirstPlay() {
-      if (video.muted) video.muted = false;
-      if (video.volume === 0) video.volume = 1;
-      video.removeEventListener("play", onFirstPlay);
-    });
+  // Project clips may have music mixed into their audio track.
+  // Keep embedded tracks silent; the FAQ narration uses a separate player.
+  document.querySelectorAll(".case-video video, .project-video-player").forEach(function (video) {
+    function keepProjectSilent() {
+      if (!video.muted) video.muted = true;
+    }
+    video.defaultMuted = true;
+    keepProjectSilent();
+    video.addEventListener("play", keepProjectSilent);
+    video.addEventListener("volumechange", keepProjectSilent);
   });
 
   const videoModal = document.getElementById("project-video-modal");
