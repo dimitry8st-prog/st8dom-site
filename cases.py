@@ -79,6 +79,7 @@ CASES = [
         "related_repos": [],
         "demo_url": None,
         "video": "knightcat-content-factory-16x9.mp4",
+        "media_version": "voice-v2-20261003",
         "video_poster": "knightcat-content-factory-poster.jpg",
         "video_captions": "knightcat-content-factory-ru.vtt",
         "video_fallback": (
