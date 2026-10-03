@@ -1,0 +1,31 @@
+{% from "macros/form.html" import render_inquiry_form %}
+{% extends "base.html" %}
+{% block title %}{{ demo.name }} — интерактивная демонстрация ДИС{% endblock %}
+{% block description %}{{ demo.headline }}. Сценарии, примеры результата и заявка на внедрение.{% endblock %}
+{% block canonical %}{{ site_url }}{{ demo.url }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/project-demos.css', v='20261003') }}">
+<div class="container demo-page">
+  <aside class="demo-notice">Портфолио Степанова Д.А. · Интерактивный пример на тестовых данных. Рабочие сервисы не вызываются.</aside>
+  <nav class="demo-nav" aria-label="Разделы демонстрации">
+    <a href="#benefits">Возможности</a><a href="#example">Попробовать</a><a href="#process">Этапы</a><a href="#faq">Вопросы</a><a href="#request">Обсудить внедрение</a>
+  </nav>
+  <section class="hero demo-hero">
+    <div><p class="eyebrow">{{ demo.name }} · демонстрация</p><h1>{{ demo.headline }}</h1><p class="hero-sub">{{ demo.audience }}</p><p>{{ demo.summary }}</p><div class="hero-cta"><a class="btn btn-primary" href="#example">Посмотреть пример</a><a class="btn btn-ghost" href="#request">Обсудить такой проект</a></div></div>
+    <figure class="demo-cover"><img src="{{ url_for('static', filename='images/' + demo.image) }}" alt="{{ demo.image_alt }}" width="600" height="340"></figure>
+  </section>
+  <section class="s" id="benefits"><p class="eyebrow">Для вашей задачи</p><h2>Что показывает проект</h2><div class="demo-feature-grid">{% for title, body in demo.features %}<article><span class="demo-number">{{ '%02d'|format(loop.index) }}</span><h3>{{ title }}</h3><p>{{ body }}</p></article>{% endfor %}</div></section>
+  <section class="s" id="example" data-project-demo>
+    <p class="eyebrow">Выберите ситуацию</p><h2>От входных данных к результату</h2><p>Выберите подготовленный пример и откройте результат. Его можно проверить и сравнить с другой ситуацией.</p>
+    <label for="demo-scenario">Пример</label><select id="demo-scenario" data-demo-select>{% for example in demo.examples %}<option value="{{ loop.index0 }}">{{ example.label }}</option>{% endfor %}</select>
+    <div class="demo-workspace"><article><h3>Входные данные</h3><p data-demo-input>{{ demo.examples[0].input }}</p><button class="btn btn-primary" type="button" data-demo-run>Показать результат</button><button class="btn btn-ghost" type="button" data-demo-reset>Сбросить пример</button></article><article><h3>Результат</h3><p data-demo-placeholder>Откройте результат выбранного примера.</p><div data-demo-result hidden><pre data-demo-output></pre></div><p class="demo-live" role="status" aria-live="polite" data-demo-status></p></article></div>
+    <details class="demo-fallback"><summary>Все примеры без запуска</summary>{% for example in demo.examples %}<article><h3>{{ example.label }}</h3><p>{{ example.input }}</p><pre>{{ example.result }}</pre></article>{% endfor %}</details>
+    <noscript><p>JavaScript выключен. Откройте «Все примеры без запуска», чтобы прочитать входные данные и результаты.</p></noscript>
+    <script type="application/json" id="demo-examples">{{ demo.examples|tojson }}</script>
+  </section>
+  <section class="s" id="process"><p class="eyebrow">Понятный маршрут</p><h2>Как проходит работа</h2><ol class="demo-steps">{% for step in demo.steps %}<li><span>{{ '%02d'|format(loop.index) }}</span><h3>{{ step }}</h3></li>{% endfor %}</ol><div class="demo-readiness"><h3>Текущее состояние проекта</h3><p><strong>{{ demo.status }}</strong></p><p>{{ demo.current }}</p><h3>Что нужно учитывать</h3><p>{{ demo.limitations }}</p></div></section>
+  <section class="s demo-faq" id="faq"><p class="eyebrow">Перед внедрением</p><h2>Частые вопросы</h2><details><summary>{{ demo.faq[0] }}</summary><p>{{ demo.faq[1] }}</p></details><details><summary>Можно ли использовать свои данные?</summary><p>В публичном примере используются только подготовленные тестовые сведения. Для рабочего проекта отдельно согласуем источники, доступы, проверку результата и обработку данных.</p></details><details><summary>Как обсуждается стоимость и запуск?</summary><p>Сначала уточняем задачу, объём работ и интеграции. Затем согласуем состав проекта и условия приёмки. Цена и срок определяются по вашему запросу.</p></details></section>
+  <section class="s demo-contact" id="request"><div><p class="eyebrow">Ваш следующий шаг</p><h2>Нужен такой проект?</h2><p>Опишите процесс, исходные данные и ожидаемый результат. Обращение по проекту «{{ demo.name }}» попадёт в общую очередь заявок портала ДИС.</p><p>Не отправляйте медицинские документы, пароли и другие чувствительные сведения через эту форму.</p><div class="hero-cta">{% if demo.case_slug %}<a class="btn btn-ghost" href="{{ url_for('case_detail', slug=demo.case_slug) }}">О проекте на портале</a>{% endif %}{% if demo.repo_url %}<a class="btn btn-ghost" href="{{ demo.repo_url }}" rel="noopener" target="_blank">Исходный проект</a>{% endif %}</div></div><div class="demo-form-panel"><h3>Обсудить внедрение</h3>{{ render_inquiry_form(form) }}</div></section>
+</div>
+<script src="{{ url_for('static', filename='js/project-demos.js', v='20261003') }}" defer></script>
+{% endblock %}

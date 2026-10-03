@@ -30,9 +30,9 @@
           {% if case.slug == 'psychologist-landing' %}
             <a class="btn btn-ghost" href="{{ url_for('contact', topic='website', project='psychologist-landing') }}">Обсудить такой сайт</a>
           {% elif case.demo_reel %}
-            <a class="btn btn-ghost" href="{{ url_for('contact', topic='faq') }}">Обсудить внедрение</a>
+            <a class="btn btn-ghost" href="{{ url_for('contact', topic='faq', project=case.slug) }}">Обсудить внедрение</a>
           {% else %}
-            <a class="btn btn-ghost" href="{{ url_for('contact') }}">Обсудить похожее</a>
+            <a class="btn btn-ghost" href="{{ url_for('contact', project=case.slug) }}">Обсудить похожее</a>
           {% endif %}
         </div>
       </div>

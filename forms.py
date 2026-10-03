@@ -35,6 +35,7 @@ TOPIC_CHOICES = [
 
 
 class InquiryForm(FlaskForm):
+    project = HiddenField("Проект", validators=[Optional(), Length(max=80)])
     name = StringField(
         "Имя",
         validators=[DataRequired(message="Укажите имя."), Length(min=2, max=120)],
@@ -82,6 +83,12 @@ class InquiryForm(FlaskForm):
     def validate_website(self, field):
         if field.data:
             raise ValidationError("Заявка отклонена.")
+
+    def validate_project(self, field):
+        if field.data:
+            from project_demos import get_demo
+            if get_demo(field.data) is None:
+                raise ValidationError("Неизвестный проект заявки.")
 
 
 class LoginForm(FlaskForm):

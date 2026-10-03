@@ -9,6 +9,7 @@
 {% macro render_inquiry_form(form) %}
 <form class="form reveal" id="inquiry-form" method="post" action="{{ url_for('contact') }}" autocomplete="off">
   {{ form.hidden_tag() }}
+  {{ field_errors(form.project) }}
   {{ form.website(class="hp", tabindex="-1", autocomplete="off") }}
   <div class="form-row">
     <div class="field">
