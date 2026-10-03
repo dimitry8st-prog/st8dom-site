@@ -8,8 +8,8 @@
 {% block og_description %}{{ section.summary }}{% endblock %}
 
 {% block content %}
-<div class="container{% if slug == 'medicine' %} container--medicine{% elif slug == 'ai' %} container--ai{% endif %}">
-  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% elif slug == 'ai' %} direction-hero--ai{% endif %}">
+<div class="container{% if slug == 'medicine' %} container--medicine{% elif slug == 'ai' %} container--ai{% elif slug == 'longevity' %} container--longevity{% endif %}">
+  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% elif slug == 'ai' %} direction-hero--ai{% elif slug == 'longevity' %} direction-hero--longevity{% endif %}">
     <div class="direction-hero__copy">
       <p class="eyebrow">{{ section.eyebrow }}</p>
       <h1>{{ section.title }}</h1>
@@ -35,6 +35,12 @@
       <img src="{{ url_for('static', filename='images/ai-practice-human-loop-final.jpg') }}"
            alt="Человек остаётся в контуре: задача, AI Orchestrator, LLM, RAG, проверка человеком и решение"
            width="1000" height="563" loading="eager" fetchpriority="high">
+    </figure>
+    {% elif slug == 'longevity' %}
+    <figure class="direction-hero__visual direction-hero__visual--longevity">
+      <img src="{{ url_for('static', filename='images/longevity-wise-knightcat.jpg') }}"
+           alt="Дмитрий Степанов беседует с мудрым котом-рыцарем; позади тропа ведёт к горной вершине в облаках"
+           width="1672" height="941" loading="eager" fetchpriority="high">
     </figure>
     {% endif %}
   </section>
