@@ -129,6 +129,8 @@
     voice.preload = "none";
     let enabled = true;
     let source = "";
+    let buffering = false;
+    let playAttempt = 0;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "btn btn-ghost btn-sm project-voice-toggle";
@@ -146,18 +148,29 @@
       voice.playbackRate = video.playbackRate;
       voice.volume = video.volume;
     }
+    function pauseVoice() {
+      playAttempt += 1;
+      voice.pause();
+    }
     function playVoice() {
-      if (!source || !enabled || video.paused || video.ended) return;
+      if (!source || !enabled || buffering || video.seeking || video.paused || video.ended) return;
       syncVoice();
+      const attempt = ++playAttempt;
       const result = voice.play();
       if (result && typeof result.catch === "function") {
-        result.catch(function () { enabled = false; updateButton(); });
+        result.catch(function (error) {
+          // A seek, pause or clip switch may abort an older play request.
+          if (attempt !== playAttempt || (error && error.name === "AbortError")) return;
+          enabled = false;
+          updateButton();
+        });
       }
     }
     function setSource() {
       const next = video.getAttribute("data-clean-voice-src") || "";
       if (next !== source) {
-        voice.pause();
+        pauseVoice();
+        buffering = false;
         source = next;
         if (source) voice.src = source;
         else { voice.removeAttribute("src"); voice.load(); }
@@ -174,9 +187,11 @@
     setSource();
     video.addEventListener("loadstart", setSource);
     video.addEventListener("play", function () { setSource(); keepEmbeddedSilent(); playVoice(); });
-    video.addEventListener("pause", function () { voice.pause(); });
-    video.addEventListener("ended", function () { voice.pause(); });
-    video.addEventListener("seeking", function () { voice.pause(); });
+    video.addEventListener("waiting", function () { buffering = true; pauseVoice(); });
+    video.addEventListener("playing", function () { buffering = false; playVoice(); });
+    video.addEventListener("pause", pauseVoice);
+    video.addEventListener("ended", pauseVoice);
+    video.addEventListener("seeking", pauseVoice);
     video.addEventListener("seeked", function () { syncVoice(); playVoice(); });
     video.addEventListener("timeupdate", syncVoice);
     video.addEventListener("ratechange", syncVoice);
@@ -189,7 +204,7 @@
     button.addEventListener("click", function () {
       enabled = !enabled;
       if (enabled) playVoice();
-      else voice.pause();
+      else pauseVoice();
       updateButton();
     });
   }
