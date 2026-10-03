@@ -140,7 +140,9 @@ def test_cases_and_details(client):
     assert b"autoplay" not in faq.data.lower()
 
 
-def test_portal_directions(client):
+def test_portal_directions(client, monkeypatch):
+    monkeypatch.setitem(app.config, "LIFEOS_USERNAME", "lifeos-test")
+    monkeypatch.setitem(app.config, "LIFEOS_PASSWORD", "test-only-password")
     expected = {
         "medicine": "Медицина",
         "ai": "AI на практике",
@@ -148,7 +150,8 @@ def test_portal_directions(client):
         "life-os": "Life-OS",
     }
     for slug, title in expected.items():
-        page = client.get(f"/directions/{slug}/")
+        auth = ("lifeos-test", "test-only-password") if slug == "life-os" else None
+        page = client.get(f"/directions/{slug}/", auth=auth)
         assert page.status_code == 200, slug
         assert title.encode("utf-8") in page.data
         assert "Как проверяются материалы".encode("utf-8") in page.data
@@ -228,8 +231,10 @@ def test_editorial_workshop_is_public_and_source_grounded(client):
     assert b"/editorial-workshop/" in sitemap.data
 
 
-def test_life_os_and_library_use_distinct_names(client):
-    life_os = client.get("/directions/life-os/")
+def test_life_os_and_library_use_distinct_names(client, monkeypatch):
+    monkeypatch.setitem(app.config, "LIFEOS_USERNAME", "lifeos-test")
+    monkeypatch.setitem(app.config, "LIFEOS_PASSWORD", "test-only-password")
+    life_os = client.get("/directions/life-os/", auth=("lifeos-test", "test-only-password"))
     assert life_os.status_code == 200
     assert "База знаний Life-OS".encode("utf-8") in life_os.data
     assert "Библиотека знаний".encode("utf-8") not in life_os.data
@@ -239,6 +244,17 @@ def test_life_os_and_library_use_distinct_names(client):
     home = client.get("/")
     assert b'id="library"' in home.data
     assert "Все 17 материалов".encode("utf-8") in home.data
+
+
+def test_life_os_requires_correct_password(client, monkeypatch):
+    monkeypatch.setitem(app.config, "LIFEOS_USERNAME", "lifeos-test")
+    monkeypatch.setitem(app.config, "LIFEOS_PASSWORD", "test-only-password")
+    for path in ("/directions/life-os/", "/directions/life-os/knowledge-base/"):
+        assert client.get(path).status_code == 401
+        denied = client.get(path, auth=("lifeos-test", "wrong-password"))
+        assert denied.status_code == 401
+        assert denied.headers["Cache-Control"] == "no-store"
+    assert client.get("/directions/life-os/", auth=("lifeos-test", "test-only-password")).status_code == 200
 
 
 def test_selected_projects_catalog(client):
