@@ -43,8 +43,8 @@
         <button
           class="btn btn-primary btn-sm project-video-trigger"
           type="button"
-          data-video-src="{{ url_for('static', filename='video/' + project.video) }}"
-          {% if static_exists(clean_voice) %}data-video-voice-src="{{ url_for('static', filename=clean_voice) }}"{% endif %}
+          data-video-src="{{ url_for('static', filename='video/' + project.video, v=project.media_version|default(none)) }}"
+          {% if static_exists(clean_voice) %}data-video-voice-src="{{ url_for('static', filename=clean_voice, v=project.media_version|default(none)) }}"{% endif %}
           data-video-poster="{{ url_for('static', filename='video/' + project.poster) }}"
           data-video-title="{{ project.name }}"
         >▶ Смотреть видео</button>
