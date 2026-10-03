@@ -11,7 +11,7 @@
 <div class="container">
   <section class="hero">
     <p class="eyebrow"><a href="{{ url_for('cases_list') }}">Кейсы</a> / {{ case.type }}</p>
-    <div class="case-hero{% if case.slug == 'corporate-site' %} case-hero--corporate{% endif %}">
+    <div class="case-hero{% if case.slug == 'corporate-site' %} case-hero--corporate{% elif case.slug == 'psychologist-landing' %} case-hero--psychologist{% endif %}">
       <div>
         {% if case.slug == 'corporate-site' %}
           <h1 class="case-title--corporate"><span class="case-title-line">Лендинг клуба единоборств</span><br><span>под заявку</span></h1>
