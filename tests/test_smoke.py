@@ -260,8 +260,8 @@ def test_life_os_requires_correct_password(client, monkeypatch):
 def test_selected_projects_catalog(client):
     page = client.get("/projects/")
     assert page.status_code == 200
-    assert "17 проектов".encode("utf-8") in page.data
-    assert page.data.count(b'class="portal-project-card') == 17
+    assert "18 проектов".encode("utf-8") in page.data
+    assert page.data.count(b'class="portal-project-card') == 18
     assert b"st8dom-site" not in page.data
     for name in [
         "AutoSfera-AI",

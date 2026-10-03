@@ -24,7 +24,12 @@
           {% if case.repo_url %}
             <a class="btn btn-primary" href="{{ case.repo_url }}" target="_blank" rel="noopener" data-track="github_click">Репозиторий</a>
           {% endif %}
-          {% if case.demo_reel %}
+          {% if case.demo_url %}
+            <a class="btn btn-ghost" href="{{ case.demo_url }}">Открыть демонстрацию</a>
+          {% endif %}
+          {% if case.slug == 'psychologist-landing' %}
+            <a class="btn btn-ghost" href="{{ url_for('contact', topic='website', project='psychologist-landing') }}">Обсудить такой сайт</a>
+          {% elif case.demo_reel %}
             <a class="btn btn-ghost" href="{{ url_for('contact', topic='faq') }}">Обсудить внедрение</a>
           {% else %}
             <a class="btn btn-ghost" href="{{ url_for('contact') }}">Обсудить похожее</a>

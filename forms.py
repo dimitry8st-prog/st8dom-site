@@ -19,6 +19,7 @@ from wtforms.validators import (
 )
 
 TOPIC_CHOICES = [
+    ("website", "Сайт / лендинг под заявку"),
     ("express", "Экспресс-разбор"),
     ("audit", "AI-аудит процесса"),
     ("automation", "Автоматизация процесса"),

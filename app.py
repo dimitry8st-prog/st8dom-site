@@ -792,6 +792,13 @@ def create_app() -> Flask:
             page_id="projects",
         )
 
+    @app.get("/demos/psychologist/")
+    def psychologist_demo():
+        form = InquiryForm()
+        form.topic.data = "website"
+        form.message.data = "Хочу адаптировать лендинг психолога для своей практики."
+        return render_template("demos/psychologist.html", form=form, page_id="psychologist-demo")
+
     @app.route("/cases/<slug>/")
     def case_detail(slug: str):
         case = get_case(slug)
@@ -814,6 +821,9 @@ def create_app() -> Flask:
             allowed = {value for value, _label in TOPIC_CHOICES}
             if topic in allowed:
                 form.topic.data = topic
+            if request.args.get("project") == "psychologist-landing":
+                form.topic.data = "website"
+                form.message.data = "Хочу адаптировать лендинг психолога для своей практики."
         if form.validate_on_submit():
             now = datetime.now(timezone.utc).replace(tzinfo=None)
             client_ip = hash_ip(request.remote_addr)
@@ -1397,6 +1407,7 @@ def create_app() -> Flask:
             origin + "/",
             origin + url_for("cases_list"),
             origin + url_for("projects_catalog"),
+            origin + url_for("psychologist_demo"),
             origin + url_for("library_catalog"),
             origin + url_for("editorial_workshop"),
             origin + url_for("contact"),
