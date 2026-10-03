@@ -41,6 +41,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from assistant.answer import MAX_MESSAGE_LEN, answer_question
 from assistant.rate_limit import SlidingWindowLimiter, limiter
 from cases import FILTERS, get_all_cases, get_case
+from project_demos import all_demos, catalog_with_demos, get_demo
 from clinical_guidelines import (
     GuidelineValidationError,
     OFFICIAL_SOURCES,
@@ -787,7 +788,7 @@ def create_app() -> Flask:
     def projects_catalog():
         return render_template(
             "projects.html",
-            projects=PROJECTS,
+            projects=catalog_with_demos(),
             filters=PROJECT_FILTERS,
             page_id="projects",
         )
@@ -795,15 +796,28 @@ def create_app() -> Flask:
     @app.get("/demos/psychologist/")
     def psychologist_demo():
         form = InquiryForm()
+        form.project.data = "psychologist-landing"
         form.topic.data = "website"
         form.message.data = "Хочу адаптировать лендинг психолога для своей практики."
         return render_template("demos/psychologist.html", form=form, page_id="psychologist-demo")
+
+    @app.get("/demos/<slug>/")
+    def project_demo(slug: str):
+        demo = get_demo(slug)
+        if not demo or slug == "psychologist-landing":
+            abort(404)
+        form = InquiryForm()
+        form.project.data = slug
+        form.topic.data = demo["topic"]
+        form.message.data = f"Хочу обсудить проект «{demo['name']}» для своей задачи."
+        return render_template("demos/project.html", demo=demo, form=form, page_id="projects")
 
     @app.route("/cases/<slug>/")
     def case_detail(slug: str):
         case = get_case(slug)
         if not case:
             abort(404)
+        case = {**case, "demo_url": case.get("demo_url") or get_demo(slug)["url"]}
         others = [item for item in get_all_cases() if item["slug"] != slug]
         return render_template(
             "case_detail.html",
@@ -821,14 +835,19 @@ def create_app() -> Flask:
             allowed = {value for value, _label in TOPIC_CHOICES}
             if topic in allowed:
                 form.topic.data = topic
-            if request.args.get("project") == "psychologist-landing":
-                form.topic.data = "website"
-                form.message.data = "Хочу адаптировать лендинг психолога для своей практики."
+            demo = get_demo(request.args.get("project", ""))
+            if demo:
+                form.project.data = demo["slug"]
+                form.topic.data = demo["topic"]
+                form.message.data = "Хочу адаптировать лендинг психолога для своей практики." if demo["slug"] == "psychologist-landing" else f"Хочу обсудить проект «{demo['name']}» для своей задачи."
         if form.validate_on_submit():
             now = datetime.now(timezone.utc).replace(tzinfo=None)
             client_ip = hash_ip(request.remote_addr)
             email = form.email.data.strip().lower()
             message = form.message.data.strip()
+            demo = get_demo(form.project.data or "")
+            if demo:
+                message = f"[Проект: {demo['slug']} — {demo['name']}]\n{message}"
             # Считаем по БД: лимит общий для всех процессов gunicorn.
             hourly = Inquiry.created_at >= now - timedelta(hours=1)
             too_many_from_ip = bool(client_ip) and Inquiry.query.filter(
@@ -1137,6 +1156,9 @@ def create_app() -> Flask:
     @login_required
     def admin_inquiries():
         status = request.args.get("status", "all")
+        selected_project = request.args.get("project", "")
+        if selected_project and get_demo(selected_project) is None:
+            abort(400)
         today = datetime.now(MOSCOW).date()
         start_raw = request.args.get("visits_from", today.replace(day=1).isoformat())
         end_raw = request.args.get("visits_to", today.isoformat())
@@ -1156,6 +1178,8 @@ def create_app() -> Flask:
         except (ValueError, OverflowError):
             range_error = "Выберите даты по порядку; период не длиннее одного года."
         query = Inquiry.query.order_by(Inquiry.created_at.desc())
+        if selected_project:
+            query = query.filter(Inquiry.message.startswith(f"[Проект: {selected_project} — ", autoescape=True))
         if status == "spam":
             query = query.filter(Inquiry.spam_flag.has())
         else:
@@ -1172,6 +1196,8 @@ def create_app() -> Flask:
         )
         return render_template(
             "admin/inquiries.html",
+            demo_projects=all_demos(),
+            selected_project=selected_project,
             inquiries=inquiries,
             status=status,
             unread_count=unread_count,
@@ -1418,6 +1444,7 @@ def create_app() -> Flask:
             origin + url_for("clinical_guidelines_catalog"),
             origin + url_for("products_catalog"),
         ]
+        pages.extend(origin + demo["url"] for demo in all_demos() if demo["slug"] != "psychologist-landing")
         pages.extend(
             origin + url_for("direction_detail", slug=slug) for slug in SECTIONS
         )

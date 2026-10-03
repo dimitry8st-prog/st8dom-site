@@ -1,0 +1,29 @@
+.demo-page { max-width:1180px; }
+.demo-notice { padding:18px 0; color:var(--muted); font-size:14px; }
+.demo-nav { position:static; display:flex; flex-wrap:wrap; gap:20px; padding:18px 0; background:transparent; border-bottom:1px solid var(--border); }
+.demo-hero { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); align-items:center; gap:42px; }
+.demo-hero h1 { font-size:clamp(34px,3.6vw,50px); }
+.demo-hero > div { min-width:0; }
+.demo-cover { margin:0; border-radius:20px; overflow:hidden; border:1px solid var(--border); background:var(--card); }
+.demo-cover img { display:block; width:100%; height:auto; aspect-ratio:16/9; object-fit:contain; }
+.demo-feature-grid,.demo-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+.demo-feature-grid article,.demo-workspace article,.demo-readiness,.demo-form-panel { padding:26px; border:1px solid var(--border); border-radius:18px; background:var(--card); }
+.demo-number,.demo-steps span { color:var(--accent,#f59e0b); font-size:24px; font-weight:700; }
+.demo-feature-grid h3,.demo-workspace h3 { margin-top:12px; }
+.demo-page p { line-height:1.75; }
+.demo-page select { width:100%; max-width:520px; display:block; margin:12px 0 24px; padding:14px; color:var(--text); background:var(--card); border:1px solid var(--border); border-radius:10px; }
+.demo-workspace { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.demo-workspace button { margin:10px 10px 0 0; }
+.demo-page pre { white-space:pre-wrap; overflow-wrap:anywhere; font-family:inherit; line-height:1.8; margin:14px 0; }
+.demo-page [hidden] { display:none; }
+.demo-live { min-height:1.8em; color:var(--muted); }
+.demo-fallback { margin-top:24px; }
+.demo-fallback article { padding:18px 0; border-top:1px solid var(--border); }
+.demo-steps { list-style:none; padding:0; margin:24px 0; }
+.demo-steps li { padding:20px; border-left:2px solid #f59e0b; }
+.demo-faq details { padding:20px 0; border-bottom:1px solid var(--border); }
+.demo-page summary { cursor:pointer; font-weight:600; }
+.demo-contact { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:42px; align-items:start; }
+.demo-page section { scroll-margin-top:100px; }
+@media(max-width:980px) { .demo-hero,.demo-contact { grid-template-columns:1fr; gap:28px; } }
+@media(max-width:720px) { .demo-feature-grid,.demo-workspace,.demo-steps { grid-template-columns:1fr; } .demo-form-panel,.demo-workspace article { padding:20px; } .demo-nav { gap:12px 20px; } .demo-hero h1 { font-size:clamp(32px,8vw,44px); } }

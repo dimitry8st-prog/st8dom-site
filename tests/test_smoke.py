@@ -289,7 +289,8 @@ def test_selected_projects_catalog(client):
     vitalis_start = html.index("<h2>Vitalis Medical AI</h2>")
     vitalis_end = html.index("</article>", vitalis_start)
     vitalis_card = html[vitalis_start:vitalis_end]
-    assert vitalis_card.count('class="btn ') == 2
+    assert vitalis_card.count('class="btn ') == 3
+    assert '/demos/vitalis-medical-ai/' in vitalis_card
     assert "Смотреть видео" in vitalis_card
     assert "Подробнее" in vitalis_card
     assert "GitHub" not in vitalis_card

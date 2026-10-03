@@ -38,6 +38,7 @@
         {% for area in project.areas %}<span class="tag">{{ area }}</span>{% endfor %}
       </div>
       <div class="project-actions">
+        <a class="btn btn-primary btn-sm" href="{{ project.demo_url }}">Открыть демонстрацию</a>
         {% if project.video %}
         {% set clean_voice = 'audio/' + project.video.rsplit('.', 1)[0] + '-voice-only.mp3' %}
         <button
