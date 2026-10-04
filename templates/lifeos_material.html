@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} — Life-OS{% endblock %}
+{% block content %}
+<div class="container"><section class="s">
+<a href="{{ url_for('lifeos_workspace', stream=item.stream) }}">← {{ stream_info.title }}</a>
+<h1>{{ item.title }}</h1><p class="content-status">{{ item.evidence }}</p>
+<p><a href="{{ item.source_url }}" target="_blank" rel="noopener noreferrer">Открыть источник</a> · {{ item.published_date }}</p>
+<h2>Короткий отчёт</h2><p style="white-space:pre-wrap">{{ item.summary or 'Отчёт ещё не подготовлен.' }}</p>
+<h2>Материал</h2><div style="white-space:pre-wrap">{{ item.body or 'Сохранён анонс и ссылка на оригинал. Исследовательские заметки ещё не добавлены.' }}</div>
+{% if current_user.is_authenticated %}<p><a href="{{ url_for('lifeos_notion_report', material_id=item.id) }}">Заголовок, короткий отчёт и ссылка для Notion (JSON)</a></p>{% endif %}
+</section></div>
+{% endblock %}

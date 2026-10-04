@@ -77,6 +77,7 @@ from payments_robokassa import (
 )
 from products import PRODUCTS, PRODUCTS_BY_SLUG
 from lifeos_import import ImportValidationError, import_lifeos_package
+from lifeos_workspace import STREAMS, save_material, collect_securitylab
 from library_content import (
     LIBRARY_CATEGORIES,
     LIBRARY_ITEMS,
@@ -91,6 +92,7 @@ from models import (
     ArticleView,
     ClinicalGuideline,
     ImportPackage,
+    LifeOSMaterial,
     Inquiry,
     InquiryAutoReply,
     InquirySpam,
@@ -358,7 +360,7 @@ def create_app() -> Flask:
             response.headers.setdefault(
                 "Strict-Transport-Security", "max-age=31536000"
             )
-        if request.path.startswith("/admin/"):
+        if request.path.startswith(("/admin/", "/directions/life-os")):
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -433,6 +435,7 @@ def create_app() -> Flask:
             "direction.html",
             section=section,
             slug=slug,
+            lifeos_streams=STREAMS,
             related_projects=related_projects,
             latest_materials=published_articles()
             .filter_by(section=slug)
@@ -443,6 +446,44 @@ def create_app() -> Flask:
             medical_context=(slug == "medicine"),
             page_id=f"direction-{slug}",
         )
+
+    @app.route("/directions/life-os/dis/<stream>/", methods=["GET", "POST"])
+    def lifeos_workspace(stream):
+        if stream not in STREAMS:
+            abort(404)
+        if request.method == "POST":
+            if not current_user.is_authenticated:
+                abort(403)
+            try:
+                item, created = save_material(stream, request.form.get("title", ""), request.form.get("source_url", ""), body=request.form.get("body", ""), summary=request.form.get("summary", ""), evidence=request.form.get("evidence", "Требует проверки"))
+                flash("Материал сохранён на портале." if created else "Источник уже сохранён; дубль не создан.", "success")
+                return redirect(url_for("lifeos_material", material_id=item.id))
+            except ValueError as exc:
+                flash(str(exc), "error")
+        query = request.args.get("q", "").strip()[:200]
+        materials = LifeOSMaterial.query.filter_by(stream=stream)
+        if query:
+            pattern = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+            materials = materials.filter(or_(LifeOSMaterial.title.ilike(pattern, escape="\\"), LifeOSMaterial.body.ilike(pattern, escape="\\"), LifeOSMaterial.summary.ilike(pattern, escape="\\")))
+        return render_template("lifeos_workspace.html", stream=stream, stream_info=STREAMS[stream], materials=materials.order_by(LifeOSMaterial.created_at.desc()).limit(100).all(), query=query, page_id="direction-life-os")
+
+    @app.route("/directions/life-os/dis/material/<int:material_id>/")
+    def lifeos_material(material_id):
+        item = db.get_or_404(LifeOSMaterial, material_id)
+        return render_template("lifeos_material.html", item=item, stream_info=STREAMS[item.stream], page_id="direction-life-os")
+
+    @app.route("/directions/life-os/dis/security/collect/", methods=["POST"])
+    @login_required
+    def lifeos_collect_security():
+        created, errors = collect_securitylab()
+        flash(f"Добавлено материалов: {created}." + (" Не удалось прочитать ленты: " + ", ".join(errors) if errors else ""), "error" if errors else "success")
+        return redirect(url_for("lifeos_workspace", stream="security"))
+
+    @app.route("/directions/life-os/dis/notion-report/<int:material_id>/")
+    @login_required
+    def lifeos_notion_report(material_id):
+        item = db.get_or_404(LifeOSMaterial, material_id)
+        return jsonify(title=item.title, report=item.summary, portal_url=app.config["SITE_URL"] + url_for("lifeos_material", material_id=item.id))
 
     @app.route("/directions/<section_slug>/<topic_slug>/")
     def topic_detail(section_slug: str, topic_slug: str):

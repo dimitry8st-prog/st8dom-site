@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ stream_info.title }} — Life-OS{% endblock %}
+{% block content %}
+<div class="container">
+<section class="s">
+<a href="{{ url_for('direction_detail', slug='life-os') }}#dis-workspace">← ДИС — рабочая система</a>
+<h1>{{ stream_info.title }}</h1><p class="lead">{{ stream_info.description }}</p>
+<form method="get" class="hero-cta">
+<label for="lifeos-search">Поиск по материалам</label>
+<input id="lifeos-search" name="q" value="{{ query }}" maxlength="200" placeholder="Тема, заголовок или CVE">
+<button class="btn btn-primary" type="submit">Найти</button>
+</form>
+{% if stream == 'security' %}
+<p><a href="https://www.securitylab.ru/" target="_blank" rel="noopener noreferrer">SecurityLab.ru</a> · <a href="https://www.google.com/search?q=site%3Asecuritylab.ru+{{ query|urlencode }}" target="_blank" rel="noopener noreferrer">Поиск на SecurityLab</a></p>
+{% if current_user.is_authenticated %}
+<form method="post" action="{{ url_for('lifeos_collect_security') }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-primary" type="submit">Собрать RSS SecurityLab</button>
+<p>Новости, уязвимости, статьи и софт. Сохраняются анонсы и источники; повторные URL пропускаются.</p>
+</form>
+{% endif %}
+{% endif %}
+<div class="materials-grid" style="margin-top:24px">
+{% for item in materials %}
+<article class="portal-project-card"><span class="content-status">{{ item.evidence }}</span><h2><a href="{{ url_for('lifeos_material', material_id=item.id) }}">{{ item.title }}</a></h2><p>{{ item.summary }}</p><p>{{ item.published_date }}</p></article>
+{% else %}<p>{{ 'Совпадений не найдено.' if query else 'Материалов пока нет. Добавьте первый источник или выполните сбор RSS.' }}</p>{% endfor %}
+</div>
+{% if current_user.is_authenticated %}
+<details style="margin-top:32px"><summary>Добавить материал</summary>
+<form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<p><label>Заголовок <input name="title" required maxlength="500"></label></p>
+<p><label>Источник <input name="source_url" type="url" required maxlength="1500"></label></p>
+<p><label>Тип материала <select name="evidence"><option>Требует проверки</option><option>Подтверждённый научный результат</option><option>Теоретическая модель</option><option>Гипотеза</option><option>Исторический факт</option><option>Культурная интерпретация</option><option>Легенда / фантастика</option></select></label></p>
+<p><label>Короткий отчёт для Notion <textarea name="summary" rows="4" maxlength="2000"></textarea></label></p>
+<p><label>Материал / исследовательские заметки <textarea name="body" rows="12" maxlength="100000"></textarea></label></p>
+<button class="btn btn-primary" type="submit">Сохранить в Life-OS</button>
+</form></details>
+{% else %}<p><a href="{{ url_for('admin_login', next=request.path) }}">Войти в админку для добавления и сбора</a></p>{% endif %}
+</section></div>
+{% endblock %}

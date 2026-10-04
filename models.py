@@ -424,3 +424,18 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
     paid_at = db.Column(db.DateTime, nullable=True, index=True)
     refunded_at = db.Column(db.DateTime, nullable=True)
+
+
+class LifeOSMaterial(db.Model):
+    """Личные материалы трёх независимых направлений Life-OS."""
+    __tablename__ = "lifeos_materials"
+    id = db.Column(db.Integer, primary_key=True)
+    stream = db.Column(db.String(32), nullable=False, index=True)
+    title = db.Column(db.String(500), nullable=False)
+    source_url = db.Column(db.String(1500), nullable=False, unique=True)
+    body = db.Column(db.Text, nullable=False, default="")
+    summary = db.Column(db.Text, nullable=False, default="")
+    evidence = db.Column(db.String(80), nullable=False, default="Требует проверки")
+    published_date = db.Column(db.String(100), nullable=False, default="")
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    notion_page_id = db.Column(db.String(64), nullable=True)

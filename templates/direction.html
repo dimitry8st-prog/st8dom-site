@@ -15,7 +15,7 @@
       <h1>{{ section.title }}</h1>
       <p class="hero-sub">{{ section.summary }}</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#topics">Выбрать тему</a>
+        <a class="btn btn-primary" href="{{ '#dis-workspace' if slug == 'life-os' else '#topics' }}">Выбрать тему</a>
         <a class="btn btn-ghost" href="{{ url_for('projects_catalog') }}">Смотреть проекты</a>
       </div>
     </div>
@@ -44,6 +44,24 @@
     </figure>
     {% endif %}
   </section>
+
+  {% if slug == 'life-os' %}
+  <section class="s" id="dis-workspace">
+    <div class="s-label"><span>//</span> личное пространство</div>
+    <h2>ДИС — рабочая система</h2>
+    <p class="lead">Материалы собираются и хранятся здесь. В Notion отражаются заголовки, ссылки на портал и короткие отчёты.</p>
+    <div class="topic-grid">
+      {% for key, block in lifeos_streams.items() %}
+      <a class="topic-card" href="{{ url_for('lifeos_workspace', stream=key) }}">
+        <span class="topic-number">0{{ loop.index }}</span>
+        <h3>{{ block.title }}</h3><p>{{ block.description }}</p>
+        <span class="content-status">Материалы и поиск →</span>
+      </a>
+      {% endfor %}
+    </div>
+    <p class="editorial-notice">Три направления хранятся раздельно. Научные результаты, гипотезы и культурные трактовки имеют отдельные отметки.</p>
+  </section>
+  {% endif %}
 
   {% if latest_materials %}
   <section class="s">
