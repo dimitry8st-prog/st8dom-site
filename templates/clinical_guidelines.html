@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Клинические рекомендации по неврологии и нейрохирургии — портал ДИС{% endblock %}
-{% block description %}Карточки российских и международных клинических рекомендаций по неврологии и нейрохирургии со ссылками на официальные источники.{% endblock %}
+{% block title %}Клинические рекомендации: неврология, нейрохирургия, остеопороз — портал ДИС{% endblock %}
+{% block description %}Карточки российских и международных клинических рекомендаций по неврологии, нейрохирургии и остеопорозу со ссылками на официальные источники.{% endblock %}
 {% block canonical %}{{ site_url }}{{ url_for('clinical_guidelines_catalog') }}{% endblock %}
 
 {% block content %}
@@ -8,7 +8,7 @@
   <section class="hero guideline-hero">
     <p class="eyebrow"><a href="{{ url_for('direction_detail', slug='medicine') }}">Медицина</a> / официальный мониторинг</p>
     <h1>Клинические рекомендации</h1>
-    <p class="hero-sub">Неврология и нейрохирургия. Система сохраняет дату, версию и прямую ссылку на первоисточник. Карточка не заменяет оригинальный документ.</p>
+    <p class="hero-sub">Неврология, нейрохирургия и остеопороз. Система сохраняет дату, версию и прямую ссылку на первоисточник. Карточка не заменяет оригинальный документ.</p>
   </section>
 
   <form class="material-filters" method="get" action="{{ url_for('clinical_guidelines_catalog') }}" role="search">

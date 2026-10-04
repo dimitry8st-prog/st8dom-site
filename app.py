@@ -552,18 +552,20 @@ def create_app() -> Flask:
             query = query.filter(ClinicalGuideline.source_key == source_key)
         else:
             source_key = ""
-        if search:
-            pattern = f"%{search}%"
-            query = query.filter(
-                or_(
-                    ClinicalGuideline.title.ilike(pattern),
-                    ClinicalGuideline.organization.ilike(pattern),
-                    ClinicalGuideline.codes.ilike(pattern),
-                )
-            )
         guidelines = query.order_by(
             ClinicalGuideline.published_on.desc(), ClinicalGuideline.id.desc()
         ).all()
+        if search:
+            # SQLite ILIKE does not fold Cyrillic case. The catalog is small;
+            # apply Unicode casefold after the source/kind database filters.
+            needle = search.casefold()
+            guidelines = [
+                item for item in guidelines
+                if any(
+                    needle in (value or "").casefold()
+                    for value in (item.title, item.organization, item.codes)
+                )
+            ]
         return render_template(
             "clinical_guidelines.html",
             guidelines=guidelines,

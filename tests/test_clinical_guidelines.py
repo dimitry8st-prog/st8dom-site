@@ -157,3 +157,27 @@ def test_filter_accepts_neurosurgical_condition():
         "Mkbs": [{"MkbName": "Травматическое повреждение мозга", "MkbCode": "S06.3"}],
     }
     assert is_neurology_or_neurosurgery(item) is True
+
+
+def test_osteoporosis_is_synced_with_correct_specialty_and_search(client):
+    external_id = "test-osteoporosis-5"
+    cleanup("minzdrav", external_id)
+    item = {
+        **minzdrav_item(external_id),
+        "Name": "Остеопороз",
+        "Developers": [{"NkoName": "Российская ассоциация эндокринологов"}],
+        "Mkbs": [{"MkbCode": "M81.0"}],
+        "Specialities": [{"ReferenceName": "Эндокринология"}],
+    }
+    try:
+        with app.app_context():
+            stats = sync_minzdrav([item])
+            assert stats["created"] == 1
+            record = ClinicalGuideline.query.filter_by(external_id=external_id).one()
+            assert record.specialties == "Эндокринология"
+        for search in ("остеопороз", "ОСТЕОПОРОЗ", "ОсТеОпОрОз", "эндокринологов", "m81.0"):
+            response = client.get("/clinical-guidelines/", query_string={"kind": "russian", "q": search})
+            assert response.status_code == 200
+            assert f"view-cr/{external_id}".encode() in response.data
+    finally:
+        cleanup("minzdrav", external_id)

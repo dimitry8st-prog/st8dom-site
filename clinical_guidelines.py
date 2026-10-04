@@ -233,7 +233,11 @@ def is_neurology_or_neurosurgery(item: dict) -> bool:
     диагнозов встречается один код G/F/I или в МКБ-описании есть слово
     «неврологический». Основной сигнал — название рекомендации.
     """
+    # Остеопороз добавлен в каталог по отдельному запросу автора портала.
+    # Точное название сохраняет узкий отбор остальных смежных документов.
     title = str(item.get("Name") or "").casefold()
+    if title.strip() == "остеопороз":
+        return True
     if any(term in title for term in NEURO_TITLE_TERMS):
         return True
 
@@ -348,7 +352,15 @@ def _minzdrav_payload(item: dict) -> dict:
         "organization": developers,
         "version": str(item.get("Version") or ""),
         "codes": codes,
-        "specialties": "Неврология / нейрохирургия",
+        "specialties": (
+            " / ".join(
+                row.get("ReferenceName", "").strip()
+                for row in item.get("Specialities") or []
+                if row.get("ReferenceName")
+            ) or "Гериатрия / Ревматология / Травматология и ортопедия / Эндокринология"
+            if str(item.get("Name") or "").strip().casefold() == "остеопороз"
+            else "Неврология / нейрохирургия"
+        ),
         "url": MINZDRAV_VIEW_URL.format(code_version=code_version),
         "published_on": str(item.get("PublishDateStr") or "")[:10] or None,
         "status": "active" if int(item.get("Status") or 0) == 0 else "inactive",
