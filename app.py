@@ -77,7 +77,7 @@ from payments_robokassa import (
 )
 from products import PRODUCTS, PRODUCTS_BY_SLUG
 from lifeos_import import ImportValidationError, import_lifeos_package
-from lifeos_workspace import STREAMS, save_material, collect_securitylab
+from lifeos_workspace import STREAMS, SCIENCE_STREAMS, ALL_STREAMS, save_material, collect_securitylab
 from library_content import (
     LIBRARY_CATEGORIES,
     LIBRARY_ITEMS,
@@ -360,7 +360,7 @@ def create_app() -> Flask:
             response.headers.setdefault(
                 "Strict-Transport-Security", "max-age=31536000"
             )
-        if request.path.startswith(("/admin/", "/directions/life-os")):
+        if request.path.startswith(("/admin/", "/directions/life-os", "/api/life-os/")):
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -436,6 +436,7 @@ def create_app() -> Flask:
             section=section,
             slug=slug,
             lifeos_streams=STREAMS,
+            lifeos_science_streams=SCIENCE_STREAMS,
             related_projects=related_projects,
             latest_materials=published_articles()
             .filter_by(section=slug)
@@ -449,7 +450,7 @@ def create_app() -> Flask:
 
     @app.route("/directions/life-os/dis/<stream>/", methods=["GET", "POST"])
     def lifeos_workspace(stream):
-        if stream not in STREAMS:
+        if stream not in ALL_STREAMS:
             abort(404)
         if request.method == "POST":
             if not current_user.is_authenticated:
@@ -465,12 +466,59 @@ def create_app() -> Flask:
         if query:
             pattern = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
             materials = materials.filter(or_(LifeOSMaterial.title.ilike(pattern, escape="\\"), LifeOSMaterial.body.ilike(pattern, escape="\\"), LifeOSMaterial.summary.ilike(pattern, escape="\\")))
-        return render_template("lifeos_workspace.html", stream=stream, stream_info=STREAMS[stream], materials=materials.order_by(LifeOSMaterial.created_at.desc()).limit(100).all(), query=query, page_id="direction-life-os")
+        return render_template("lifeos_workspace.html", stream=stream, stream_info=ALL_STREAMS[stream], materials=materials.order_by(LifeOSMaterial.created_at.desc()).limit(100).all(), query=query, page_id="direction-life-os")
 
     @app.route("/directions/life-os/dis/material/<int:material_id>/")
     def lifeos_material(material_id):
         item = db.get_or_404(LifeOSMaterial, material_id)
-        return render_template("lifeos_material.html", item=item, stream_info=STREAMS[item.stream], page_id="direction-life-os")
+        return render_template("lifeos_material.html", item=item, stream_info=ALL_STREAMS[item.stream], page_id="direction-life-os")
+
+    def require_lifeos_ingest_token():
+        token = (app.config.get("LIFEOS_INGEST_TOKEN") or "").strip()
+        if not token:
+            abort(503, description="Импорт Life-OS не настроен.")
+        if not hmac.compare_digest(request.headers.get("Authorization", "").encode("utf-8"), f"Bearer {token}".encode("utf-8")):
+            abort(401)
+
+    @app.post("/api/life-os/mit/import/")
+    @csrf.exempt
+    def api_lifeos_mit_import():
+        require_lifeos_ingest_token()
+        from lifeos_ingest import validate_mit_batch
+        try:
+            records = validate_mit_batch(request.get_json(silent=True))
+        except ValueError as exc:
+            return jsonify(ok=False, error=str(exc)), 400
+        created = 0
+        for fields in records:
+            _, added = save_material(**fields)
+            created += added
+        return jsonify(ok=True, created=created, existing=len(records) - created)
+
+    @app.get("/api/life-os/mit/pending/")
+    def api_lifeos_mit_pending():
+        require_lifeos_ingest_token()
+        items = LifeOSMaterial.query.filter(LifeOSMaterial.stream.in_(SCIENCE_STREAMS), LifeOSMaterial.notion_page_id.is_(None), LifeOSMaterial.source_url.startswith("https://news.mit.edu/")).order_by(LifeOSMaterial.id).limit(100).all()
+        return jsonify(reports=[dict(id=item.id, title=item.title, report=item.summary, portal_url=app.config["SITE_URL"] + url_for("lifeos_material", material_id=item.id)) for item in items])
+
+    @app.post("/api/life-os/mit/reports/<int:material_id>/ack/")
+    @csrf.exempt
+    def api_lifeos_mit_ack(material_id):
+        require_lifeos_ingest_token()
+        from uuid import UUID
+        payload = request.get_json(silent=True)
+        try:
+            page_id = str(UUID(payload["notion_page_id"]))
+        except (ValueError, TypeError, KeyError, AttributeError):
+            return jsonify(ok=False, error="Нужен notion_page_id в формате UUID."), 400
+        item = db.get_or_404(LifeOSMaterial, material_id)
+        if item.stream not in SCIENCE_STREAMS or not item.source_url.startswith("https://news.mit.edu/"):
+            abort(404)
+        if item.notion_page_id and item.notion_page_id != page_id:
+            return jsonify(ok=False, error="Отчёт уже связан с другой страницей."), 409
+        item.notion_page_id = page_id
+        db.session.commit()
+        return jsonify(ok=True, id=item.id)
 
     @app.route("/directions/life-os/dis/security/collect/", methods=["POST"])
     @login_required

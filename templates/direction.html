@@ -93,6 +93,11 @@
   <section class="s lifeos-sources">
     <div class="s-label"><span>//</span> глобальная карта источников</div>
     <h2>Научные потоки Life-OS</h2>
+    <div class="topic-grid">
+      {% for key, block in lifeos_science_streams.items() %}
+      <a class="topic-card" href="{{ url_for('lifeos_workspace', stream=key) }}"><h3>{{ block.title }}</h3><p>{{ block.description }}</p><span class="content-status">Материалы и поиск →</span></a>
+      {% endfor %}
+    </div>
     <p class="lead">Life-OS собирает материалы только из проверяемых научных и университетских источников. Источник сохраняется всегда, а публикация на портале проходит отдельную авторскую проверку.</p>
 
     <div class="topic-grid">

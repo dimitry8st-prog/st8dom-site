@@ -37,6 +37,8 @@ class Config:
     # используется пароль администратора, чтобы защита работала сразу.
     LIFEOS_USERNAME = os.environ.get("LIFEOS_USERNAME", "lifeos")
     LIFEOS_PASSWORD = os.environ.get("LIFEOS_PASSWORD", ADMIN_PASSWORD)
+    # Отдельный ключ записи для n8n; без него API выключен.
+    LIFEOS_INGEST_TOKEN = os.environ.get("LIFEOS_INGEST_TOKEN", "")
 
     # Публичный канонический URL — для SEO, sitemap и Open Graph.
     SITE_URL = os.environ.get("SITE_URL", "https://st8dom.ru").rstrip("/")
