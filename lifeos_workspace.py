@@ -15,6 +15,12 @@ STREAMS = {
     "culture": {"title": "Культурно-исторический слой", "description": "История идей, религиозная философия, традиции, космизм и представления о бессмертии. Исторические факты отделяются от интерпретаций и легенд."},
     "security": {"title": "Кибербезопасность", "description": "Уязвимости, защита сайтов, API, Docker, n8n, сетей и AI-агентов. Поиск и сбор материалов SecurityLab.ru."},
 }
+SCIENCE_STREAMS = {
+    "science-ai": {"title": "AI и технологии", "description": "Исследования AI, машинного обучения и инженерии. Анонсы требуют проверки первоисточника."},
+    "science-neuro": {"title": "Медицина и нейронауки", "description": "Медицинские исследования, нейронауки и общественное здоровье. Новости отделяются от клинических рекомендаций."},
+    "science-longevity": {"title": "Долголетие", "description": "Старение, geroscience и продление здоровой жизни. Результаты на людях, животных и клетках рассматриваются раздельно."},
+}
+ALL_STREAMS = {**STREAMS, **SCIENCE_STREAMS}
 FEEDS = {name: f"https://www.securitylab.ru/_Services/Export/RSS/{name}/" for name in ("news", "vulnerabilities", "analytics", "software")}
 
 
@@ -27,7 +33,7 @@ def normalize_url(value):
 
 
 def save_material(stream, title, source_url, body="", summary="", evidence="Требует проверки", published_date=""):
-    if stream not in STREAMS or not title.strip():
+    if stream not in ALL_STREAMS or not title.strip():
         raise ValueError("Укажите направление и заголовок.")
     url = normalize_url(source_url)
     existing = LifeOSMaterial.query.filter_by(source_url=url).first()
