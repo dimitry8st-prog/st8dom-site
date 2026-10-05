@@ -604,6 +604,16 @@ def create_app() -> Flask:
                 .limit(8)
                 .all()
             )
+        elif section_slug == "medicine" and topic_slug == "rehabilitation":
+            guidelines = (
+                public_guidelines_query()
+                .filter(db.or_(
+                    ClinicalGuideline.title.ilike("%инсульт%"),
+                    ClinicalGuideline.title.ilike("%stroke%"),
+                ))
+                .order_by(ClinicalGuideline.published_on.desc(), ClinicalGuideline.id.desc())
+                .all()
+            )
         return render_template(
             "topic.html",
             section=section,

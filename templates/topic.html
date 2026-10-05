@@ -55,9 +55,11 @@
   {% if guidelines %}
   <section class="s">
     <div class="s-label"><span>//</span> официальный мониторинг</div>
-    <h2>Последние клинические рекомендации</h2>
+    <h2>{{ "Клинические рекомендации по инсульту" if topic.slug == 'rehabilitation' else "Последние клинические рекомендации" }}</h2>
+    {% for group in guidelines|groupby('kind') %}
+    <h3>{{ "Российские рекомендации" if group.grouper == 'russian' else "Международные рекомендации" }}</h3>
     <div class="guideline-grid">
-      {% for item in guidelines %}
+      {% for item in group.list %}
       <article class="guideline-card">
         <div class="guideline-card__meta">
           <span>{{ "Россия" if item.is_russian else "Международные" }}</span>
@@ -69,6 +71,8 @@
       </article>
       {% endfor %}
     </div>
+    <a class="btn btn-ghost" href="{{ url_for('clinical_guidelines_catalog', kind=group.grouper, q='инсульт' if topic.slug == 'rehabilitation' else '') }}">{{ "Все российские рекомендации" if group.grouper == 'russian' else "Все международные рекомендации" }}</a>
+    {% endfor %}
     <a class="btn btn-ghost" href="{{ url_for('clinical_guidelines_catalog') }}">Все рекомендации</a>
   </section>
   {% endif %}

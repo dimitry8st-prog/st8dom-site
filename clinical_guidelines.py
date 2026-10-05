@@ -81,6 +81,11 @@ OFFICIAL_SOURCES = {
         "kind": "international",
         "domains": {"who.int", "www.who.int"},
     },
+    "canadian_stroke": {
+        "name": "Heart & Stroke Canada — Canadian Stroke Best Practices",
+        "kind": "international",
+        "domains": {"strokebestpractices.ca", "www.strokebestpractices.ca"},
+    },
     "aha_asa": {
         "name": "American Heart Association / American Stroke Association",
         "kind": "international",

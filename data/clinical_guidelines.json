@@ -2,6 +2,30 @@
   "schema_version": 1,
   "items": [
     {
+      "source_key": "aha_asa",
+      "external_id": "AHA-ASA-STROKE-REHABILITATION-2026",
+      "title": "Реабилитация и восстановление взрослых после инсульта — AHA/ASA 2026",
+      "organization": "American Heart Association / American Stroke Association",
+      "version": "2026",
+      "codes": "Stroke rehabilitation",
+      "specialties": "Неврология / медицинская реабилитация",
+      "url": "https://professional.heart.org/en/science-news/2026-guideline-for-adult-stroke-rehabilitation-and-recovery",
+      "published_on": "2026-08-27",
+      "status": "active"
+    },
+    {
+      "source_key": "canadian_stroke",
+      "external_id": "CSBPR-REHABILITATION-MOBILITY-2025",
+      "title": "Восстановление движений, равновесия, ходьбы и аэробная нагрузка после инсульта — Canadian Stroke Best Practices",
+      "organization": "Heart & Stroke Canada",
+      "version": "2025",
+      "codes": "Stroke rehabilitation / mobility / aerobic training",
+      "specialties": "Неврология / медицинская реабилитация / ЛФК",
+      "url": "https://www.strokebestpractices.ca/recommendations/stroke-rehabilitation-delivery/4-lower-extremity-balance-mobility-and-aerobic-training",
+      "published_on": null,
+      "status": "active"
+    },
+    {
       "source_key": "ahs",
       "external_id": "AAN-AHS-2026-MIGRAINE-PREVENTION",
       "title": "Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations",
