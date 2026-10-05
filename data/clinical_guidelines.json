@@ -2,6 +2,54 @@
   "schema_version": 1,
   "items": [
     {
+      "source_key": "ahs",
+      "external_id": "AAN-AHS-2026-MIGRAINE-PREVENTION",
+      "title": "Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations",
+      "organization": "American Academy of Neurology / American Headache Society",
+      "version": "2026",
+      "codes": "Migraine prevention",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://www.neurology.org/doi/10.1212/WNL.0000000000214881",
+      "published_on": "2026-08-31",
+      "status": "active"
+    },
+    {
+      "source_key": "bash",
+      "external_id": "BASH-MIGRAINE-GUIDELINES",
+      "title": "BASH Guidelines for Headache Disorders",
+      "organization": "British Association for the Study of Headache",
+      "version": "current",
+      "codes": "Migraine / headache disorders",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://bash.org.uk/guidelines/",
+      "published_on": null,
+      "status": "active"
+    },
+    {
+      "source_key": "ehf",
+      "external_id": "EHF-2022-CGRP-MABS",
+      "title": "European Headache Federation guideline on monoclonal antibodies targeting the CGRP pathway for migraine prevention — 2022 update",
+      "organization": "European Headache Federation",
+      "version": "2022",
+      "codes": "Migraine prevention / CGRP",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35690723/",
+      "published_on": "2022-06-11",
+      "status": "active"
+    },
+    {
+      "source_key": "ihs",
+      "external_id": "IHS-2024-PREVENTIVE-MIGRAINE",
+      "title": "International Headache Society Global Practice Recommendations for Preventive Pharmacological Treatment of Migraine",
+      "organization": "International Headache Society",
+      "version": "2024",
+      "codes": "Migraine prevention",
+      "specialties": "Neurology / Headache medicine",
+      "url": "https://journals.sagepub.com/doi/10.1177/03331024241269735",
+      "published_on": "2024-09-01",
+      "status": "active"
+    },
+    {
       "source_key": "minzdrav",
       "external_id": "995_1",
       "title": "Вирусные менингиты у детей",
@@ -27,6 +75,30 @@
     },
     {
       "source_key": "minzdrav",
+      "external_id": "567_2",
+      "title": "Клещевой вирусный энцефалит у взрослых",
+      "organization": "Национальная ассоциация специалистов по инфекционным болезням имени академика В. И. Покровского (НАСИБ)",
+      "version": "2",
+      "codes": "A84, A84.0, A84.1, A84.8, A84.9",
+      "specialties": "Неврология / нейрохирургия",
+      "url": "https://cr.minzdrav.gov.ru/view-cr/567_2",
+      "published_on": "2025-10-23",
+      "status": "active"
+    },
+    {
+      "source_key": "minzdrav",
+      "external_id": "1031_1",
+      "title": "Клещевой вирусный энцефалит у детей",
+      "organization": "Межрегиональная общественная организация \"Ассоциация врачей-инфекционистов Санкт-Петербурга и Ленинградской области\", Международная общественная организация \"Евро-Азиатское общество по инфекционным болезням\"",
+      "version": "1",
+      "codes": "A84, A87.8",
+      "specialties": "Неврология / нейрохирургия",
+      "url": "https://cr.minzdrav.gov.ru/view-cr/1031_1",
+      "published_on": "2026-05-04",
+      "status": "active"
+    },
+    {
+      "source_key": "minzdrav",
       "external_id": "165_2",
       "title": "Миастения",
       "organization": "Всероссийское общество неврологов, Общероссийская общественная организация \"Союз реабилитологов России\"",
@@ -39,6 +111,18 @@
     },
     {
       "source_key": "minzdrav",
+      "external_id": "295_4",
+      "title": "Мигрень",
+      "organization": "Всероссийское общество неврологов; Российское общество по изучению головной боли; Союз реабилитологов России",
+      "version": "4",
+      "codes": "G43, G43.0, G43.1, G43.2, G43.3, G43.8, G43.9, G44.0, G44.1, G44.4",
+      "specialties": "Неврология",
+      "url": "https://cr.minzdrav.gov.ru/view-cr/295_4",
+      "published_on": "2024-10-25",
+      "status": "active"
+    },
+    {
+      "source_key": "minzdrav",
       "external_id": "988_1",
       "title": "Мононевропатии",
       "organization": "Ассоциация нейрохирургов России, Всероссийское общество неврологов, Общероссийская общественная организация \"Союз реабилитологов России\", Ассоциация специалистов по клинической нейрофизиологии",
@@ -47,6 +131,18 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/988_1",
       "published_on": "2025-12-22",
+      "status": "active"
+    },
+    {
+      "source_key": "minzdrav",
+      "external_id": "87_5",
+      "title": "Остеопороз",
+      "organization": "Российская ассоциация эндокринологов, Ассоциация ревматологов России, Ассоциация травматологов-ортопедов России, Ассоциация гинекологов – эндокринологов России, Общественная организация \"Российская ассоциация по остеопорозу\", Общероссийская общественная организация «Российская ассоциация геронтологов и гериатров»",
+      "version": "5",
+      "codes": "M81.0, M81.1, M81.2, M81.3, M81.4, M81.5, M81.8, M81.9",
+      "specialties": "Гериатрия / Ревматология / Травматология и ортопедия / Эндокринология",
+      "url": "https://cr.minzdrav.gov.ru/view-cr/87_5",
+      "published_on": "2025-12-30",
       "status": "active"
     },
     {
@@ -135,6 +231,18 @@
     },
     {
       "source_key": "minzdrav",
+      "external_id": "1077_1",
+      "title": "Транстиретиновая семейная амилоидная полинейропатия",
+      "organization": "Автономная некоммерческая организация \"Национальное общество по изучению сердечной недостаточности и заболеваний миокарда\", Общероссийская общественная организация \"Российское общество патологоанатомов\", Ассоциация медицинских генетиков, Региональная общественная организация «Общество специалистов по нервно-мышечным болезням»",
+      "version": "1",
+      "codes": "E85.1",
+      "specialties": "Неврология / нейрохирургия",
+      "url": "https://cr.minzdrav.gov.ru/view-cr/1077_1",
+      "published_on": "2026-09-28",
+      "status": "active"
+    },
+    {
+      "source_key": "minzdrav",
       "external_id": "493_3",
       "title": "Черепно-мозговая травма у детей",
       "organization": "Ассоциация нейрохирургов России, Всероссийское Общество по детской нейрохирургии",
@@ -143,54 +251,6 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/493_3",
       "published_on": "2026-01-12",
-      "status": "active"
-    },
-    {
-      "source_key": "minzdrav",
-      "external_id": "295_4",
-      "title": "Мигрень",
-      "organization": "Всероссийское общество неврологов; Российское общество по изучению головной боли; Союз реабилитологов России",
-      "version": "4",
-      "codes": "G43, G43.0, G43.1, G43.2, G43.3, G43.8, G43.9, G44.0, G44.1, G44.4",
-      "specialties": "Неврология",
-      "url": "https://cr.minzdrav.gov.ru/view-cr/295_4",
-      "published_on": "2024-10-25",
-      "status": "active"
-    },
-    {
-      "source_key": "ahs",
-      "external_id": "AAN-AHS-2026-MIGRAINE-PREVENTION",
-      "title": "Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations",
-      "organization": "American Academy of Neurology / American Headache Society",
-      "version": "2026",
-      "codes": "Migraine prevention",
-      "specialties": "Neurology / Headache medicine",
-      "url": "https://www.neurology.org/doi/10.1212/WNL.0000000000214881",
-      "published_on": "2026-08-31",
-      "status": "active"
-    },
-    {
-      "source_key": "ihs",
-      "external_id": "IHS-2024-PREVENTIVE-MIGRAINE",
-      "title": "International Headache Society Global Practice Recommendations for Preventive Pharmacological Treatment of Migraine",
-      "organization": "International Headache Society",
-      "version": "2024",
-      "codes": "Migraine prevention",
-      "specialties": "Neurology / Headache medicine",
-      "url": "https://journals.sagepub.com/doi/10.1177/03331024241269735",
-      "published_on": "2024-09-01",
-      "status": "active"
-    },
-    {
-      "source_key": "ehf",
-      "external_id": "EHF-2022-CGRP-MABS",
-      "title": "European Headache Federation guideline on monoclonal antibodies targeting the CGRP pathway for migraine prevention — 2022 update",
-      "organization": "European Headache Federation",
-      "version": "2022",
-      "codes": "Migraine prevention / CGRP",
-      "specialties": "Neurology / Headache medicine",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/35690723/",
-      "published_on": "2022-06-11",
       "status": "active"
     },
     {
@@ -203,30 +263,6 @@
       "specialties": "Neurology / Primary care",
       "url": "https://www.nice.org.uk/guidance/cg150",
       "published_on": "2025-06-03",
-      "status": "active"
-    },
-    {
-      "source_key": "bash",
-      "external_id": "BASH-MIGRAINE-GUIDELINES",
-      "title": "BASH Guidelines for Headache Disorders",
-      "organization": "British Association for the Study of Headache",
-      "version": "current",
-      "codes": "Migraine / headache disorders",
-      "specialties": "Neurology / Headache medicine",
-      "url": "https://bash.org.uk/guidelines/",
-      "published_on": null,
-      "status": "active"
-    },
-    {
-      "source_key": "minzdrav",
-      "external_id": "87_5",
-      "title": "Остеопороз",
-      "organization": "Российская ассоциация эндокринологов, Ассоциация ревматологов России, Ассоциация травматологов-ортопедов России, Ассоциация гинекологов – эндокринологов России, Общественная организация \"Российская ассоциация по остеопорозу\", Общероссийская общественная организация «Российская ассоциация геронтологов и гериатров»",
-      "version": "5",
-      "codes": "M81.0, M81.1, M81.2, M81.3, M81.4, M81.5, M81.8, M81.9",
-      "specialties": "Гериатрия / Ревматология / Травматология и ортопедия / Эндокринология",
-      "url": "https://cr.minzdrav.gov.ru/view-cr/87_5",
-      "published_on": "2025-12-30",
       "status": "active"
     }
   ]
