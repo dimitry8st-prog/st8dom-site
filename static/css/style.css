@@ -1604,6 +1604,28 @@ section.s {
 }
 
 /* FORMS */
+.product-buy-form {
+  display: grid;
+  gap: 16px;
+}
+
+.product-buy-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 16px;
+}
+
+.product-buy-fields .field { min-width: 0; }
+.product-buy-fields input { box-sizing: border-box; }
+.product-buy-form .pricing-note { margin: 0; }
+.product-buy-form .btn { justify-self: start; }
+.product-name-explanation { font-size: 0.8em; font-weight: 500; }
+
+@media (max-width: 640px) {
+  .product-buy-fields { grid-template-columns: minmax(0, 1fr); }
+}
+
 .form {
   background: var(--card);
   border: 1px solid var(--border);

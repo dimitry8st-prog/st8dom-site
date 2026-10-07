@@ -36,7 +36,7 @@
         <div class="project-card-top">
           <span class="project-kind">{{ product.service_class_label }}</span>
         </div>
-        <h3>{{ product.name }}</h3>
+        <h3>{{ product.name }}{% if product.name_explanation %} <span class="product-name-explanation">({{ product.name_explanation }})</span>{% endif %}</h3>
         <p>{{ product.summary }}</p>
         <p><strong>Срок:</strong> {{ product.delivery_label }}</p>
         <p style="font-size:1.45rem;font-weight:800;margin:18px 0">{{ product.price_label }}</p>
@@ -44,8 +44,16 @@
           {% if payment_enabled %}
           <form method="post" action="{{ url_for('robokassa_checkout', slug=product.slug) }}" class="product-buy-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <label>Имя <input type="text" name="name" maxlength="120" autocomplete="name"></label>
-            <label>Email для заказа и чека <input type="email" name="email" maxlength="255" required autocomplete="email"></label>
+            <div class="product-buy-fields">
+              <div class="field">
+                <label for="buy-name-{{ product.slug }}">Имя (необязательно)</label>
+                <input id="buy-name-{{ product.slug }}" type="text" name="name" maxlength="120" autocomplete="name" placeholder="Как к вам обращаться">
+              </div>
+              <div class="field">
+                <label for="buy-email-{{ product.slug }}">Email для заказа и чека <span class="req">*</span></label>
+                <input id="buy-email-{{ product.slug }}" type="email" name="email" maxlength="255" required autocomplete="email" placeholder="you@example.ru">
+              </div>
+            </div>
             <p class="pricing-note">Нажимая кнопку оплаты, вы принимаете <a href="{{ url_for('offer') }}">Публичную оферту</a> и подтверждаете ознакомление с <a href="{{ url_for('privacy') }}">Политикой обработки персональных данных</a>.</p>
             <button class="btn btn-primary" type="submit">{{ "Тестовая оплата" if payment_test_mode else "Купить" }} — {{ product.price_label }}</button>
           </form>

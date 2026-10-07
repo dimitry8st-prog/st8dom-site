@@ -40,6 +40,7 @@ PRODUCTS = [
     {
         "slug": "meeting-intelligence",
         "name": "Meeting Intelligence",
+        "name_explanation": "расшифровка встреч, решения и задачи",
         "price": 19900,
         "price_label": "19 900 ₽",
         "summary": "Настройка рабочего контура для расшифровки встреч, решений и задач.",
@@ -52,6 +53,7 @@ PRODUCTS = [
     {
         "slug": "reputation-assistant",
         "name": "Reputation Assistant",
+        "name_explanation": "анализ отзывов и подготовка ответов",
         "price": 24900,
         "price_label": "24 900 ₽",
         "summary": "Анализ отзывов, проекты ответов и контроль человеком.",
@@ -64,6 +66,7 @@ PRODUCTS = [
     {
         "slug": "knightcat-content-factory",
         "name": "KnightCat Content Factory",
+        "name_explanation": "создание контента для соцсетей",
         "price": 29900,
         "price_label": "29 900 ₽",
         "summary": "Контент-завод: идея → тексты → изображение → согласование → публикация.",
