@@ -346,7 +346,11 @@ def create_app() -> Flask:
                     "base-uri 'self'",
                     "object-src 'none'",
                     "frame-ancestors 'none'",
-                    "form-action 'self'",
+                    (
+                        "form-action 'self' https://auth.robokassa.ru"
+                        if request.endpoint == "robokassa_checkout" and response.status_code == 200
+                        else "form-action 'self'"
+                    ),
                     "script-src 'self' 'unsafe-inline'",
                     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                     "font-src 'self' https://fonts.gstatic.com data:",

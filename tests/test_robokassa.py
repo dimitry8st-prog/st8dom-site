@@ -33,3 +33,41 @@ def test_missing_password_cannot_validate_publicly_computable_signature():
     signature = hashlib.md5(b"100.00:7:").hexdigest()
     assert not valid_result_signature("100.00", "7", signature, config)
     assert not valid_success_signature("100.00", "7", signature, config)
+
+
+def test_checkout_form_destination_is_allowed_by_browser_policy(client, monkeypatch):
+    from app import app, PRODUCTS_BY_SLUG
+    from extensions import db
+    from models import Order
+    from payments_robokassa import PAY_URL
+    from urllib.parse import urlsplit
+
+    for key, value in {
+        "ROBOKASSA_MERCHANT_LOGIN": "shop",
+        "ROBOKASSA_TEST_MODE": True,
+        "ROBOKASSA_TEST_PASSWORD1": "first",
+        "ROBOKASSA_TEST_PASSWORD2": "second",
+    }.items():
+        monkeypatch.setitem(app.config, key, value)
+    slug = next(key for key, product in PRODUCTS_BY_SLUG.items()
+                if product.get("sellable") and product.get("price"))
+    email = "checkout-csp-test@example.com"
+    try:
+        response = client.post(f"/products/{slug}/checkout/",
+                               data={"name": "Test", "email": email})
+        assert response.status_code == 200
+        assert f'action="{PAY_URL}"'.encode() in response.data
+        destination = urlsplit(PAY_URL)
+        origin = f"{destination.scheme}://{destination.netloc}"
+        directives = response.headers["Content-Security-Policy"].split("; ")
+        assert f"form-action 'self' {origin}" in directives
+        for path in ("/products/", "/admin/login/"):
+            policy = client.get(path).headers["Content-Security-Policy"].split("; ")
+            assert "form-action 'self'" in policy
+            assert origin not in "; ".join(policy)
+        invalid = client.post(f"/products/{slug}/checkout/", data={"email": "invalid"})
+        assert "form-action 'self'" in invalid.headers["Content-Security-Policy"].split("; ")
+    finally:
+        with app.app_context():
+            Order.query.filter_by(email=email).delete()
+            db.session.commit()
