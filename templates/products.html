@@ -37,12 +37,12 @@
         <div class="project-card-top">
           <span class="project-kind">{{ product.service_class_label }}</span>
         </div>
-        <h3>{{ product.name }}{% if product.name_explanation %} <span class="product-name-explanation">({{ product.name_explanation }})</span>{% endif %}</h3>
+        <h3>{% if product.case_slug %}<a class="product-title-link" href="{{ url_for('case_detail', slug=product.case_slug) }}">{% endif %}{{ product.name }}{% if product.name_explanation %} <span class="product-name-explanation">({{ product.name_explanation }})</span>{% endif %}{% if product.case_slug %}</a>{% endif %}</h3>
         <p>{{ product.summary }}</p>
         <p><strong>Срок выполнения:</strong> {{ product.delivery_label }}</p>
         <p style="font-size:1.45rem;font-weight:800;margin:18px 0">{{ product.price_label }}</p>
         {% if product.case_slug %}
-        <p><a href="{{ url_for('case_detail', slug=product.case_slug) }}">Посмотреть пример{% if product.slug == 'martial-arts-site' %} и видеоролик{% endif %}</a>{% if product.demo_url %} · <a href="{{ product.demo_url }}">Открыть лендинг</a>{% endif %}</p>
+        <div class="product-preview-actions"><a class="btn btn-ghost" href="{{ url_for('case_detail', slug=product.case_slug) }}" aria-label="Посмотреть: {{ product.name }}">Посмотреть</a>{% if product.demo_url %}<a class="btn btn-ghost" href="{{ product.demo_url }}">Открыть лендинг</a>{% endif %}</div>
         {% endif %}
         {% if product.sellable %}
           {% if payment_enabled %}

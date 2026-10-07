@@ -1621,6 +1621,10 @@ section.s {
 .product-buy-form .pricing-note { margin: 0; }
 .product-buy-form .btn { justify-self: start; }
 .product-name-explanation { font-size: 0.8em; font-weight: 500; }
+.portal-project-card .product-title-link { color: inherit; text-decoration: none; transition: color 0.18s ease; }
+.portal-project-card .product-title-link:hover,
+.portal-project-card .product-title-link:focus-visible { color: #ffb347; text-decoration: underline; text-underline-offset: 4px; }
+.product-preview-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; }
 
 @media (max-width: 640px) {
   .product-buy-fields { grid-template-columns: minmax(0, 1fr); }
