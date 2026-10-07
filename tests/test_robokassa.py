@@ -6,6 +6,32 @@ import pytest
 from payments_robokassa import enabled, payment_form, valid_result_signature, valid_success_signature
 
 
+@pytest.mark.parametrize("bom", [b"", b"\xef\xbb\xbf"])
+def test_operation_key_xml_uses_response_bytes(monkeypatch, bom):
+    import requests
+    import payments_robokassa as robokassa
+
+    response = requests.Response()
+    response.status_code = 200
+    response.encoding = "ISO-8859-1"
+    response._content = bom + (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<Operation xmlns="urn:robokassa"><OpKey>operation-key</OpKey></Operation>'
+    ).encode("utf-8")
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return response
+
+    monkeypatch.setattr(robokassa.requests, "get", fake_get)
+    config = {"ROBOKASSA_TEST_MODE": False,
+              "ROBOKASSA_MERCHANT_LOGIN": "shop", "ROBOKASSA_PASSWORD2": "second"}
+    assert robokassa.fetch_op_key(SimpleNamespace(id=7), config) == "operation-key"
+    assert calls[0][1]["params"]["Signature"] == hashlib.md5(b"shop:7:second").hexdigest()
+    assert calls[0][1]["timeout"] == 15
+
+
 @pytest.mark.parametrize("test_mode", [True, False])
 def test_payment_credentials_are_separate_for_each_mode(test_mode):
     prefix = "ROBOKASSA_TEST_PASSWORD" if test_mode else "ROBOKASSA_PASSWORD"

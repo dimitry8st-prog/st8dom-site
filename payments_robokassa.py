@@ -121,7 +121,9 @@ def fetch_op_key(order, config) -> str | None:
         timeout=15,
     )
     response.raise_for_status()
-    root = ElementTree.fromstring(response.text)
+    # Parse bytes so the XML declaration/BOM determines the encoding.
+    # requests may otherwise decode text/xml as Latin-1 and corrupt a UTF-8 BOM.
+    root = ElementTree.fromstring(response.content)
     for node in root.iter():
         if node.tag.endswith("OpKey") and node.text:
             return node.text.strip()
