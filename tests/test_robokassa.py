@@ -3,6 +3,19 @@ from types import SimpleNamespace
 
 import pytest
 
+
+def test_refund_http_error_preserves_provider_message(monkeypatch):
+    import requests
+    import payments_robokassa as robokassa
+
+    response = requests.Response()
+    response.status_code = 400
+    response._content = b'{"success":false,"message":"NotEnoughOperationFunds"}'
+    monkeypatch.setattr(robokassa.requests, "post", lambda *args, **kwargs: response)
+    order = SimpleNamespace(robokassa_op_key="operation-key", amount=10)
+    with pytest.raises(RuntimeError, match="HTTP 400: NotEnoughOperationFunds"):
+        robokassa.create_refund(order, {"name": "Service"}, {"ROBOKASSA_PASSWORD3": "test-password-long-enough-for-hs256"})
+
 from payments_robokassa import enabled, payment_form, valid_result_signature, valid_success_signature
 
 

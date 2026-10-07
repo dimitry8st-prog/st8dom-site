@@ -157,6 +157,16 @@ def create_refund(order, product: dict, config, amount: Decimal | None = None) -
 
     token = jwt.encode(payload, password3, algorithm="HS256")
     response = requests.post(REFUND_URL, json=token, timeout=20)
+    if not response.ok:
+        # Preserve the provider's error message without logging the signed request.
+        try:
+            error_data = response.json()
+        except ValueError:
+            error_data = {}
+        message = error_data.get("message") if isinstance(error_data, dict) else None
+        if isinstance(message, str) and message:
+            message = message.replace(token, "[JWT hidden]").replace(password3, "[secret hidden]")[:300]
+            raise RuntimeError(f"Robokassa REFUND HTTP {response.status_code}: {message}")
     response.raise_for_status()
     data = response.json()
     if not data.get("success"):
