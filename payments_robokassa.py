@@ -23,10 +23,11 @@ def money(value) -> str:
 
 
 def enabled(config) -> bool:
+    prefix = "ROBOKASSA_TEST_PASSWORD" if config.get("ROBOKASSA_TEST_MODE") else "ROBOKASSA_PASSWORD"
     return bool(
         config.get("ROBOKASSA_MERCHANT_LOGIN")
-        and config.get("ROBOKASSA_PASSWORD1")
-        and config.get("ROBOKASSA_PASSWORD2")
+        and config.get(prefix + "1")
+        and config.get(prefix + "2")
     )
 
 
@@ -52,8 +53,10 @@ def payment_form(order, product: dict, config) -> dict:
     password1 = (
         config.get("ROBOKASSA_TEST_PASSWORD1")
         if config.get("ROBOKASSA_TEST_MODE")
-        else config["ROBOKASSA_PASSWORD1"]
-    ) or config["ROBOKASSA_PASSWORD1"]
+        else config.get("ROBOKASSA_PASSWORD1")
+    )
+    if not password1:
+        raise ValueError("Не задан пароль №1 для выбранного режима Robokassa.")
     amount = money(order.amount)
     _receipt_raw, receipt_encoded = build_receipt(product)
     signature = hashlib.md5(
@@ -78,8 +81,10 @@ def valid_result_signature(out_sum: str, inv_id: str, signature: str, config) ->
     password2 = (
         config.get("ROBOKASSA_TEST_PASSWORD2")
         if config.get("ROBOKASSA_TEST_MODE")
-        else config["ROBOKASSA_PASSWORD2"]
-    ) or config["ROBOKASSA_PASSWORD2"]
+        else config.get("ROBOKASSA_PASSWORD2")
+    )
+    if not password2:
+        return False
     expected = hashlib.md5(
         f"{out_sum}:{inv_id}:{password2}".encode("utf-8")
     ).hexdigest()
@@ -90,8 +95,10 @@ def valid_success_signature(out_sum: str, inv_id: str, signature: str, config) -
     password1 = (
         config.get("ROBOKASSA_TEST_PASSWORD1")
         if config.get("ROBOKASSA_TEST_MODE")
-        else config["ROBOKASSA_PASSWORD1"]
-    ) or config["ROBOKASSA_PASSWORD1"]
+        else config.get("ROBOKASSA_PASSWORD1")
+    )
+    if not password1:
+        return False
     expected = hashlib.md5(
         f"{out_sum}:{inv_id}:{password1}".encode("utf-8")
     ).hexdigest()
