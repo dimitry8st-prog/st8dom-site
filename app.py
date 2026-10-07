@@ -1173,8 +1173,14 @@ def create_app() -> Flask:
             return redirect(url_for("admin_orders"))
         product = PRODUCTS_BY_SLUG.get(order.product_slug)
         if product is None:
-            flash("Продукт заказа не найден в каталоге.", "error")
-            return redirect(url_for("admin_orders"))
+            # A paid order remains refundable after removal from the catalog.
+            # Portal orders describe services; preserve their recorded name and amount.
+            product = {
+                "slug": order.product_slug,
+                "name": order.product_name,
+                "price": order.amount,
+                "payment_object": "service",
+            }
 
         raw_amount = (request.form.get("amount") or "").strip().replace(",", ".")
         refund_amount = None

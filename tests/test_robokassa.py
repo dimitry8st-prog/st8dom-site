@@ -80,3 +80,50 @@ def test_checkout_form_destination_is_allowed_by_browser_policy(client, monkeypa
         with app.app_context():
             Order.query.filter_by(email=email).delete()
             db.session.commit()
+
+
+def test_paid_order_missing_from_catalog_can_be_refunded(client, monkeypatch):
+    import app as app_module
+    from decimal import Decimal
+    from extensions import db
+    from models import AdminUser, Order
+
+    app = app_module.app
+    email = "refund-catalog-test@example.com"
+    calls = []
+
+    def fake_refund(order, product, config, amount):
+        calls.append((order.id, product, amount))
+        return {"op_key": "operation-key", "request_id": "refund-request"}
+
+    monkeypatch.setattr(app_module, "create_refund", fake_refund)
+    with app.app_context():
+        admin_id = str(AdminUser.query.first().id)
+        order = Order(product_slug="removed-service", product_name="Recorded service",
+                      amount=Decimal("10.00"), email=email, status="paid")
+        db.session.add(order)
+        db.session.commit()
+        order_id = order.id
+    try:
+        with client.session_transaction() as session:
+            session["_user_id"] = admin_id
+            session["_fresh"] = True
+        response = client.post(f"/admin/orders/{order_id}/refund/", data={})
+        assert response.status_code == 302
+        assert len(calls) == 1
+        assert calls[0][1]["name"] == "Recorded service"
+        assert calls[0][1]["price"] == Decimal("10.00")
+        assert calls[0][1]["payment_object"] == "service"
+        assert calls[0][2] is None
+        with app.app_context():
+            order = db.session.get(Order, order_id)
+            assert order.status == "refund_processing"
+            assert order.refund_request_id == "refund-request"
+            assert order.refund_amount == Decimal("10.00")
+        # A repeated click must not submit another refund.
+        client.post(f"/admin/orders/{order_id}/refund/", data={})
+        assert len(calls) == 1
+    finally:
+        with app.app_context():
+            Order.query.filter_by(email=email).delete()
+            db.session.commit()
