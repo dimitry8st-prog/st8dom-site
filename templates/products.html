@@ -5,7 +5,8 @@
 
 {% block content %}
 <div class="container container--wide">
-  <section class="hero" style="padding-bottom:28px">
+  <section class="hero direction-hero direction-hero--longevity">
+    <div class="direction-hero__copy">
     <p class="eyebrow">// услуги и AI-решения</p>
     <h1>Готовые услуги и решения под ключ</h1>
     <p class="hero-sub">Фиксированная цена — для услуг с заранее определённым объёмом. Готовые AI-системы адаптируются под клиента. Сложные интеграции выполняются как индивидуальные проекты после согласования ТЗ.</p>
@@ -14,6 +15,12 @@
     {% elif not payment_enabled %}
       <p class="trust-line">Онлайн-оплата готовится к активации. Заказ можно оставить через форму связи.</p>
     {% endif %}
+    </div>
+    <figure class="direction-hero__visual direction-hero__visual--longevity">
+      <img src="{{ url_for('static', filename='images/services-knightcat-hero.webp') }}"
+           alt="Кот-рыцарь KnightCat в мастерской сайтов, контента и автоматизации"
+           width="1672" height="941" loading="eager" fetchpriority="high">
+    </figure>
   </section>
 
   {% set groups = [
