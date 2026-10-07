@@ -21,9 +21,6 @@
         <p class="hero-sub">{{ case.card_summary }}</p>
         <p class="trust-line">Статус: {{ case.status }}</p>
         <div class="hero-cta">
-          {% if case.repo_url %}
-            <a class="btn btn-primary" href="{{ case.repo_url }}" target="_blank" rel="noopener" data-track="github_click">Репозиторий</a>
-          {% endif %}
           {% if case.demo_url %}
             <a class="btn btn-ghost" href="{{ case.demo_url }}">Открыть демонстрацию</a>
           {% endif %}
@@ -91,9 +88,6 @@
       {% for tag in case.tech %}<span class="tag">{{ tag }}</span> {% endfor %}
     </p>
     <div class="case-actions">
-      {% if case.repo_url %}
-        <a class="btn btn-primary" href="{{ case.repo_url }}" target="_blank" rel="noopener">Открыть репозиторий</a>
-      {% endif %}
       {% if case.demo_url %}
         <a class="btn btn-ghost" href="{{ case.demo_url }}" target="_blank" rel="noopener">Демо</a>
       {% endif %}

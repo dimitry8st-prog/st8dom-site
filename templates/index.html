@@ -168,7 +168,7 @@
   <section class="s" id="projects">
     <div class="s-label reveal"><span>//</span> доказательства</div>
     <h2 class="reveal">Кейсы</h2>
-    <p class="lead reveal">Рабочие примеры с репозиторием. Демо и учебные MVP не выдаются за внедрение у клиента.</p>
+    <p class="lead reveal">Рабочие примеры с описанием и демонстрациями. Демо и учебные MVP не выдаются за внедрение у клиента.</p>
     <div class="projects-list">
       {% for case in cases %}
       <a class="project-card reveal" href="{{ url_for('case_detail', slug=case.slug) }}" data-track="project_open" data-d="{{ loop.index0 }}">
@@ -223,7 +223,6 @@
         <p>Дмитрий Степанов объединяет медицинский опыт и разработку прикладных AI‑систем. На портале он объясняет сложные темы простым языком, разбирает источники и показывает собственные проекты.</p>
         <p style="margin-top:12px;color:var(--muted)">Клинический стаж — 29 лет. Основные технологические направления: AI‑ассистенты, Telegram‑боты, RAG, n8n, Python и FastAPI.</p>
         <div class="about-links">
-          <a class="btn btn-ghost btn-sm" href="{{ github_url }}" target="_blank" rel="noopener" data-track="github_click">GitHub</a>
           <a class="btn btn-tg btn-sm" href="{{ telegram_url }}" data-track="telegram_click">Telegram-бот готовится</a>
           <a class="btn btn-ghost btn-sm" href="{{ fl_url }}" target="_blank" rel="noopener">FL.ru</a>
           <a class="btn btn-ghost btn-sm" href="{{ kwork_url }}" target="_blank" rel="noopener">Kwork</a>

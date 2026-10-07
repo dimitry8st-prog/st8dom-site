@@ -67,7 +67,8 @@ def test_cases_and_details(client):
         page = client.get(f"/cases/{slug}/")
         assert page.status_code == 200, slug
         if slug != "knightcat-content-factory":
-            assert "Репозиторий".encode("utf-8") in page.data
+            assert "Открыть репозиторий".encode("utf-8") not in page.data
+            assert b'data-track="github_click"' not in page.data
 
     knightcat = client.get("/cases/knightcat-content-factory/")
     assert b"knightcat-content-factory-16x9.mp4" in knightcat.data
