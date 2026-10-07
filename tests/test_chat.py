@@ -81,7 +81,7 @@ def test_assistant_lists_methodical_materials():
     result = answer_question("Какие методички есть?", {})
     assert result["escalated"] is False
     assert result["source"] == "library"
-    assert "15 методических материалов" in result["answer"]
+    assert "16 методических материалов" in result["answer"]
     assert result["results"]
 
 
@@ -89,7 +89,7 @@ def test_assistant_understands_methodics_list_word_form():
     result = answer_question("Список методичек", {})
     assert result["escalated"] is False
     assert result["source"] == "library"
-    assert "15 методических материалов" in result["answer"]
+    assert "16 методических материалов" in result["answer"]
     assert result["results"][0]["url"] == "/library/"
     assert all(item["url"].startswith("/library/") for item in result["results"])
 
