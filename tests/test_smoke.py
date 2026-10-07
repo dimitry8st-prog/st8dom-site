@@ -179,7 +179,7 @@ def test_library_catalog_is_online_only(client):
     assert "Скачать DOCX".encode("utf-8") not in page.data
     assert b"/library/ai-law-brand-protection/" in page.data
     assert "Читать онлайн".encode("utf-8") in page.data
-    assert "На редактуре".encode("utf-8") in page.data
+    assert b"/library/ai-audit-pilot/" in page.data
     assert b"/editorial-workshop/" in page.data
     assert "Редакционная мастерская".encode("utf-8") in page.data
 
@@ -197,7 +197,11 @@ def test_library_catalog_is_online_only(client):
     assert "Как пользоваться брошюрой".encode("utf-8") in reader.data
     assert "Скачать DOCX".encode("utf-8") not in reader.data
 
-    assert client.get("/library/ai-audit-pilot/").status_code == 404
+    audit_reader = client.get("/library/ai-audit-pilot/")
+    assert audit_reader.status_code == 200
+    assert "Дорожная карта пилота".encode("utf-8") in audit_reader.data
+    assert "Экономическая модель".encode("utf-8") in audit_reader.data
+    assert client.get("/static/downloads/ai-audit-pilot.docx").status_code == 404
     assert client.get("/library/not-found/").status_code == 404
 
 
