@@ -239,7 +239,11 @@ def test_life_os_and_library_use_distinct_names(client, monkeypatch):
     assert "База знаний Life-OS".encode("utf-8") in life_os.data
     assert "Библиотека знаний".encode("utf-8") not in life_os.data
     assert "Один материал".encode("utf-8") not in life_os.data
-    assert "Методички по теме".encode("utf-8") in life_os.data
+    assert "Методички по теме".encode("utf-8") not in life_os.data
+    library = client.get("/library/")
+    for slug in ("digital-solutions-sales-n8n-websites", "ai-solution-architecture", "ai-model-evaluation", "ai-learning-tool"):
+        assert f'/library/{slug}/'.encode() in library.data
+        assert client.get(f'/library/{slug}/').status_code == 200
 
     home = client.get("/")
     assert b'id="library"' in home.data

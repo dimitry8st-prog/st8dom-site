@@ -53,7 +53,7 @@ LIBRARY_ITEMS = [
         "file": "digital-solutions-sales-n8n-websites.docx",
         "status": "Опубликовано · версия 1",
         "featured": True,
-        "directions": ["ai", "life-os"],
+        "directions": ["ai"],
     },
     {
         "slug": "migraine-brochure-2026",
@@ -90,7 +90,7 @@ LIBRARY_ITEMS = [
         "file": "ai-solution-architecture.docx",
         "status": "Опубликовано",
         "featured": True,
-        "directions": ["ai", "life-os"],
+        "directions": ["ai"],
     },
     {
         "slug": "ai-model-evaluation",
@@ -102,7 +102,7 @@ LIBRARY_ITEMS = [
         "file": "ai-model-evaluation.docx",
         "status": "Опубликовано",
         "featured": True,
-        "directions": ["ai", "life-os"],
+        "directions": ["ai"],
     },
     {
         "slug": "autosfera-n8n-langflow",
@@ -138,7 +138,7 @@ LIBRARY_ITEMS = [
         "file": "ai-learning-tool.docx",
         "status": "Опубликовано",
         "featured": False,
-        "directions": ["ai", "life-os"],
+        "directions": ["ai"],
     },
     {
         "slug": "ai-audit-pilot",
