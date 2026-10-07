@@ -28,6 +28,7 @@ PRODUCTS = [
         "service_class_label": "Готовый сайт с адаптацией",
         "delivery_label": "от 10 рабочих дней",
         "case_slug": "corporate-site",
+        "demo_url": "/demos/force-team/",
         "inquiry_topic": "website",
     },
     {
@@ -42,6 +43,7 @@ PRODUCTS = [
         "service_class_label": "Готовое Web-решение с адаптацией",
         "delivery_label": "от 7–10 рабочих дней",
         "case_slug": "elan",
+        "demo_url": "/demos/elan-landing/",
         "inquiry_topic": "website",
     },
     {

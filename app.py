@@ -906,6 +906,14 @@ def create_app() -> Flask:
         form.message.data = "Хочу адаптировать лендинг психолога для своей практики."
         return render_template("demos/psychologist.html", form=form, page_id="psychologist-demo")
 
+    @app.get("/demos/elan-landing/")
+    def elan_landing():
+        return render_template("demos/elan.html")
+
+    @app.get("/demos/force-team/")
+    def force_team_landing():
+        return render_template("demos/force-team.html")
+
     @app.get("/demos/<slug>/")
     def project_demo(slug: str):
         demo = get_demo(slug)
@@ -1554,6 +1562,8 @@ def create_app() -> Flask:
             origin + url_for("consent"),
             origin + url_for("clinical_guidelines_catalog"),
             origin + url_for("products_catalog"),
+            origin + url_for("force_team_landing"),
+            origin + url_for("elan_landing"),
         ]
         pages.extend(origin + demo["url"] for demo in all_demos() if demo["slug"] != "psychologist-landing")
         pages.extend(
