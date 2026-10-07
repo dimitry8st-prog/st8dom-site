@@ -16,6 +16,15 @@ def test_payment_credentials_are_separate_for_each_mode(test_mode):
     product = {"name": "Service", "price": 100}
     fields = payment_form(order, product, config)["fields"]
     assert (fields.get("IsTest") == "1") == test_mode
+    # The decoded HTTP form value must be identical to the receipt used in the signature.
+    from urllib.parse import parse_qs, urlencode, unquote
+    import json
+    submitted = {key: values[0] for key, values in parse_qs(urlencode(fields)).items()}
+    expected_payment_sign = hashlib.md5(
+        f"shop:100.00:7:{submitted['Receipt']}:first".encode()
+    ).hexdigest()
+    assert submitted["SignatureValue"] == expected_payment_sign
+    assert json.loads(unquote(submitted["Receipt"]))["items"][0]["name"] == "Service"
     result_sign = hashlib.md5(b"100.00:7:second").hexdigest()
     success_sign = hashlib.md5(b"100.00:7:first").hexdigest()
     assert valid_result_signature("100.00", "7", result_sign, config)

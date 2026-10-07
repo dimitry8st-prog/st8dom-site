@@ -70,7 +70,7 @@ def payment_form(order, product: dict, config) -> dict:
         "SignatureValue": signature,
         "Email": order.email,
         "Culture": "ru",
-        "Receipt": _receipt_raw,
+        "Receipt": receipt_encoded,
     }
     if config.get("ROBOKASSA_TEST_MODE"):
         fields["IsTest"] = "1"
