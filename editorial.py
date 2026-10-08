@@ -350,6 +350,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 5, 17, 0, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "claude-fable-mythos-5-1-2026-10.json",
+        datetime(2026, 10, 8, 5, 35, tzinfo=timezone.utc),
+    )
+
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
         stroke_rubric = Rubric.query.filter_by(
