@@ -4081,3 +4081,35 @@ body:has(.site-chat) .foot {
 .lifeos-source-item p {
   margin: 0 0 8px;
 }
+
+/* Постоянная кнопка рядом с помощником портала. */
+.back-to-top {
+  position: fixed;
+  right: 88px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 1000;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--orange);
+  border-radius: 50%;
+  background: var(--bg2);
+  color: var(--orange);
+  font-size: 28px;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+}
+.back-to-top:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+.back-to-top:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="{{ self.og_title() }}">
   <meta name="twitter:description" content="{{ self.og_description() }}">
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20261009-back-to-top') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/psychologist-cover.css', v='20261003-project-demos') }}">
   {% block jsonld %}
   <script type="application/ld+json">
@@ -63,7 +63,7 @@
   </script>
   {% endblock %}
 </head>
-<body>
+<body id="page-top">
   <a class="skip-link" href="#main">К содержанию</a>
   <nav aria-label="Основная навигация">
     <div class="nav-inner">
@@ -123,6 +123,7 @@
       <p>© 2026 <span>Степанов Д.А.</span> · Портал «ДИС» · Медицина, AI и будущее человека</p>
     </div>
   </footer>
+  <a class="back-to-top" href="#page-top" aria-label="Вернуться к началу страницы" title="Наверх"><span aria-hidden="true">↑</span></a>
   {% if chat_enabled and page_id != 'admin' and not medical_context|default(false) %}
     {% include "macros/chat_widget.html" %}
   {% endif %}
