@@ -452,6 +452,21 @@ def create_app() -> Flask:
             page_id=f"direction-{slug}",
         )
 
+    @app.get("/directions/life-os/dis/oracle/")
+    def lifeos_oracle():
+        import json
+
+        base = json.loads((BASE_DIR / "data" / "lifeos" / "rune-oracle.json").read_text(encoding="utf-8"))
+        query = request.args.get("q", "").strip()[:200]
+        traditions = base["traditions"]
+        if query:
+            traditions = [item for item in traditions if query.casefold() in " ".join(
+                item[key] for key in ("title", "context", "history", "limit", "adaptation")
+            ).casefold()]
+        return render_template("lifeos_oracle.html", base=base, traditions=traditions,
+                               sources_by_id={source["id"]: source for source in base["sources"]},
+                               query=query, page_id="direction-life-os")
+
     @app.route("/directions/life-os/dis/<stream>/", methods=["GET", "POST"])
     def lifeos_workspace(stream):
         if stream not in ALL_STREAMS:

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ base.title }} — Life-OS{% endblock %}
+{% block description %}Исторические традиции, слои Рунического оракула различения и программа исследований времени и прогнозирования.{% endblock %}
+{% block canonical %}{{ site_url }}{{ url_for('lifeos_oracle') }}{% endblock %}
+{% block content %}
+<div class="container">
+  <section class="s">
+    <a href="{{ url_for('direction_detail', slug='life-os') }}#dis-workspace">← ДИС — рабочая система</a>
+    <p class="eyebrow">{{ base.subtitle }}</p>
+    <h1>{{ base.title }}</h1>
+    <p class="lead">{{ base.intro }}</p>
+    <p>{{ base.author }} · Проверка {{ base.reviewed_date }} · Версия {{ base.version }}</p>
+    <nav class="hero-cta" aria-label="Части базы">
+      <a class="btn btn-primary" href="#traditions">Исторические карточки</a>
+      <a class="btn btn-ghost" href="#layers">Слои оракула</a>
+      <a class="btn btn-ghost" href="#research">Программа исследований</a>
+    </nav>
+    <p class="editorial-notice">{{ base.recommendation }}</p>
+  </section>
+
+  <section class="s" id="traditions">
+    <h2>1. Исторические карточки традиций</h2>
+    <form method="get" class="hero-cta" action="{{ url_for('lifeos_oracle') }}#traditions">
+      <label for="oracle-search">Поиск по историческим карточкам</label>
+      <input id="oracle-search" name="q" value="{{ query }}" maxlength="200" placeholder="Руны, Мо, календарь, самопознание">
+      <button class="btn btn-primary" type="submit">Найти</button>
+      {% if query %}<a class="btn btn-ghost" href="{{ url_for('lifeos_oracle') }}#traditions">Все карточки</a>{% endif %}
+    </form>
+    <div class="materials-grid" style="margin-top:24px">
+      {% for item in traditions %}
+      <article class="portal-project-card" id="tradition-{{ item.id }}">
+        <span class="content-status">{{ item.status }}</span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.context }}</p>
+        <p>{{ item.history }}</p>
+        <details><summary>Границы и адаптация</summary>
+          <p><strong>Границы:</strong> {{ item.limit }}</p>
+          <p><strong>Для нашего оракула:</strong> {{ item.adaptation }}</p>
+        </details>
+        <p>{% for source_id in item.sources %}<a href="#source-{{ source_id }}">{{ sources_by_id[source_id].title }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}</p>
+      </article>
+      {% else %}<p>Совпадений не найдено. Попробуйте другое слово или откройте все карточки.</p>{% endfor %}
+    </div>
+  </section>
+
+  <section class="s" id="layers">
+    <h2>2. Необязательные слои оракула</h2>
+    <p class="lead">Якорь — руны. Дополнения выбираются до расклада и не меняют первоначальное чтение. Представленная база описывает метод; проведение раскладов и ведение личного дневника пока не реализованы на этой странице.</p>
+    <div class="topic-grid">
+      {% for layer in base.layers %}
+      <article class="portal-project-card">
+        <span class="content-status">{{ layer.position }}</span>
+        <h3>{{ layer.title }}</h3><p>{{ layer.origin }}</p>
+        <p><strong>Вопрос:</strong> {{ layer.question }}</p>
+        <p>{{ layer.rule }}</p>
+      </article>
+      {% endfor %}
+    </div>
+    <details style="margin-top:24px"><summary>Правила соединения с мастер-промптом v1.0</summary>
+      <ul class="principles-list">{% for rule in base.contract %}<li>{{ rule }}</li>{% endfor %}</ul>
+    </details>
+  </section>
+
+  <section class="s" id="research">
+    <h2>3. Программа исследований</h2>
+    <p class="lead">Культурный смысл, польза для решения и точность прогноза оцениваются раздельно. Ниже — предлагаемые исследования, а не результаты проведённых экспериментов.</p>
+    {% for study in base.studies %}
+    <article class="portal-project-card" id="study-{{ study.id }}" style="margin:20px 0">
+      <span class="content-status">{{ study.status }}</span>
+      <h3>{{ study.title }}</h3>
+      <p><strong>Версия:</strong> {{ study.hypothesis }}</p>
+      <p><strong>Как исследовать:</strong> {{ study.method }}</p>
+      <p><strong>Что измерять:</strong> {{ study.measure }}</p>
+      <p><strong>Граница вывода:</strong> {{ study.limit }}</p>
+      {% if study.sources %}<p>{% for source_id in study.sources %}<a href="#source-{{ source_id }}">{{ sources_by_id[source_id].title }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}</p>{% endif %}
+    </article>
+    {% endfor %}
+    <h3>Три версии развития</h3>
+    <div class="topic-grid">{% for version in base.versions %}
+      <article class="portal-project-card"><span class="content-status">{{ version.priority }}</span>
+      <h4>{{ version.title }}</h4><p>{{ version.scope }}</p><p>{{ version.result }}</p></article>
+    {% endfor %}</div>
+    <p class="editorial-notice">{{ base.pilot }}</p>
+    <details><summary>Поля будущего исследовательского дневника</summary>
+      <ul>{% for field in base.journal_fields %}<li>{{ field }}</li>{% endfor %}</ul>
+    </details>
+  </section>
+
+  <section class="s" id="sources">
+    <h2>Источники и границы проверки</h2>
+    <p>Музейное описание подтверждает предмет или практику; самоописание школы подтверждает её заявленный метод; научная работа подтверждает только исследованный ею вопрос. Непроверенные детали отмечены в карточках.</p>
+    <ol>{% for source in base.sources %}
+      <li id="source-{{ source.id }}" style="margin-bottom:16px"><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.title }}</a><br>{{ source.type }}</li>
+    {% endfor %}</ol>
+    <a class="btn btn-primary" href="{{ url_for('lifeos_workspace', stream='culture') }}">Вернуться в культурно-исторический слой</a>
+    <a class="btn btn-ghost" href="{{ url_for('lifeos_workspace', stream='time') }}">Время и прогнозирование</a>
+  </section>
+</div>
+{% endblock %}

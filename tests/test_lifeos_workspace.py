@@ -59,3 +59,27 @@ def test_feed_validation():
     data = b'<rss><channel><item><title>CVE-2099-1234</title><link>https://www.securitylab.ru/news/1.php</link><description>&lt;script&gt;bad&lt;/script&gt;</description></item><item><title>external</title><link>https://example.org/</link></item></channel></rss>'
     rows = parse_feed(data)
     assert len(rows) == 1 and rows[0]['summary'] == 'bad'
+
+
+def test_oracle_base_is_protected_and_linked(client):
+    path = '/directions/life-os/dis/oracle/'
+    assert client.get(path).status_code == 401
+    login(client)
+    page = client.get(path)
+    assert page.status_code == 200
+    assert 'Степанов Д.А.'.encode() in page.data
+    for anchor in ('traditions', 'layers', 'research'):
+        assert f'id="{anchor}"'.encode() in page.data
+    for path in ('/directions/life-os/', '/directions/life-os/dis/culture/', '/directions/life-os/dis/time/'):
+        assert b'/directions/life-os/dis/oracle/' in client.get(path).data
+
+
+def test_oracle_search_filters_cards_and_escapes_input(client):
+    login(client)
+    path = '/directions/life-os/dis/oracle/'
+    page = client.get(path, query_string={'q': 'Манджушри'})
+    assert b'id="tradition-mo"' in page.data
+    assert b'id="tradition-maya"' not in page.data
+    malicious = client.get(path, query_string={'q': '<script>alert(1)</script>'})
+    assert b'<script>alert(1)</script>' not in malicious.data
+    assert 'Совпадений не найдено'.encode() in malicious.data

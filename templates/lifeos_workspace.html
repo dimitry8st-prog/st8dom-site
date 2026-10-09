@@ -5,6 +5,14 @@
 <section class="s">
 <a href="{{ url_for('direction_detail', slug='life-os') }}#dis-workspace">← ДИС — рабочая система</a>
 <h1>{{ stream_info.title }}</h1><p class="lead">{{ stream_info.description }}</p>
+{% if stream in ('culture', 'time') %}
+<article class="portal-project-card" style="margin:24px 0">
+<span class="content-status">Культурная база · гипотезы отмечены отдельно</span>
+<h2><a href="{{ url_for('lifeos_oracle') }}{{ '#traditions' if stream == 'culture' else '#research' }}">Время, предсказание и символические традиции</a></h2>
+<p>Исторические карточки, необязательные слои Рунического оракула различения и программа исследований времени и прогнозирования.</p>
+<a class="btn btn-primary" href="{{ url_for('lifeos_oracle') }}">Открыть базу</a>
+</article>
+{% endif %}
 <form method="get" class="hero-cta">
 <label for="lifeos-search">Поиск по материалам</label>
 <input id="lifeos-search" name="q" value="{{ query }}" maxlength="200" placeholder="Тема, заголовок или CVE">
