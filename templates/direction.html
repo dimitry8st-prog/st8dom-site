@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="container{% if slug == 'medicine' %} container--medicine{% elif slug == 'ai' %} container--ai{% elif slug == 'longevity' %} container--longevity{% endif %}">
-  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% elif slug == 'ai' %} direction-hero--ai{% elif slug == 'longevity' %} direction-hero--longevity{% endif %}">
+  <section class="hero direction-hero{% if slug == 'medicine' %} direction-hero--medicine{% elif slug == 'ai' %} direction-hero--ai{% elif slug == 'longevity' %} direction-hero--longevity{% elif slug == 'life-os' %} direction-hero--lifeos{% endif %}">
     <div class="direction-hero__copy">
       <p class="eyebrow">{{ section.eyebrow }}</p>
       <h1>{{ section.title }}</h1>
@@ -42,6 +42,12 @@
            alt="Дмитрий Степанов беседует с мудрым котом-рыцарем; позади тропа ведёт к горной вершине в облаках"
            width="1672" height="941" loading="eager" fetchpriority="high">
     </figure>
+    {% elif slug == 'life-os' %}
+    <figure class="direction-hero__visual direction-hero__visual--lifeos">
+      <img src="{{ url_for('static', filename='images/lifeos-tree-of-knowledge.webp') }}"
+           alt="Дерево знаний: синий лис изучает книгу, кот-рыцарь на лестнице хранит материалы и светящиеся руны"
+           width="1536" height="1024" loading="eager" fetchpriority="high">
+    </figure>
     {% endif %}
   </section>
 
@@ -60,7 +66,7 @@
       {% endfor %}
     </div>
     <p class="editorial-notice">Три направления хранятся раздельно. Научные результаты, гипотезы и культурные трактовки имеют отдельные отметки.</p>
-    <p><a class="btn btn-ghost" href="{{ url_for('lifeos_oracle') }}">Время, предсказание и символические традиции</a></p>
+    <p><a class="btn btn-ghost" href="{{ url_for('lifeos_oracle') }}">Оракул — время и символические традиции</a></p>
   </section>
   {% endif %}
 

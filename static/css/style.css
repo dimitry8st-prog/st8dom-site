@@ -4113,3 +4113,19 @@ body:has(.site-chat) .foot {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Life-OS: дерево знаний и хранители смыслов. */
+.direction-hero--lifeos {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: 40px;
+}
+.direction-hero--lifeos .direction-hero__copy { position: relative; z-index: 2; min-width: 0; }
+.direction-hero__visual--lifeos { width: 100%; border-color: rgba(245, 158, 11, .35); }
+.direction-hero__visual--lifeos img { aspect-ratio: 3 / 2; object-fit: contain; }
+@media (max-width: 900px) {
+  .direction-hero--lifeos { grid-template-columns: 1fr; gap: 28px; }
+  .direction-hero__visual--lifeos { max-width: 680px; margin-inline: auto; }
+}
