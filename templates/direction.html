@@ -66,7 +66,12 @@
       {% endfor %}
     </div>
     <p class="editorial-notice">Три направления хранятся раздельно. Научные результаты, гипотезы и культурные трактовки имеют отдельные отметки.</p>
-    <p><a class="btn btn-ghost" href="{{ url_for('lifeos_oracle') }}">Оракул — время и символические традиции</a></p>
+    <article class="portal-project-card" style="margin-top:24px">
+      <span class="content-status">Наука и символические традиции</span>
+      <h3>Оракул — пространство знаний и смыслов</h3>
+      <p>Общая база исследований, исторических традиций и символических систем. Научные результаты, гипотезы и культурные интерпретации отмечены отдельно.</p>
+      <a class="btn btn-primary" href="{{ url_for('lifeos_oracle') }}">Открыть Оракул</a>
+    </article>
   </section>
   {% endif %}
 
