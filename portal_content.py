@@ -136,6 +136,7 @@ SECTIONS = {
                     ("Johns Hopkins University / Medicine / Bloomberg School / APL", "AI в медицине · нейро · public health · engineering", "A"),
                     ("Stanford University", "longevity · AI в медицине · neuroscience", "A"),
                     ("MIT", "AI · aging brain · rejuvenation · engineering", "A"),
+                    ("Max Planck Florida Institute for Neuroscience (MPFI)", "нейронные сети · обучение и память · восприятие времени · моторное обучение", "A"),
                 ],
             },
             {
