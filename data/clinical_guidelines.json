@@ -14,18 +14,6 @@
       "status": "active"
     },
     {
-      "source_key": "canadian_stroke",
-      "external_id": "CSBPR-REHABILITATION-MOBILITY-2025",
-      "title": "Восстановление движений, равновесия, ходьбы и аэробная нагрузка после инсульта — Canadian Stroke Best Practices",
-      "organization": "Heart & Stroke Canada",
-      "version": "2025",
-      "codes": "Stroke rehabilitation / mobility / aerobic training",
-      "specialties": "Неврология / медицинская реабилитация / ЛФК",
-      "url": "https://www.strokebestpractices.ca/recommendations/stroke-rehabilitation-delivery/4-lower-extremity-balance-mobility-and-aerobic-training",
-      "published_on": null,
-      "status": "active"
-    },
-    {
       "source_key": "ahs",
       "external_id": "AAN-AHS-2026-MIGRAINE-PREVENTION",
       "title": "Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations",
@@ -46,6 +34,18 @@
       "codes": "Migraine / headache disorders",
       "specialties": "Neurology / Headache medicine",
       "url": "https://bash.org.uk/guidelines/",
+      "published_on": null,
+      "status": "active"
+    },
+    {
+      "source_key": "canadian_stroke",
+      "external_id": "CSBPR-REHABILITATION-MOBILITY-2025",
+      "title": "Восстановление движений, равновесия, ходьбы и аэробная нагрузка после инсульта — Canadian Stroke Best Practices",
+      "organization": "Heart & Stroke Canada",
+      "version": "2025",
+      "codes": "Stroke rehabilitation / mobility / aerobic training",
+      "specialties": "Неврология / медицинская реабилитация / ЛФК",
+      "url": "https://www.strokebestpractices.ca/recommendations/stroke-rehabilitation-delivery/4-lower-extremity-balance-mobility-and-aerobic-training",
       "published_on": null,
       "status": "active"
     },
