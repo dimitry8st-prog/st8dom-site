@@ -579,6 +579,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 11, 11, 8, 17, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "google-gemini-agent-2026-10.json",
+        datetime(2026, 10, 12, 8, 30, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
