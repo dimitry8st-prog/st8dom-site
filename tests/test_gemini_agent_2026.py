@@ -34,4 +34,5 @@ def test_gemini_agent_article_is_public_in_agent_technologies(client):
         assert article.rubric.slug == "innovations-agents"
         assert article.author == "Степанов Д.А."
         assert len(article.sources) == 4
+        assert "## Источники" not in article.body
         assert record.status == "published"
