@@ -585,6 +585,11 @@ def ensure_editorial_seed() -> None:
         update_published=True,
     )
 
+    ensure_published_content_package(
+        "anthropic-ipo-q3-2026-10.json",
+        datetime(2026, 10, 15, 14, 17, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
