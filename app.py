@@ -388,7 +388,6 @@ def create_app() -> Flask:
             "site_url": app.config["SITE_URL"],
             "analytics_id": app.config.get("ANALYTICS_ID") or "",
             "telegram_url": url_for("telegram_placeholder"),
-            "github_url": "https://github.com/dimitry8st-prog",
             "fl_url": "https://www.fl.ru/users/dimitry8st/",
             "kwork_url": "https://kwork.ru/user/stepanov_craft",
             "email_address": app.config["INQUIRY_EMAIL"],
@@ -750,37 +749,142 @@ def create_app() -> Flask:
 
     @app.route("/search/")
     def unified_search():
-        search = request.args.get("q", "").strip()
+        search = request.args.get("q", "").strip()[:200]
+        selected_focus = request.args.get("focus", "").strip()
+        selected_group = request.args.get("group", "").strip()
+
+        search_groups = [
+            {
+                "slug": "ai",
+                "label": "AI",
+                "keywords": ["AI", "ИИ", "LLM", "agent", "multimodal", "RAG", "reasoning", "machine learning"],
+                "items": [
+                    ("frontier-ai", "AI Research / Frontier AI", ["AI", "ИИ", "LLM", "foundation model", "reasoning", "frontier"]),
+                    ("medical-ai", "AI in Medicine", ["medical AI", "clinical AI", "ИИ в медицине", "диагност", "clinical decision"]),
+                    ("neuroai", "NeuroAI / Neuroscience", ["NeuroAI", "neuroscience", "нейро", "brain", "BCI", "мозг"]),
+                    ("human-ai", "Human–AI Collaboration", ["human-AI", "human in the loop", "human-in-the-loop", "человек", "collaboration"]),
+                    ("ai-safety", "AI Safety / Evaluation", ["AI safety", "evaluation", "benchmark", "hallucination", "reliability", "безопасност"]),
+                    ("ai-engineering", "AI Engineering / Systems", ["engineering", "inference", "orchestration", "MCP", "distributed", "RAG", "agent"]),
+                ],
+            },
+            {
+                "slug": "medicine-neuro",
+                "label": "Medicine & Neuro",
+                "keywords": ["medicine", "медицин", "neuro", "нейро", "cognitive", "clinical"],
+                "items": [
+                    ("cognitive-health", "Cognitive Health / Mental Health", ["cognitive", "когнитив", "mental health", "псих", "депресс", "ADHD", "деменц"]),
+                    ("public-health", "Public Health", ["public health", "эпидеми", "профилакти", "population", "WHO", "ECDC"]),
+                    ("ai-biology", "AI × Biology / Bioengineering", ["biology", "bioengineering", "биолог", "omics", "organoid", "drug discovery", "synthetic biology"]),
+                ],
+            },
+            {
+                "slug": "longevity",
+                "label": "Longevity",
+                "keywords": ["longevity", "geroscience", "aging", "старен", "rejuvenation"],
+                "items": [
+                    ("longevity-geroscience", "Longevity / Geroscience / Rejuvenation", ["longevity", "geroscience", "aging", "старен", "rejuvenation", "senescence", "митохонд"]),
+                    ("human-performance", "Human Performance", ["human performance", "performance", "fatigue", "resilience", "работоспособ", "усталост"]),
+                ],
+            },
+            {
+                "slug": "human-society",
+                "label": "Human & Society",
+                "keywords": ["history", "истори", "society", "общество", "ideas", "идеи", "defense"],
+                "items": [
+                    ("defense-open", "Defense Research — open/public only", ["defense", "DARPA", "Bundeswehr", "military medicine", "военн"]),
+                    ("history-ideas", "History of Ideas / Initiatic Organizations", ["history of ideas", "история идей", "order", "орден", "инициат", "symbolic"]),
+                ],
+            },
+            {
+                "slug": "institutions",
+                "label": "Institutions & Sources",
+                "keywords": ["MIT", "Stanford", "Max Planck", "Charité", "TUM", "Fraunhofer", "alphaXiv", "arXiv", "OpenReview"],
+                "items": [
+                    ("germany-radar", "Germany Research Radar", ["Max Planck", "Charité", "Heidelberg", "TUM", "DZNE", "Fraunhofer", "Bundeswehr"]),
+                    ("institutions-labs", "Institutions & Labs", ["MIT", "Stanford", "DeepMind", "OpenAI", "Anthropic", "Microsoft Research", "Meta AI", "NVIDIA Research"]),
+                    ("preprints", "Preprints / Early Research", ["alphaXiv", "arXiv", "bioRxiv", "medRxiv", "OpenReview", "preprint"]),
+                ],
+            },
+        ]
+
+        focus_index = {}
+        group_index = {}
+        for group in search_groups:
+            group_index[group["slug"]] = group
+            for slug, label, keywords in group["items"]:
+                focus_index[slug] = {"label": label, "keywords": keywords, "group": group["slug"]}
+
+        if selected_focus not in focus_index:
+            selected_focus = ""
+        if selected_group not in group_index:
+            selected_group = ""
+        if selected_focus:
+            selected_group = focus_index[selected_focus]["group"]
+
+        query_terms = [term.casefold() for term in search.split() if len(term) >= 2]
+        focus_terms = [term.casefold() for term in focus_index.get(selected_focus, {}).get("keywords", [])]
+        group_terms = [term.casefold() for term in group_index.get(selected_group, {}).get("keywords", [])] if not selected_focus else []
+        filter_terms = focus_terms or group_terms
+
+        def score_text(title, haystack):
+            title_cf = title.casefold()
+            haystack_cf = haystack.casefold()
+            query_score = sum(3 if term in title_cf else 1 for term in query_terms if term in haystack_cf)
+            filter_score = sum(2 if term in title_cf else 1 for term in filter_terms if term in haystack_cf)
+            if query_terms and not query_score:
+                return 0
+            if filter_terms and not filter_score:
+                return 0
+            return query_score + filter_score
+
         materials = []
         library_items = []
         projects = []
-        if search:
-            terms = [term.casefold() for term in search.split() if len(term) >= 2]
+        if search or selected_focus or selected_group:
             for article in published_articles().all():
                 tag_text = " ".join(tag.name for tag in article.tags)
-                haystack = " ".join([article.title, article.summary, article.body, article.rubric.name, tag_text]).casefold()
-                score = sum(3 if term in article.title.casefold() else 1 for term in terms if term in haystack)
+                haystack = " ".join([
+                    article.title,
+                    article.summary,
+                    article.body,
+                    article.section or "",
+                    article.rubric.name,
+                    article.rubric.slug,
+                    tag_text,
+                ])
+                score = score_text(article.title, haystack)
                 if score:
                     materials.append((score, article))
-            materials = [item for _score, item in sorted(materials, key=lambda row: (row[0], row[1].published_at), reverse=True)]
+            materials = [item for _score, item in sorted(
+                materials, key=lambda row: (row[0], row[1].published_at), reverse=True
+            )]
+
             for item in LIBRARY_ITEMS:
-                haystack = " ".join([item["title"], item["summary"], item["kind"]]).casefold()
-                score = sum(3 if term in item["title"].casefold() else 1 for term in terms if term in haystack)
+                haystack = " ".join([item["title"], item["summary"], item["kind"], item.get("category", "")])
+                score = score_text(item["title"], haystack)
                 if score:
                     library_items.append((score, item))
             library_items = [item for _score, item in sorted(library_items, key=lambda row: row[0], reverse=True)]
+
             for project in PROJECTS:
-                haystack = " ".join([project["name"], project["summary"], *project["areas"]]).casefold()
-                score = sum(3 if term in project["name"].casefold() else 1 for term in terms if term in haystack)
+                haystack = " ".join([project["name"], project["summary"], *project["areas"]])
+                score = score_text(project["name"], haystack)
                 if score:
                     projects.append((score, project))
             projects = [item for _score, item in sorted(projects, key=lambda row: row[0], reverse=True)]
+
         return render_template(
             "search.html",
             query=search,
             materials=materials,
             library_items=library_items,
             projects=projects,
+            search_groups=search_groups,
+            selected_focus=selected_focus,
+            selected_group=selected_group,
+            selected_focus_label=focus_index.get(selected_focus, {}).get("label", ""),
+            selected_group_label=group_index.get(selected_group, {}).get("label", ""),
+            total_results=len(materials) + len(library_items) + len(projects),
             page_id="search",
         )
 
