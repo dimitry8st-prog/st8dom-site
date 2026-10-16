@@ -1,23 +1,82 @@
 {% from "macros/material_card.html" import material_card %}
 {% from "macros/library_card.html" import library_card %}
 {% extends "base.html" %}
-{% block title %}Поиск — портал ДИС{% endblock %}
+{% block title %}Research Map — поиск по порталу ДИС{% endblock %}
 {% block content %}
+<style>
+  .research-intro{max-width:880px}
+  .research-tabs,.research-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .research-tab,.research-chip{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:9px 13px;text-decoration:none;color:var(--text);background:var(--surface)}
+  .research-tab:hover,.research-chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .research-tab.active,.research-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .research-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px;margin-top:22px}
+  .research-group{border:1px solid var(--border);border-radius:18px;padding:18px;background:var(--surface)}
+  .research-group h3{margin:0 0 8px}
+  .research-group p{margin:0;color:var(--muted);font-size:.92rem}
+  .search-meta{margin-top:14px;color:var(--muted)}
+  .search-active{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .search-active strong{color:var(--accent)}
+</style>
 <div class="container">
-  <section class="hero" style="padding-bottom:32px">
-    <p class="eyebrow">// единый поиск</p><h1>Поиск по порталу</h1>
-    <form class="topic-search" method="get" role="search"><input type="search" name="q" value="{{ query }}" placeholder="Материал, рубрика, тег или проект" autofocus><button class="btn btn-primary" type="submit">Найти</button></form>
+  <section class="hero" style="padding-bottom:28px">
+    <p class="eyebrow">// Life-OS Research Map</p>
+    <h1>Поиск по исследованиям и проектам</h1>
+    <p class="lead research-intro">Единая точка поиска по AI, медицине, нейронаукам, долголетию, Human Performance, исследовательским институтам и ранним научным публикациям.</p>
+    <form class="topic-search" method="get" role="search">
+      <input type="search" name="q" value="{{ query }}" placeholder="Тема, paper, модель, институт, проект..." autofocus>
+      {% if selected_focus %}<input type="hidden" name="focus" value="{{ selected_focus }}">{% elif selected_group %}<input type="hidden" name="group" value="{{ selected_group }}">{% endif %}
+      <button class="btn btn-primary" type="submit">Найти</button>
+    </form>
+
+    <div class="research-tabs" aria-label="Быстрые направления поиска">
+      {% for group in search_groups %}
+        <a class="research-tab {% if selected_group == group.slug and not selected_focus %}active{% endif %}"
+           href="{{ url_for('unified_search', q=query, group=group.slug) }}">{{ group.label }}</a>
+      {% endfor %}
+      {% if selected_group or selected_focus %}
+        <a class="research-tab" href="{{ url_for('unified_search', q=query) }}">Сбросить фильтр</a>
+      {% endif %}
+    </div>
+
+    {% if selected_focus_label or selected_group_label %}
+      <div class="search-active">
+        <span>Активное направление:</span>
+        <strong>{{ selected_focus_label or selected_group_label }}</strong>
+      </div>
+    {% endif %}
   </section>
-  {% if query %}
+
+  <section class="s">
+    <div class="s-label"><span>//</span> карта направлений</div>
+    <h2>Основные исследовательские потоки</h2>
+    <div class="research-map">
+      {% for group in search_groups %}
+        <article class="research-group">
+          <h3>{{ group.label }}</h3>
+          <div class="research-chips">
+            {% for slug, label, keywords in group["items"] %}
+              <a class="research-chip {% if selected_focus == slug %}active{% endif %}"
+                 href="{{ url_for('unified_search', q=query, focus=slug) }}">{{ label }}</a>
+            {% endfor %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if query or selected_focus or selected_group %}
+    <p class="search-meta">Найдено: <strong>{{ total_results }}</strong> · поиск учитывает заголовки, тексты, рубрики, теги, проекты и тематический контекст.</p>
     <section class="s"><div class="s-label"><span>//</span> материалы · {{ materials|length }}</div><h2>Публикации</h2>
-      {% if materials %}<div class="materials-grid materials-grid--compact">{% for article in materials %}{{ material_card(article) }}{% endfor %}</div>{% else %}<p class="lead">Публикаций по запросу не найдено.</p>{% endif %}
+      {% if materials %}<div class="materials-grid materials-grid--compact">{% for article in materials %}{{ material_card(article) }}{% endfor %}</div>{% else %}<p class="lead">Публикаций по выбранному запросу пока нет.</p>{% endif %}
     </section>
     <section class="s"><div class="s-label"><span>//</span> библиотека · {{ library_items|length }}</div><h2>Методички и брошюры</h2>
-      {% if library_items %}<div class="library-grid library-grid--preview">{% for item in library_items %}{{ library_card(item) }}{% endfor %}</div>{% else %}<p class="lead">Методичек и брошюр по запросу не найдено.</p>{% endif %}
+      {% if library_items %}<div class="library-grid library-grid--preview">{% for item in library_items %}{{ library_card(item) }}{% endfor %}</div>{% else %}<p class="lead">Материалов библиотеки по выбранному запросу пока нет.</p>{% endif %}
     </section>
     <section class="s"><div class="s-label"><span>//</span> проекты · {{ projects|length }}</div><h2>Проекты</h2>
-      {% if projects %}<div class="portal-project-grid">{% for project in projects %}<article class="portal-project-card"><h3>{{ project.name }}</h3><p>{{ project.summary }}</p>{% if project.case_slug %}<a href="{{ url_for('case_detail', slug=project.case_slug) }}">Подробнее →</a>{% endif %}</article>{% endfor %}</div>{% else %}<p class="lead">Проектов по запросу не найдено.</p>{% endif %}
+      {% if projects %}<div class="portal-project-grid">{% for project in projects %}<article class="portal-project-card"><h3>{{ project.name }}</h3><p>{{ project.summary }}</p>{% if project.case_slug %}<a href="{{ url_for('case_detail', slug=project.case_slug) }}">Подробнее →</a>{% endif %}</article>{% endfor %}</div>{% else %}<p class="lead">Проектов по выбранному запросу пока нет.</p>{% endif %}
     </section>
-  {% else %}<div class="empty-state"><h2>Введите запрос</h2><p>Поиск проверяет заголовки, тексты, рубрики, теги и проекты.</p></div>{% endif %}
+  {% else %}
+    <div class="empty-state"><h2>Выберите направление или введите запрос</h2><p>Для быстрого старта используйте вкладки AI, Medicine & Neuro, Longevity, Human & Society или Institutions & Sources.</p></div>
+  {% endif %}
 </div>
 {% endblock %}
