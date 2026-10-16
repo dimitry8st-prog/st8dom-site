@@ -84,6 +84,22 @@ def test_unified_search_finds_material_tags_and_projects(client):
     assert b"AutoSfera-AI" in by_project.data
 
 
+def test_unified_search_exposes_research_map_filters(client):
+    page = client.get("/search/")
+    assert page.status_code == 200
+    assert "AI Research / Frontier AI".encode("utf-8") in page.data
+    assert "Germany Research Radar".encode("utf-8") in page.data
+    assert "Preprints / Early Research".encode("utf-8") in page.data
+
+    focused = client.get("/search/?focus=preprints")
+    assert focused.status_code == 200
+    assert "Preprints / Early Research".encode("utf-8") in focused.data
+
+    grouped = client.get("/search/?group=ai")
+    assert grouped.status_code == 200
+    assert "Активное направление".encode("utf-8") in grouped.data
+
+
 def test_lifeos_import_is_draft_and_idempotent(client):
     package_id, slug = "lifeos-test-001", "lifeos-test-draft"
     cleanup_import(package_id, slug)
