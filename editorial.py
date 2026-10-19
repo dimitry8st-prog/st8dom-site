@@ -610,6 +610,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 18, 16, 32, 38, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "prompt-injection-agents-2026-10.json",
+        datetime(2026, 10, 19, 18, 50, 37, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
