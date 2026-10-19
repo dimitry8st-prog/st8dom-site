@@ -360,6 +360,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 10, 13, 38, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "post-stroke-movement-technologies-2026-10.json",
+        datetime(2026, 10, 19, 7, 21, tzinfo=timezone.utc),
+    )
+
     stroke_slug = "reabilitaciya-posle-ishemicheskogo-insulta"
     if not Article.query.filter_by(slug=stroke_slug).first():
         stroke_rubric = Rubric.query.filter_by(

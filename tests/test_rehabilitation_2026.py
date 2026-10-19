@@ -43,3 +43,29 @@ def test_stroke_guidelines_are_classified_and_visible_in_rehabilitation(client):
     assert b"2026-guideline-for-adult-stroke-rehabilitation-and-recovery" in international.data
     assert b"2026-guideline-for-adult-stroke-rehabilitation-and-recovery" not in russian.data
     assert b"523_3" in russian.data
+
+
+def test_movement_technologies_review_is_public_sourced_and_idempotent(client):
+    slug = "posle-insulta-roboty-stimulyaciya-nerva-i-dvizhenie"
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "универсальной дозировки нет".encode() in page.data
+    assert "Проверить весь перечень противопоказаний".encode() in page.data
+    assert "112 или 103".encode() in page.data
+    assert b"10.1097/MD.0000000000050933" in page.data
+    assert b"10.1177/10538135261490939" in page.data
+    assert b"CD016000" in page.data
+    assert b"](" not in page.data
+    with app.app_context():
+        ensure_editorial_seed()
+        assert Article.query.filter_by(slug=slug).count() == 1
+        article = Article.query.filter_by(slug=slug).one()
+        assert article.status == "published"
+        assert article.rubric.slug == "rehabilitation-movement"
+        assert len(article.sources) == 6
+    for path in (
+        "/directions/medicine/rehabilitation/",
+        "/materials/?section=medicine&rubric=rehabilitation-movement",
+        "/sitemap.xml",
+    ):
+        assert slug.encode() in client.get(path).data
