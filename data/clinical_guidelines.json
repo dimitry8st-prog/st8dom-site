@@ -14,6 +14,18 @@
       "status": "active"
     },
     {
+      "source_key": "aao_hnsf",
+      "external_id": "AAO-HNSF-TINNITUS-UPDATE-2026",
+      "title": "Clinical Practice Guideline: Tinnitus Update",
+      "organization": "American Academy of Otolaryngology–Head and Neck Surgery Foundation",
+      "version": "2026 update",
+      "codes": "Tinnitus",
+      "specialties": "Otorhinolaryngology / Audiology / Neurology",
+      "url": "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/",
+      "published_on": "2026-10-12",
+      "status": "active"
+    },
+    {
       "source_key": "ahs",
       "external_id": "AAN-AHS-2026-MIGRAINE-PREVENTION",
       "title": "Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations",

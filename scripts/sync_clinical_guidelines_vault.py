@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 from clinical_guidelines import (
     OFFICIAL_SOURCES,
     _minzdrav_payload,
+    fetch_aao_hnsf_guidelines,
     fetch_minzdrav_page,
     is_neurology_or_neurosurgery,
 )
@@ -99,6 +100,10 @@ def sync(pages: int, full: bool = False) -> dict[str, int]:
         if current_page > 40:
             raise RuntimeError("Остановлено после 40 страниц: проверьте API Минздрава.")
 
+    international = fetch_aao_hnsf_guidelines()
+    for item in international:
+        registry[(item["source_key"], item["external_id"])] = item
+
     items = sorted(registry.values(), key=lambda row: (row["source_key"], row["title"].casefold()))
     REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
     REGISTRY_PATH.write_text(
@@ -109,7 +114,12 @@ def sync(pages: int, full: bool = False) -> dict[str, int]:
     for item in items:
         note = VAULT_DIR / _safe_filename(item["source_key"], item["external_id"])
         note.write_text(render_obsidian_note(item), encoding="utf-8")
-    return {"scanned": scanned, "matched": matched, "stored": len(items)}
+    return {
+        "scanned": scanned,
+        "matched": matched,
+        "international": len(international),
+        "stored": len(items),
+    }
 
 
 def main() -> None:

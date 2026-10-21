@@ -6,6 +6,7 @@ from app import app
 from clinical_guidelines import (
     GuidelineValidationError,
     is_neurology_or_neurosurgery,
+    parse_aao_hnsf_guidelines,
     sync_guidelines_registry,
     sync_minzdrav,
     upsert_guideline,
@@ -157,6 +158,38 @@ def test_filter_accepts_neurosurgical_condition():
         "Mkbs": [{"MkbName": "Травматическое повреждение мозга", "MkbCode": "S06.3"}],
     }
     assert is_neurology_or_neurosurgery(item) is True
+
+
+def test_aao_hnsf_parser_reads_tinnitus_update_from_official_catalog():
+    html = """
+      <h2>CPG: Tinnitus Update</h2>
+      <p>Clinical Practice Guideline: Tinnitus Update published in
+      <em>Otolaryngology-Head and Neck Surgery</em> on October 12, 2026.</p>
+      <li><a href="https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/">Tinnitus Update</a></li>
+    """
+    items = parse_aao_hnsf_guidelines(html)
+    assert items == [
+        {
+            "source_key": "aao_hnsf",
+            "external_id": "AAO-HNSF-TINNITUS-UPDATE-2026",
+            "title": "Clinical Practice Guideline: Tinnitus Update",
+            "organization": "American Academy of Otolaryngology–Head and Neck Surgery Foundation",
+            "version": "2026 update",
+            "codes": "Tinnitus",
+            "specialties": "Otorhinolaryngology / Audiology / Neurology",
+            "url": "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/",
+            "published_on": "2026-10-12",
+            "status": "active",
+        }
+    ]
+
+
+def test_aao_hnsf_parser_does_not_accept_press_release_only():
+    html = """
+      <p>October 16, 2026 — a manufacturer says its tinnitus device was added.</p>
+      <a href="https://example.com/press-release">Read more</a>
+    """
+    assert parse_aao_hnsf_guidelines(html) == []
 
 
 def test_osteoporosis_is_synced_with_correct_specialty_and_search(client):

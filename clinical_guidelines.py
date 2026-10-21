@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 from datetime import date, datetime, timezone
+from html import unescape
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -19,6 +20,25 @@ MINZDRAV_API_URL = (
     "https://apicr.minzdrav.gov.ru/api.ashx?op=GetJsonClinrecsFilterV2"
 )
 MINZDRAV_VIEW_URL = "https://cr.minzdrav.gov.ru/view-cr/{code_version}"
+AAO_HNSF_GUIDELINES_URL = (
+    "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/"
+)
+
+# Международные источники не имеют единого API. Для каждого официального
+# каталога используется узкий адаптер и явный список профильных документов.
+# Это не даёт случайной новости или пресс-релизу производителя попасть в
+# реестр клинических рекомендаций.
+AAO_HNSF_WATCHED_GUIDELINES = {
+    "cpg-tinnitus-update": {
+        "external_id": "AAO-HNSF-TINNITUS-UPDATE-2026",
+        "title": "Clinical Practice Guideline: Tinnitus Update",
+        "organization": "American Academy of Otolaryngology–Head and Neck Surgery Foundation",
+        "version": "2026 update",
+        "codes": "Tinnitus",
+        "specialties": "Otorhinolaryngology / Audiology / Neurology",
+        "url": "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/",
+    },
+}
 
 OFFICIAL_SOURCES = {
     "minzdrav": {
@@ -94,6 +114,11 @@ OFFICIAL_SOURCES = {
             "ahajournals.org",
             "www.ahajournals.org",
         },
+    },
+    "aao_hnsf": {
+        "name": "American Academy of Otolaryngology–Head and Neck Surgery Foundation",
+        "kind": "international",
+        "domains": {"entnet.org", "www.entnet.org"},
     },
 }
 
@@ -334,6 +359,61 @@ def fetch_minzdrav_guidelines(
         if current_page > 20:
             raise RuntimeError("Синхронизация Минздрава остановлена: слишком много страниц.")
     return records
+
+
+def parse_aao_hnsf_guidelines(html: str) -> list[dict]:
+    """Извлекает только отслеживаемые CPG из официального каталога AAO-HNSF."""
+    if not isinstance(html, str) or len(html.encode("utf-8")) > 2 * 1024 * 1024:
+        raise GuidelineValidationError("AAO-HNSF: некорректный или слишком большой HTML.")
+    plain = " ".join(unescape(re.sub(r"<[^>]+>", " ", html)).split())
+    items: list[dict] = []
+    for slug, metadata in AAO_HNSF_WATCHED_GUIDELINES.items():
+        if f"/{slug}/" not in html:
+            continue
+        title = re.escape(metadata["title"])
+        match = re.search(
+            rf"{title}\s+published\s+in\s+.*?\s+on\s+"
+            r"([A-Z][a-z]+\s+\d{1,2},\s+\d{4})",
+            plain,
+            flags=re.IGNORECASE,
+        )
+        if not match:
+            # Без даты официальный каталог считается изменившим формат.
+            # Карточка не создаётся из догадки, а существующая не удаляется.
+            continue
+        try:
+            published_on = datetime.strptime(match.group(1), "%B %d, %Y").date().isoformat()
+        except ValueError:
+            continue
+        items.append(
+            {
+                "source_key": "aao_hnsf",
+                **metadata,
+                "published_on": published_on,
+                "status": "active",
+            }
+        )
+    return items
+
+
+def fetch_aao_hnsf_guidelines(*, timeout: int = 35, request_get=requests.get) -> list[dict]:
+    """Читает официальный каталог AAO-HNSF и возвращает проверенные метаданные."""
+    last_error = None
+    for _attempt in range(2):
+        try:
+            response = request_get(
+                AAO_HNSF_GUIDELINES_URL,
+                headers={"Accept": "text/html", "User-Agent": "DIS-ClinicalGuidelines/1.0"},
+                timeout=timeout,
+            )
+            response.raise_for_status()
+            final_host = urlparse(getattr(response, "url", AAO_HNSF_GUIDELINES_URL)).hostname
+            if final_host not in OFFICIAL_SOURCES["aao_hnsf"]["domains"]:
+                raise GuidelineValidationError("AAO-HNSF: перенаправление на неофициальный домен.")
+            return parse_aao_hnsf_guidelines(response.text)
+        except (requests.RequestException, GuidelineValidationError) as exc:
+            last_error = exc
+    raise last_error or RuntimeError("Официальный источник AAO-HNSF недоступен.")
 
 
 def _minzdrav_payload(item: dict) -> dict:
