@@ -2,7 +2,7 @@
   "package_id": "dis-content-factory-anthropic-loss-2026-10-22",
   "generator_version": "DIS-Content-Factory-360/1.0",
   "created_at": "2026-10-22T07:35:00+03:00",
-  "workflow_status": "ready_for_import",
+  "workflow_status": "approved",
   "article": {
     "title": "Anthropic потеряла $80 миллиардов. ИИ-бум заканчивается или только начинается?",
     "slug": "anthropic-ubytok-807-mlrd-ipo-2026",
@@ -11,9 +11,9 @@
     "section": "ai",
     "rubric": "innovations-models",
     "content_type": "analysis",
-    "status": "draft",
+    "status": "published",
     "author": "Степанов Д.А.",
-    "revision_note": "Материал подготовлен 22 октября 2026 года по сообщениям Reuters и WSJ; перед публикацией проверить цифры и первоисточники.",
+    "revision_note": "Редакционно утверждено 22 октября 2026 года. Финансовые показатели — по журналистским публикациям о проекте S-1.",
     "tags": [
       "Anthropic",
       "Claude",
