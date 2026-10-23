@@ -606,6 +606,11 @@ def ensure_editorial_seed() -> None:
     )
 
     ensure_published_content_package(
+        "ai-market-anthropic-2026-10-23.json",
+        datetime(2026, 10, 23, 16, 43, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "ai-self-replication-2026-10.json",
         datetime(2026, 10, 15, 17, 17, tzinfo=timezone.utc),
     )
