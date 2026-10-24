@@ -149,7 +149,6 @@
       {% for principle in section.principles %}<li>{{ principle }}</li>{% endfor %}
     </ul>
     <p class="editorial-notice">{{ section.notice }}</p>
-    {% if section.repo_url %}<p class="repository-pending">Репозиторий Life-OS готовится к публикации</p>{% endif %}
   </section>
 
   {% if library_items %}
@@ -174,7 +173,6 @@
         <p class="project-kind">{{ "Флагман" if project.group == "flagship" else "Проект" }}</p>
         <h3>{{ project.name }}</h3>
         <p>{{ project.summary }}</p>
-        <span class="repository-pending">Репозиторий готовится к публикации</span>
       </article>
       {% endfor %}
     </div>

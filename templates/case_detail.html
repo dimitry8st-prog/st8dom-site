@@ -58,7 +58,7 @@
         {% if case.video_captions %}
         <track kind="captions" srclang="ru" label="Русский" default src="{{ url_for('static', filename='subtitles/' + case.video_captions, v=case.media_version|default(none)) }}">
         {% endif %}
-        {{ case.video_fallback or 'Демонстрация бота. Если плеер не открывается, откройте репозиторий.' }}
+        {{ case.video_fallback or 'Демонстрация на этой странице.' }}
       </video>
     </div>
     {% if case.video_note %}
@@ -96,14 +96,6 @@
       {% endif %}
       <a class="btn btn-tg" href="{{ telegram_url }}" data-track="telegram_click">Telegram-бот готовится</a>
     </div>
-    {% if case.related_repos %}
-      <h2>Связанные репозитории</h2>
-      <ul>
-        {% for repo in case.related_repos %}
-          <li><a href="{{ repo.url }}" target="_blank" rel="noopener">{{ repo.label }}</a></li>
-        {% endfor %}
-      </ul>
-    {% endif %}
   </section>
 
   {% if recommended_materials %}

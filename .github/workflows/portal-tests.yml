@@ -1,0 +1,33 @@
+# Проверка pull request. Публикация образа, SSH и деплой здесь не запускаются
+# и production-секреты не читаются. Имя проверки должно оставаться portal-tests:
+# его нужно будет указать в защите main.
+name: portal-tests
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portal-tests:
+    name: portal-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установить зависимости
+        run: pip install -r requirements.txt
+
+      - name: Запустить pytest
+        run: python -m pytest -q

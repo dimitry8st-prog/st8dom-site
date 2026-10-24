@@ -78,7 +78,7 @@ def test_cases_and_details(client):
     assert "решение человеку".encode("utf-8") in knightcat.data
 
     autosfera = client.get("/cases/autosfera-ai/")
-    assert b"AutoSfera-AI-" in autosfera.data
+    assert b"github.com" not in autosfera.data
     assert "18 зарегистрированных skills".encode("utf-8") in autosfera.data
     assert "контролируемая beta".encode("utf-8") in autosfera.data
 
@@ -89,7 +89,7 @@ def test_cases_and_details(client):
     assert "не медицинское изделие".encode("utf-8") in vitalis.data
 
     healthy_store = client.get("/cases/healthy-store/")
-    assert b"Zdorowii_magazin" in healthy_store.data
+    assert b"github.com" not in healthy_store.data
     assert "концепция / техническое задание".encode("utf-8") in healthy_store.data
     assert b"case-healthy-store.webp" in healthy_store.data
     assert b"biobalance-promo-16x9.mp4" in healthy_store.data
@@ -101,12 +101,12 @@ def test_cases_and_details(client):
     assert b"autosfera-ai-defense-poster.png" in autosfera.data
 
     reputatsiya = client.get("/cases/dis-reputatsiya-360/")
-    assert b"-_-360" in reputatsiya.data
+    assert b"github.com" not in reputatsiya.data
     assert b"dis-reputatsiya-360-16x9.mp4" in reputatsiya.data
     assert "не служба репутации".encode("utf-8") in reputatsiya.data
 
     legalbot = client.get("/cases/legalbot/")
-    assert b"JustBot" in legalbot.data
+    assert b"github.com" not in legalbot.data
     assert b"legalbot-demo.mp4" in legalbot.data
     assert "не замена юриста".encode("utf-8") in legalbot.data
 
@@ -116,7 +116,7 @@ def test_cases_and_details(client):
     assert "не замена врача".encode("utf-8") in docpulse.data
 
     mentor = client.get("/cases/ai-nastavnik-360/")
-    assert b"-AI--360" in mentor.data
+    assert b"github.com" not in mentor.data
     assert b"ai-nastavnik-360-16x9.mp4" in mentor.data
     assert b"ai-nastavnik-360-ru.vtt" in mentor.data
     assert "кадровые решения".encode("utf-8") in mentor.data
@@ -129,7 +129,7 @@ def test_cases_and_details(client):
 
     faq = client.get("/cases/faq-assistant/")
     assert faq.status_code == 200
-    assert b"Faq_assistants" in faq.data
+    assert b"github.com" not in faq.data
     assert "Обсудить внедрение".encode("utf-8") in faq.data
     assert "Текстовая расшифровка ролика".encode("utf-8") in faq.data
     assert b"faq-assistant-poster.webp" in faq.data
@@ -255,6 +255,14 @@ def test_life_os_and_library_use_distinct_names(client, monkeypatch):
     assert "Все 17 материалов".encode("utf-8") in home.data
 
 
+def test_life_os_accepts_non_ascii_password(client, monkeypatch):
+    monkeypatch.setitem(app.config, "LIFEOS_USERNAME", "lifeos-test")
+    monkeypatch.setitem(app.config, "LIFEOS_PASSWORD", "пароль-тест")
+    assert client.get("/directions/life-os/").status_code == 401
+    assert client.get("/directions/life-os/", auth=("lifeos-test", "пароль-тест")).status_code == 200
+    assert client.get("/directions/life-os/", auth=("lifeos-test", "другой-пароль")).status_code == 401
+
+
 def test_life_os_requires_correct_password(client, monkeypatch):
     monkeypatch.setitem(app.config, "LIFEOS_USERNAME", "lifeos-test")
     monkeypatch.setitem(app.config, "LIFEOS_PASSWORD", "test-only-password")
@@ -305,7 +313,9 @@ def test_selected_projects_catalog(client):
     assert "GitHub" not in vitalis_card
     assert b'id="project-video-modal"' in page.data
     assert b"portfolio_repo_open" not in page.data
-    assert "Репозиторий готовится к публикации".encode("utf-8") in page.data
+    assert "Открыть демонстрацию".encode("utf-8") in page.data
+    assert "Репозиторий готовится к публикации".encode("utf-8") not in page.data
+    assert b"github.com" not in page.data
 
 
 def test_legal_and_seo(client):
