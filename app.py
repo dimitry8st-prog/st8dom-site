@@ -101,7 +101,7 @@ from models import (
     Rubric,
     Tag,
 )
-from portal_content import PROJECT_FILTERS, PROJECTS, SECTIONS, get_section, get_topic
+from portal_content import PROJECTS, SECTIONS, get_section, get_topic, project_portfolio
 from prompt_library import CATEGORIES as PROMPT_CATEGORIES, CATEGORY_NAMES as PROMPT_CATEGORY_NAMES, all_prompts, find_prompt
 
 logger = logging.getLogger("st8dom")
@@ -292,8 +292,10 @@ def create_app() -> Flask:
 
         if (
             expected_password
-            and hmac.compare_digest(supplied_user or "", expected_user)
-            and hmac.compare_digest(supplied_password or "", expected_password)
+            and hmac.compare_digest(supplied_user.encode("utf-8"), expected_user.encode("utf-8"))
+            and hmac.compare_digest(
+                supplied_password.encode("utf-8"), expected_password.encode("utf-8")
+            )
         ):
             return None
 
@@ -397,6 +399,7 @@ def create_app() -> Flask:
                 app.config.get("LIBRARY_DOWNLOADS_ENABLED", False)
             ),
             "visit_stats": visit_stats(),
+            "project_portfolio": project_portfolio(),
         }
 
     @app.route("/")
@@ -1013,7 +1016,6 @@ def create_app() -> Flask:
         return render_template(
             "projects.html",
             projects=catalog_with_demos(),
-            filters=PROJECT_FILTERS,
             page_id="projects",
         )
 

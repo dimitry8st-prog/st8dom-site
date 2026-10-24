@@ -74,7 +74,7 @@ SECTIONS = {
             {"slug": "innovations", "title": "Инновации в AI", "description": "Новые модели, технологии и заметные изменения в экосистеме искусственного интеллекта.", "rubrics": [("models", "Новые модели"), ("agents", "Агентные технологии"), ("tools", "Новые инструменты"), ("research", "Исследования и тренды")]},
             {"slug": "prompts", "title": "Практические промпты", "description": "Шаблоны с назначением, ограничениями и примерами проверки.", "rubrics": [("work", "Для работы"), ("analysis", "Для анализа"), ("content", "Для контента"), ("verification", "Проверка результата")]},
             {"slug": "rag-assistants", "title": "RAG и AI-ассистенты", "description": "Поиск по документам, источники, эскалация человеку.", "rubrics": [("knowledge-bases", "Базы знаний"), ("search", "Поиск и источники"), ("integrations", "Интеграции"), ("evaluation", "Оценка качества")]},
-            {"slug": "cases-projects", "title": "Кейсы и проекты", "description": "Репозитории, демонстрации, статус и честные ограничения.", "rubrics": [("business", "Для бизнеса"), ("medicine-ai", "Медицинский AI"), ("automation", "Автоматизация"), ("lessons", "Уроки разработки")]},
+            {"slug": "cases-projects", "title": "Кейсы и проекты", "description": "Демонстрации, статус и честные ограничения.", "rubrics": [("business", "Для бизнеса"), ("medicine-ai", "Медицинский AI"), ("automation", "Автоматизация"), ("lessons", "Уроки разработки")]},
         ],
         "principles": ["сначала задача, затем технология", "контроль человека", "тесты и измеримые критерии"],
         "notice": "AI может ошибаться. Критичные решения должны подтверждаться специалистом.",
@@ -233,14 +233,52 @@ PROJECTS = [
     {"name": "Сайт частного психолога", "summary": "Адаптивный лендинг частной практики с публичной демонстрацией и заявкой на адаптацию.", "group": "quality", "areas": ["web"], "repo": "Lending-", "case_slug": "psychologist-landing"},
 ]
 
-PROJECT_FILTERS = [
-    ("all", "Все 18"),
-    ("flagship", "6 флагманов"),
-    ("medicine", "Медицина"),
-    ("ai", "AI"),
-    ("rag", "RAG"),
-    ("automation", "Автоматизация"),
-]
+def ru_word(count: int, one: str, few: str, many: str) -> str:
+    value = abs(int(count))
+    tail = value % 100
+    digit = tail % 10
+    if 11 <= tail <= 14:
+        return many
+    if digit == 1:
+        return one
+    if 2 <= digit <= 4:
+        return few
+    return many
+
+
+def ru_count(count: int, one: str, few: str, many: str) -> str:
+    return f"{count} {ru_word(count, one, few, many)}"
+
+
+def project_portfolio() -> dict:
+    """Один источник количества проектов для главной, каталога и подписей."""
+    flagship = sum(1 for project in PROJECTS if project.get("group") == "flagship")
+    quality = sum(1 for project in PROJECTS if project.get("group") == "quality")
+    total = len(PROJECTS)
+    return {
+        "total": total,
+        "flagship": flagship,
+        "quality": quality,
+        "total_word": ru_word(total, "проект", "проекта", "проектов"),
+        "flagship_word": ru_word(flagship, "флагман", "флагмана", "флагманов"),
+        "quality_word": ru_word(quality, "качественный", "качественных", "качественных"),
+        "total_label": ru_count(total, "проект", "проекта", "проектов"),
+        "flagship_label": ru_count(flagship, "флагман", "флагмана", "флагманов"),
+        "quality_label": ru_count(
+            quality,
+            "качественный проект",
+            "качественных проекта",
+            "качественных проектов",
+        ),
+        "filters": [
+            ("all", f"Все {total}"),
+            ("flagship", ru_count(flagship, "флагман", "флагмана", "флагманов")),
+            ("medicine", "Медицина"),
+            ("ai", "AI"),
+            ("rag", "RAG"),
+            ("automation", "Автоматизация"),
+        ],
+    }
 
 
 def get_section(slug: str):

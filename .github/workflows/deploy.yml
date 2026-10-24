@@ -2,6 +2,8 @@
 # Код приложения не трогается.
 name: deploy
 
+# Проверки pull request живут в portal-tests.yml.
+# Этот workflow не подписывается на pull request: следом идут образ, SSH и выкладка.
 on:
   push:
     branches: [main]

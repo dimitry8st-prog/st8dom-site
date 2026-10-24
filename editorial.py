@@ -263,8 +263,8 @@ def ensure_editorial_seed() -> None:
                 tags=tags,
                 sources=[
                     ArticleSource(
-                        title="Vitalis Medical AI — открытый репозиторий проекта",
-                        url="https://github.com/dimitry8st-prog/Vitalis-Medical-AI",
+                        title="Vitalis Medical AI — страница проекта",
+                        url="/cases/vitalis-medical-ai/",
                     )
                 ],
             )
@@ -630,7 +630,39 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 19, 18, 50, 37, tzinfo=timezone.utc),
     )
 
+    point_repository_sources_at_portal()
     db.session.commit()
+
+
+def point_repository_sources_at_portal() -> int:
+    """Заменяет уже сохранённые ссылки на репозитории владельца страницами портала."""
+    from cases import get_all_cases
+
+    pages: dict[str, str] = {}
+    for case in get_all_cases():
+        url = (case.get("repo_url") or "").strip().rstrip("/")
+        if url:
+            pages[url.casefold()] = f"/cases/{case['slug']}/"
+    changed = 0
+    for source in ArticleSource.query.all():
+        current = (source.url or "").strip()
+        key = current.rstrip("/").casefold()
+        if key in pages:
+            target = pages[key]
+        elif "github.com/dimitry8st-prog/" in key:
+            target = "/projects/"
+        else:
+            continue
+        if current == target:
+            continue
+        duplicate = ArticleSource.query.filter_by(article_id=source.article_id, url=target).first()
+        if duplicate is not None and duplicate.id != source.id:
+            db.session.delete(source)
+        else:
+            source.title = "Страница проекта на портале ДИС"
+            source.url = target
+        changed += 1
+    return changed
 
 
 def published_articles():

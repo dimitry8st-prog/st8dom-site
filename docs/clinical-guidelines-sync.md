@@ -17,13 +17,25 @@
 ### Автоматическая загрузка в GitHub и Obsidian
 
 Workflow `.github/workflows/sync-clinical-guidelines.yml` запускается каждый
-понедельник в 06:30 по Москве. Он проверяет официальный реестр, обновляет
-`data/clinical_guidelines.json` для карточек сайта и создаёт Markdown-заметки в
-`obsidian-vault/Клинические рекомендации/Входящие/`. Коммит создаётся только при
-реальном изменении данных; push запускает обычное обновление сайта.
+понедельник в 06:30 по Москве и вручную, с параметром `full_sync` для полного
+прохода. Он проверяет официальный реестр, обновляет `data/clinical_guidelines.json`
+и Markdown-заметки в `obsidian-vault/Клинические рекомендации/Входящие/`.
 
-В Obsidian нужно открыть папку `obsidian-vault` как Vault. Полный первичный
-проход запускается вручную в GitHub Actions с параметром `full_sync`.
+Если данные не изменились, pull request не создаётся. Если изменились, workflow
+обновляет одну ветку `automation/clinical-guidelines` и один открытый pull request.
+Повторный запуск не открывает второй pull request. В `main` workflow сам не пушит:
+такой push от `GITHUB_TOKEN` не запускает деплой. После объединения pull request
+обычный push в `main` запускает существующий деплой. Медицинские карточки перед
+этим смотрит человек.
+
+Чтобы `GITHUB_TOKEN` мог открыть pull request, в настройках репозитория нужно
+включить **Allow GitHub Actions to create and approve pull requests**
+(Settings → Actions → General → Workflow permissions). Проверка `portal-tests`
+на таком pull request создаётся в состоянии ожидания: её запускает человек
+с правом записи кнопкой **Approve workflows to run**. Это правило GitHub для
+событий `pull_request` от `GITHUB_TOKEN`, а не результат пробного запуска.
+
+В Obsidian нужно открыть папку `obsidian-vault` как Vault.
 
 ### Альтернативный запуск из n8n
 
