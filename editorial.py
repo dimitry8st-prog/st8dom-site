@@ -630,6 +630,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 19, 18, 50, 37, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "time-reversal-2026-10.json",
+        datetime(2026, 10, 24, 16, 43, 26, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
