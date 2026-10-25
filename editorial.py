@@ -361,6 +361,11 @@ def ensure_editorial_seed() -> None:
     )
 
     ensure_published_content_package(
+        "migraine-prevention-guidelines-2026-10.json",
+        datetime(2026, 10, 25, 12, 0, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "post-stroke-movement-technologies-2026-10.json",
         datetime(2026, 10, 19, 7, 21, tzinfo=timezone.utc),
     )
