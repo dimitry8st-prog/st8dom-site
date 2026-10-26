@@ -86,6 +86,31 @@
   </section>
   {% endif %}
 
+  {% if slug == 'ai' and aaif_watch %}
+  <section class="s" id="aaif-weekly" aria-labelledby="aaif-title">
+    <div class="s-label"><span>//</span> официальные источники · еженедельный сбор</div>
+    <h2 id="aaif-title">Еженедельный мониторинг AAIF</h2>
+    <p class="lead">Agentic AI Foundation при Linux Foundation: стандарты, протоколы и инфраструктура автономных агентов. Сбор — каждый понедельник; материалы со статусом «На проверке» не являются опубликованными статьями ДИС.</p>
+    {% if aaif_watch.get('baseline') %}
+    <p class="editorial-notice">По заявлению AAIF от {{ aaif_watch['baseline']['as_of'] }}: под управлением фонда {{ aaif_watch['baseline']['project_count'] }} проектов. Новые участники: {% for project in aaif_watch['baseline']['new_projects'] %}{{ project.name }} ({{ project.contributor }}){% if not loop.last %}, {% endif %}{% endfor %}. <a href="{{ aaif_watch['baseline']['source_url'] }}" rel="noopener noreferrer" target="_blank">Официальное сообщение</a>.</p>
+    {% endif %}
+    <div class="portal-project-grid">
+      {% for item in aaif_watch.get('items', [])[:6] %}
+      <article class="portal-project-card">
+        <p class="project-kind">AAIF · {{ item.published_date or 'дата не указана' }} · На проверке</p>
+        <h3><a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></h3>
+        {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    <div class="section-actions">
+      <a class="btn btn-ghost" href="https://aaif.io/blog" target="_blank" rel="noopener noreferrer">Блог AAIF</a>
+      <a class="btn btn-ghost" href="https://aaif.io/news" target="_blank" rel="noopener noreferrer">Новости AAIF</a>
+      <a class="btn btn-primary" href="{{ url_for('material_detail', slug='aaif-agentnye-standarty-openai-anthropic-otkrytyy-fundament') }}">Наш разбор AAIF</a>
+    </div>
+  </section>
+  {% endif %}
+
   <section class="s" id="topics">
     <div class="s-label"><span>//</span> тематический маршрут</div>
     <h2>Что будет в разделе</h2>
