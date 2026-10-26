@@ -616,6 +616,11 @@ def ensure_editorial_seed() -> None:
     )
 
     ensure_published_content_package(
+        "claude-agent-boundaries-2026-10-26.json",
+        datetime(2026, 10, 26, 7, 3, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "ai-self-replication-2026-10.json",
         datetime(2026, 10, 15, 17, 17, tzinfo=timezone.utc),
     )
