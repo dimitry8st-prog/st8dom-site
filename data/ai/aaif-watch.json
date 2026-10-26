@@ -1,0 +1,37 @@
+{
+  "source": "Agentic AI Foundation",
+  "source_url": "https://aaif.io/",
+  "section": "ai",
+  "baseline": {
+    "as_of": "2026-10-22",
+    "project_count": 10,
+    "new_projects": [
+      {
+        "name": "Agent Skills",
+        "contributor": "Anthropic"
+      },
+      {
+        "name": "Open Responses",
+        "contributor": "OpenAI"
+      },
+      {
+        "name": "OpenEnv",
+        "contributor": "Hugging Face"
+      },
+      {
+        "name": "OpenSandbox",
+        "contributor": "Alibaba"
+      }
+    ],
+    "source_url": "https://aaif.io/news/agentic-ai-foundation-announces-four-new-projects"
+  },
+  "items": [
+    {
+      "title": "Agentic AI Foundation Announces Four New Projects: Agent Skills, Open Responses, OpenEnv, and OpenSandbox",
+      "url": "https://aaif.io/news/agentic-ai-foundation-announces-four-new-projects",
+      "published_date": "2026-10-22",
+      "summary": "AAIF принял Agent Skills, Open Responses, OpenEnv и OpenSandbox. Теперь под управлением фонда десять открытых проектов.",
+      "review_status": "pending"
+    }
+  ]
+}
