@@ -77,6 +77,7 @@ from payments_robokassa import (
 )
 from products import PRODUCTS, PRODUCTS_BY_SLUG
 from lifeos_import import ImportValidationError, import_lifeos_package
+from scripts.aaif_weekly_scan import load_snapshot as load_aaif_watch
 from lifeos_workspace import STREAMS, SCIENCE_STREAMS, ALL_STREAMS, save_material, collect_securitylab
 from library_content import (
     LIBRARY_CATEGORIES,
@@ -440,6 +441,7 @@ def create_app() -> Flask:
             slug=slug,
             lifeos_streams=STREAMS,
             lifeos_science_streams=SCIENCE_STREAMS,
+            aaif_watch=load_aaif_watch() if slug == "ai" else None,
             related_projects=related_projects,
             latest_materials=published_articles()
             .filter_by(section=slug)
