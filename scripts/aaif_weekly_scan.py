@@ -17,7 +17,7 @@ import requests
 BASE_URL = "https://aaif.io/"
 LISTINGS = ("https://aaif.io/", "https://aaif.io/blog", "https://aaif.io/news")
 DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "data" / "ai" / "aaif-watch.json"
-DATE_RE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})\b")
+DATE_RE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})(?!\d)")
 JSON_DATE_RE = re.compile(r'"datePublished"\s*:\s*"([^"]+)"')
 US_DATE_RE = re.compile(r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+([0-3]?\d),?\s+(20\d{2})\b", re.I)
 
