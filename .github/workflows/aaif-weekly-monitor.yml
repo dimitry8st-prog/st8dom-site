@@ -1,0 +1,64 @@
+name: AAIF — еженедельный мониторинг стандартов AI-агентов
+
+on:
+  schedule:
+    # Каждый понедельник 06:15 по Москве (03:15 UTC).
+    - cron: "15 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: aaif-weekly-monitor
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установить зависимости
+        run: pip install -r requirements.txt
+      - name: Собрать официальные публикации AAIF
+        run: python -m scripts.aaif_weekly_scan
+      - name: Проверить парсер
+        run: python -m pytest -q tests/test_aaif_watch.py
+      - name: Сохранить новые источники (без автопубликации статей)
+        id: push
+        shell: bash
+        run: |
+          set -e
+          if git diff --quiet -- data/ai/aaif-watch.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Новых источников нет. Повторные публикации не создаются."
+            exit 0
+          fi
+          git config user.name "DIS AAIF Monitor"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/ai/aaif-watch.json
+          git commit -m "monitor(ai): refresh official AAIF sources"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git rebase --abort || true
+            sleep $((attempt * 3))
+          done
+          echo "Не удалось сохранить результаты мониторинга"
+          exit 1
+      - name: Обновить витрину портала после изменения источников
+        if: steps.push.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
