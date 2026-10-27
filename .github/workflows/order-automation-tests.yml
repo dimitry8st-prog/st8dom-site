@@ -8,12 +8,15 @@ on:
       - "models.py"
       - "payments_robokassa.py"
       - "order_automation.py"
+      - "n8n_orders_api.py"
       - "inquiry_autoreply.py"
       - "templates/products.html"
       - "templates/payment*.html"
       - "templates/admin/orders.html"
       - "tests/**"
       - "deploy/install-order-notifications.sh"
+      - "workflows/**"
+      - "scripts/test_nns09_workflow.js"
       - "requirements.txt"
       - ".github/workflows/order-automation-tests.yml"
   workflow_dispatch:
@@ -34,3 +37,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pytest -q
       - run: bash -n deploy/install-order-notifications.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/test_nns09_workflow.js

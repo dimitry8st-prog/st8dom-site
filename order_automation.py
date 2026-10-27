@@ -82,7 +82,7 @@ def checkout_request_key(value, slug, config):
     return nonce
 
 
-def create_checkout(product, data, config, request_key):
+def create_checkout(product, data, config, request_key, *, queue_notification=True):
     fingerprint = hashlib.sha256(json.dumps(
         {"slug": product["slug"], **data}, sort_keys=True, ensure_ascii=False,
     ).encode("utf-8")).hexdigest()
@@ -110,7 +110,8 @@ def create_checkout(product, data, config, request_key):
         contact=data["contact"], comment=data["comment"],
     )
     db.session.add(checkout)
-    db.session.add(OrderNotification(order_id=order.id, kind="payment_link"))
+    if queue_notification:
+        db.session.add(OrderNotification(order_id=order.id, kind="payment_link"))
     try:
         db.session.commit()
     except IntegrityError:

@@ -85,6 +85,7 @@ from order_automation import (
     checkout_request_key, config_for_order, create_checkout, issue_checkout_key,
     now_utc, payment_link, process_notifications, saved_product, smtp_ready,
 )
+from n8n_orders_api import make_orders_blueprint
 from lifeos_import import ImportValidationError, import_lifeos_package
 from scripts.aaif_weekly_scan import load_snapshot as load_aaif_watch
 from lifeos_workspace import STREAMS, SCIENCE_STREAMS, ALL_STREAMS, save_material, collect_securitylab
@@ -281,6 +282,7 @@ def create_app() -> Flask:
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
+    app.register_blueprint(make_orders_blueprint())
 
     @app.before_request
     def protect_library_files():
