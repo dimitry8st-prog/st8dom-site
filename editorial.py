@@ -653,6 +653,7 @@ def ensure_editorial_seed() -> None:
     ensure_published_content_package(
         "quantum-time-spins-simulation-2026-10-27.json",
         datetime(2026, 10, 27, 17, 45, 30, tzinfo=timezone.utc),
+        update_published=True,
     )
 
     db.session.commit()
