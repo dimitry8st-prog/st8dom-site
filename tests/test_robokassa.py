@@ -86,7 +86,7 @@ def test_missing_password_cannot_validate_publicly_computable_signature():
 def test_checkout_form_destination_is_allowed_by_browser_policy(client, monkeypatch):
     from app import app, PRODUCTS_BY_SLUG
     from extensions import db
-    from models import Order
+    from models import Order, OrderCheckout, OrderNotification
     from payments_robokassa import PAY_URL
     from urllib.parse import urlsplit
 
@@ -117,6 +117,9 @@ def test_checkout_form_destination_is_allowed_by_browser_policy(client, monkeypa
         assert "form-action 'self'" in invalid.headers["Content-Security-Policy"].split("; ")
     finally:
         with app.app_context():
+            order_ids = [row.id for row in Order.query.filter_by(email=email).all()]
+            OrderNotification.query.filter(OrderNotification.order_id.in_(order_ids)).delete(synchronize_session=False)
+            OrderCheckout.query.filter(OrderCheckout.order_id.in_(order_ids)).delete(synchronize_session=False)
             Order.query.filter_by(email=email).delete()
             db.session.commit()
 

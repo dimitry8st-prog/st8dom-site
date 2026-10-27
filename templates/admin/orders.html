@@ -7,7 +7,8 @@
     <div>
       <p class="eyebrow">// платежи</p>
       <h1>Заказы</h1>
-      <p class="lead">Robokassa: {{ "подключена" if robokassa_ready else "не настроена" }} · Возвраты: {{ "готовы" if refund_ready else "нужен Password3" }}</p>
+      <p class="lead">Robokassa: {{ "параметры заданы" if robokassa_ready else "не настроена" }} · Возвраты: {{ "Password3 задан" if refund_ready else "нужен Password3" }}</p>
+      <p>Письма по заказам: {{ "настроены — очередь обрабатывает серверная задача" if order_email_ready else "не включены или SMTP не настроен — заказы сохраняются" }}.</p>
     </div>
     <div class="row-actions">
       <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_inquiries') }}">Заявки</a>
@@ -18,16 +19,29 @@
 
   <div class="table-wrap">
     <table class="data">
-      <thead><tr><th>ID</th><th>Дата</th><th>Продукт</th><th>Покупатель</th><th>Сумма</th><th>Статус</th><th>Возврат</th></tr></thead>
+      <thead><tr><th>ID</th><th>Дата</th><th>Продукт</th><th>Покупатель</th><th>Сумма</th><th>Статус</th><th>Письма</th><th>Возврат</th></tr></thead>
       <tbody>
       {% for item in orders %}
       <tr>
         <td>#{{ item.id }}</td>
         <td>{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
         <td>{{ item.product_name }}</td>
-        <td>{{ item.name or '—' }}<br><a href="mailto:{{ item.email }}">{{ item.email }}</a></td>
+        <td>{{ item.name or '—' }}<br><a href="mailto:{{ item.email }}">{{ item.email }}</a>
+          {% set checkout = checkouts.get(item.id) %}
+          {% if checkout %}
+          <div>{{ 'Тестовый заказ' if checkout.test_mode else 'Рабочий заказ' }}</div>
+          {% if checkout.contact %}<div>{{ checkout.contact }}</div>{% endif %}
+          {% if checkout.comment %}<details><summary>Комментарий</summary><p>{{ checkout.comment }}</p></details>{% endif %}
+          {% endif %}
+        </td>
         <td>{{ '%.2f'|format(item.amount) }} ₽</td>
-        <td>{{ item.status }}</td>
+        <td>{{ order_labels.get(item.status, item.status) }}</td>
+        <td>
+          {% for notice in notifications if notice.order_id == item.id %}
+          <div><strong>{{ 'Ссылка на оплату' if notice.kind == 'payment_link' else 'Подтверждение оплаты' }}:</strong> {{ notice_labels.get(notice.status, notice.status) }}</div>
+          {% if notice.last_error %}<small>{{ notice.last_error }}</small>{% endif %}
+          {% else %}—{% endfor %}
+        </td>
         <td>
           {% if item.status in ['paid', 'refund_failed'] %}
           <form method="post" action="{{ url_for('admin_order_refund', order_id=item.id) }}" onsubmit="return confirm('Отправить возврат через Robokassa?');">
@@ -47,7 +61,7 @@
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="7">Заказов пока нет.</td></tr>
+      <tr><td colspan="8">Заказов пока нет.</td></tr>
       {% endfor %}
       </tbody>
     </table>

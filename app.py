@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import logging
 import os
 import smtplib
+import ssl
 import secrets
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
@@ -21,6 +23,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import requests
+import click
+from email_validator import EmailNotValidError, validate_email
 from sqlalchemy import func, or_
 from flask import (
     Flask,
@@ -76,6 +80,11 @@ from payments_robokassa import (
     valid_success_signature,
 )
 from products import PRODUCTS, PRODUCTS_BY_SLUG
+from order_automation import (
+    CheckoutConflict, INITIAL_PAYMENT_STATES, NOTICE_LABELS, ORDER_LABELS,
+    checkout_request_key, config_for_order, create_checkout, issue_checkout_key,
+    now_utc, payment_link, process_notifications, saved_product, smtp_ready,
+)
 from lifeos_import import ImportValidationError, import_lifeos_package
 from scripts.aaif_weekly_scan import load_snapshot as load_aaif_watch
 from lifeos_workspace import STREAMS, SCIENCE_STREAMS, ALL_STREAMS, save_material, collect_securitylab
@@ -98,6 +107,8 @@ from models import (
     InquiryAutoReply,
     InquirySpam,
     Order,
+    OrderCheckout,
+    OrderNotification,
     PortalVisit,
     Rubric,
     Tag,
@@ -200,12 +211,14 @@ def notify_email(inquiry: Inquiry, app: Flask) -> bool:
     )
 
     try:
-        with smtplib.SMTP(
-            app.config["SMTP_HOST"], app.config["SMTP_PORT"], timeout=10
+        smtp_type = smtplib.SMTP_SSL if app.config.get("SMTP_USE_SSL") else smtplib.SMTP
+        tls_options = {"context": ssl.create_default_context()} if app.config.get("SMTP_USE_SSL") else {}
+        with smtp_type(
+            app.config["SMTP_HOST"], app.config["SMTP_PORT"], timeout=10, **tls_options
         ) as smtp:
             smtp.ehlo()
-            if app.config.get("SMTP_USE_TLS", True):
-                smtp.starttls()
+            if app.config.get("SMTP_USE_TLS", True) and not app.config.get("SMTP_USE_SSL"):
+                smtp.starttls(context=ssl.create_default_context())
                 smtp.ehlo()
             smtp.login(username, password)
             smtp.send_message(message)
@@ -247,6 +260,7 @@ def notify_telegram(inquiry: Inquiry, app: Flask) -> None:
 
 
 def create_app() -> Flask:
+    checkout_limiter = SlidingWindowLimiter(max_hits=20, window_sec=300)
     app = Flask(
         __name__,
         instance_path=str(BASE_DIR / "instance"),
@@ -311,7 +325,7 @@ def create_app() -> Flask:
             request.method != "GET"
             or not endpoint
             or endpoint.startswith(("admin_", "static", "api_"))
-            or endpoint in {"robots", "sitemap"}
+            or endpoint in {"robots", "sitemap", "order_payment_link"}
             or current_user.is_authenticated
             or any(marker in request.user_agent.string.lower() for marker in BOT_MARKERS)
         ):
@@ -349,7 +363,7 @@ def create_app() -> Flask:
                     "frame-ancestors 'none'",
                     (
                         "form-action 'self' https://auth.robokassa.ru"
-                        if request.endpoint == "robokassa_checkout" and response.status_code == 200
+                        if request.endpoint in {"robokassa_checkout", "order_payment_link"} and response.status_code == 200
                         else "form-action 'self'"
                     ),
                     "script-src 'self' 'unsafe-inline'",
@@ -367,6 +381,10 @@ def create_app() -> Flask:
             )
         if request.path.startswith(("/admin/", "/directions/life-os", "/api/life-os/")):
             response.headers["Cache-Control"] = "no-store"
+        if request.path.startswith(("/orders/pay/", "/payments/robokassa/")) or request.endpoint == "robokassa_checkout":
+            response.headers["Cache-Control"] = "no-store"
+            response.headers["Referrer-Policy"] = "no-referrer"
+            response.headers["X-Robots-Tag"] = "noindex, nofollow"
         return response
 
     @login_manager.user_loader
@@ -1163,6 +1181,7 @@ def create_app() -> Flask:
             products=PRODUCTS,
             payment_enabled=robokassa_enabled(app.config),
             payment_test_mode=bool(app.config.get("ROBOKASSA_TEST_MODE")),
+            checkout_keys={p["slug"]: issue_checkout_key(p["slug"], app.config) for p in PRODUCTS if p.get("sellable")},
             page_id="products",
         )
 
@@ -1175,29 +1194,66 @@ def create_app() -> Flask:
             flash("Онлайн-оплата ещё подключается. Оставьте заявку — я отвечу лично.", "info")
             return redirect(url_for("contact", topic="other"))
 
+        if not checkout_limiter.allow(f"checkout:{hash_ip(request.remote_addr)}"):
+            return "Слишком много оформлений подряд. Повторите через несколько минут.", 429
+
         email = (request.form.get("email") or "").strip().lower()
         name = (request.form.get("name") or "").strip()
-        if len(email) > 255 or "@" not in email or "\n" in email or "\r" in email:
+        try:
+            if len(email) > 255:
+                raise ValueError("email too long")
+            email = validate_email(email, check_deliverability=False).normalized.lower()
+        except (EmailNotValidError, ValueError):
             flash("Укажите корректный email для заказа и чека.", "error")
             return redirect(url_for("products_catalog"))
-
-        order = Order(
-            product_slug=product["slug"],
-            product_name=product["name"],
-            amount=Decimal(str(product["price"])),
-            email=email,
-            name=name[:120] or None,
-            status="payment_pending",
-        )
-        db.session.add(order)
-        db.session.commit()
-        payment = payment_form(order, product, app.config)
+        contact = (request.form.get("contact") or "").strip()
+        comment = (request.form.get("comment") or "").strip()
+        if len(contact) > 120 or len(comment) > 3000:
+            return "Контакт — до 120 символов, комментарий — до 3000 символов.", 400
+        try:
+            request_key = checkout_request_key(request.form.get("checkout_key"), slug, app.config)
+            order, checkout = create_checkout(product, {
+                "email": email, "name": name[:120], "contact": contact, "comment": comment,
+            }, app.config, request_key)
+        except CheckoutConflict as exc:
+            return str(exc), 409
+        except ValueError as exc:
+            return str(exc), 400
+        if checkout.test_mode != bool(app.config.get("ROBOKASSA_TEST_MODE")):
+            return "Режим оплаты изменился. Свяжитесь с нами перед оплатой этого заказа.", 409
+        product = saved_product(order, checkout)
+        payment = payment_form(order, product, config_for_order(order.id, app.config)) if order.status in INITIAL_PAYMENT_STATES else None
         return render_template(
             "payment_redirect.html",
             payment=payment,
             order=order,
             product=product,
+            payment_link=payment_link(checkout, app.config),
+            order_status=ORDER_LABELS.get(order.status, order.status),
+            payment_test_mode=checkout.test_mode,
             page_id="products",
+        )
+
+    @app.get("/orders/pay/<token>/")
+    def order_payment_link(token):
+        if len(token) != 43:
+            abort(404)
+        checkout = OrderCheckout.query.filter_by(payment_token=token).first_or_404()
+        order = db.session.get(Order, checkout.order_id)
+        if order is None:
+            abort(404)
+        if checkout.test_mode != bool(app.config.get("ROBOKASSA_TEST_MODE")):
+            return "Режим оплаты изменился. Свяжитесь с нами перед оплатой этого заказа.", 409
+        config = config_for_order(order.id, app.config)
+        if not robokassa_enabled(config):
+            return "Оплата временно недоступна. Ваш заказ сохранён.", 503
+        product = saved_product(order, checkout)
+        payment = payment_form(order, product, config) if order.status in INITIAL_PAYMENT_STATES else None
+        return render_template(
+            "payment_redirect.html", order=order, product=product, payment=payment,
+            payment_link=payment_link(checkout, app.config),
+            order_status=ORDER_LABELS.get(order.status, order.status),
+            payment_test_mode=checkout.test_mode, page_id="products",
         )
 
     @app.post("/payments/robokassa/result/")
@@ -1206,8 +1262,10 @@ def create_app() -> Flask:
         out_sum = request.values.get("OutSum", "")
         inv_id = request.values.get("InvId", "")
         signature = request.values.get("SignatureValue", "")
-        if not inv_id.isdigit() or not valid_result_signature(out_sum, inv_id, signature, app.config):
-            logger.warning("Robokassa: некорректная подпись ResultURL, InvId=%s", inv_id)
+        if not inv_id.isascii() or not inv_id.isdecimal() or len(inv_id) > 18:
+            return "bad sign", 400
+        if not valid_result_signature(out_sum, inv_id, signature, config_for_order(int(inv_id), app.config)):
+            logger.warning("Robokassa: некорректная подпись ResultURL")
             return "bad sign", 400
         order = db.session.get(Order, int(inv_id))
         if order is None:
@@ -1216,14 +1274,21 @@ def create_app() -> Flask:
             paid_sum = Decimal(out_sum)
         except InvalidOperation:
             return "bad sum", 400
-        if paid_sum != Decimal(order.amount):
+        if not paid_sum.is_finite() or paid_sum != Decimal(order.amount):
             logger.warning("Robokassa: сумма не совпала для заказа #%s", order.id)
             return "bad sum", 400
-        if order.status != "paid":
-            order.status = "paid"
-            order.paid_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        changed = Order.query.filter(
+            Order.id == order.id, Order.status.in_(INITIAL_PAYMENT_STATES),
+        ).update({"status": "paid", "paid_at": now_utc()}, synchronize_session=False)
+        if changed:
+            if db.session.get(OrderCheckout, order.id):
+                db.session.add(OrderNotification(order_id=order.id, kind="payment_received"))
+            # Оплата и событие письма фиксируются одной транзакцией. Ошибка БД
+            # не подтверждается OK: Robokassa сможет безопасно повторить callback.
             db.session.commit()
             logger.info("Robokassa: заказ #%s оплачен", order.id)
+        else:
+            db.session.rollback()
         return f"OK{order.id}"
 
     @csrf.exempt
@@ -1232,11 +1297,17 @@ def create_app() -> Flask:
         out_sum = request.values.get("OutSum", "")
         inv_id = request.values.get("InvId", "")
         signature = request.values.get("SignatureValue", "")
-        verified = bool(
-            inv_id.isdigit()
-            and valid_success_signature(out_sum, inv_id, signature, app.config)
-        )
-        order = db.session.get(Order, int(inv_id)) if inv_id.isdigit() else None
+        valid_id = inv_id.isascii() and inv_id.isdecimal() and len(inv_id) <= 18
+        verified = bool(valid_id and valid_success_signature(
+            out_sum, inv_id, signature, config_for_order(int(inv_id), app.config),
+        ))
+        order = db.session.get(Order, int(inv_id)) if verified else None
+        try:
+            verified = bool(order and Decimal(out_sum).is_finite() and Decimal(out_sum) == Decimal(order.amount))
+        except InvalidOperation:
+            verified = False
+        if not verified:
+            order = None
         return render_template(
             "payment_success.html",
             order=order,
@@ -1247,12 +1318,8 @@ def create_app() -> Flask:
     @csrf.exempt
     @app.route("/payments/robokassa/fail/", methods=["GET", "POST"])
     def robokassa_fail():
-        inv_id = request.values.get("InvId", "")
-        order = db.session.get(Order, int(inv_id)) if inv_id.isdigit() else None
-        if order is not None and order.status == "payment_pending":
-            order.status = "payment_failed"
-            db.session.commit()
-        return render_template("payment_fail.html", order=order, page_id="products")
+        # Браузерный переход не подтверждает ни отказ, ни получение денег.
+        return render_template("payment_fail.html", order=None, page_id="products")
 
     @app.route("/admin/orders/")
     @login_required
@@ -1264,6 +1331,11 @@ def create_app() -> Flask:
             products=PRODUCTS_BY_SLUG,
             robokassa_ready=robokassa_enabled(app.config),
             refund_ready=bool(app.config.get("ROBOKASSA_PASSWORD3")),
+            checkouts={c.order_id: c for c in OrderCheckout.query.all()},
+            notifications=OrderNotification.query.order_by(OrderNotification.id).all(),
+            order_labels=ORDER_LABELS,
+            notice_labels=NOTICE_LABELS,
+            order_email_ready=smtp_ready(app.config),
             page_id="admin",
         )
 
@@ -1726,6 +1798,25 @@ def create_app() -> Flask:
     def server_error(_error):
         logger.exception("Внутренняя ошибка сервера")
         return render_template("errors/500.html", page_id="error"), 500
+
+    @app.cli.command("order-notifications")
+    @click.option("--limit", default=5, type=click.IntRange(1, 100), show_default=True)
+    def order_notifications_command(limit):
+        """Обработать очередь писем; не создаёт платежей и возвратов."""
+        click.echo(json.dumps(process_notifications(app.config, limit=limit), ensure_ascii=False))
+
+    @app.cli.command("order-email-status")
+    def order_email_status_command():
+        """Готовность и счётчики очереди без адресов, ссылок и секретов."""
+        counts = dict(db.session.query(OrderNotification.status, func.count(OrderNotification.id)).group_by(OrderNotification.status).all())
+        click.echo(json.dumps({
+            "enabled": bool(app.config.get("ORDER_EMAIL_ENABLED")),
+            "smtp_ready": smtp_ready(app.config),
+            "missing": [key for key in ("SMTP_HOST", "SMTP_USERNAME", "SMTP_PASSWORD") if not app.config.get(key)],
+            "ssl_tls_conflict": bool(app.config.get("SMTP_USE_SSL") and app.config.get("SMTP_USE_TLS")),
+            "smtp_encryption_missing": not (app.config.get("SMTP_USE_SSL") or app.config.get("SMTP_USE_TLS", True)),
+            "queue": counts,
+        }, ensure_ascii=False))
 
     with app.app_context():
         db.create_all()

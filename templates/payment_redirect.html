@@ -5,8 +5,10 @@
 <div class="container" style="padding:70px 24px">
   <section class="s prose">
     <p class="eyebrow">// заказ №{{ order.id }}</p>
-    <h1>Переходим к безопасной оплате</h1>
+    <h1>{% if payment %}Заказ оформлен{% else %}{{ order_status }}{% endif %}</h1>
     <p>{{ product.name }} — <strong>{{ product.price_label }}</strong>.</p>
+    {% if payment_test_mode %}<p><strong>Тестовый режим: реальные списания не выполняются.</strong></p>{% endif %}
+    {% if payment %}
     <p>Оплата проводится на стороне Robokassa. После платежа вы вернётесь на st8dom.ru.</p>
     <form id="robokassa-payment" method="post" action="{{ payment.url }}">
       {% for key, value in payment.fields.items() %}
@@ -14,6 +16,11 @@
       {% endfor %}
       <button class="btn btn-primary" type="submit">Перейти в Robokassa</button>
     </form>
+    <p>Сохраните <a href="{{ payment_link }}">ссылку на этот заказ</a>, чтобы вернуться к оплате позже.</p>
+    <p>Письмо со ссылкой поставлено в очередь. Если оно не пришло, используйте ссылку выше. При вопросах свяжитесь с нами через <a href="{{ url_for('contact') }}">форму связи</a>.</p>
+    {% else %}
+    <p>Повторная оплата этого заказа недоступна. Если вам нужна помощь, <a href="{{ url_for('contact') }}">свяжитесь с нами</a>.</p>
+    {% endif %}
   </section>
 </div>
 {% endblock %}
