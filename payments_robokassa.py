@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 from decimal import Decimal
 from urllib.parse import quote
@@ -88,7 +89,7 @@ def valid_result_signature(out_sum: str, inv_id: str, signature: str, config) ->
     expected = hashlib.md5(
         f"{out_sum}:{inv_id}:{password2}".encode("utf-8")
     ).hexdigest()
-    return expected.casefold() == (signature or "").casefold()
+    return hmac.compare_digest(expected.encode("ascii"), (signature or "").casefold().encode("utf-8"))
 
 
 def valid_success_signature(out_sum: str, inv_id: str, signature: str, config) -> bool:
@@ -102,7 +103,7 @@ def valid_success_signature(out_sum: str, inv_id: str, signature: str, config) -
     expected = hashlib.md5(
         f"{out_sum}:{inv_id}:{password1}".encode("utf-8")
     ).hexdigest()
-    return expected.casefold() == (signature or "").casefold()
+    return hmac.compare_digest(expected.encode("ascii"), (signature or "").casefold().encode("utf-8"))
 
 
 def fetch_op_key(order, config) -> str | None:

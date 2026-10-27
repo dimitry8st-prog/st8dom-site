@@ -426,6 +426,46 @@ class Order(db.Model):
     refunded_at = db.Column(db.DateTime, nullable=True)
 
 
+class OrderCheckout(db.Model):
+    """Снимок оформления: одна форма — один заказ и одна ссылка оплаты.
+
+    Отдельная таблица позволяет обновить действующую БД через create_all(),
+    не меняя столбцы существующих заказов.
+    """
+
+    __tablename__ = "order_checkouts"
+
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id", ondelete="CASCADE"), primary_key=True)
+    request_key = db.Column(db.String(64), nullable=False, unique=True)
+    request_hash = db.Column(db.String(64), nullable=False)
+    payment_token = db.Column(db.String(64), nullable=False, unique=True)
+    test_mode = db.Column(db.Boolean, nullable=False)
+    payment_object = db.Column(db.String(32), nullable=False, default="service")
+    contact = db.Column(db.String(120), nullable=False, default="")
+    comment = db.Column(db.Text, nullable=False, default="")
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+
+
+class OrderNotification(db.Model):
+    """Очередь писем; неопределённая отправка не повторяется автоматически."""
+
+    __tablename__ = "order_notifications"
+    __table_args__ = (
+        db.UniqueConstraint("order_id", "kind", name="uq_order_notification_kind"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind = db.Column(db.String(32), nullable=False)
+    status = db.Column(db.String(24), nullable=False, default="pending", index=True)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
+    last_error = db.Column(db.String(80), nullable=True)
+    available_at = db.Column(db.DateTime, default=utcnow, nullable=False, index=True)
+    attempted_at = db.Column(db.DateTime, nullable=True)
+    sent_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+
+
 class LifeOSMaterial(db.Model):
     """Личные материалы трёх независимых направлений Life-OS."""
     __tablename__ = "lifeos_materials"

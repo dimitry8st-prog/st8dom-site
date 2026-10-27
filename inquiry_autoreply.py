@@ -5,6 +5,7 @@ import hmac
 import logging
 import re
 import smtplib
+import ssl
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 
@@ -91,10 +92,12 @@ def send_price_auto_reply(inquiry, app, *, requested: bool | None = None) -> boo
         "С уважением,\nДмитрий Степанов\nhttps://st8dom.ru\n"
     )
     try:
-        with smtplib.SMTP(app.config["SMTP_HOST"], app.config["SMTP_PORT"], timeout=10) as smtp:
+        smtp_type = smtplib.SMTP_SSL if app.config.get("SMTP_USE_SSL") else smtplib.SMTP
+        tls_options = {"context": ssl.create_default_context()} if app.config.get("SMTP_USE_SSL") else {}
+        with smtp_type(app.config["SMTP_HOST"], app.config["SMTP_PORT"], timeout=10, **tls_options) as smtp:
             smtp.ehlo()
-            if app.config.get("SMTP_USE_TLS", True):
-                smtp.starttls()
+            if app.config.get("SMTP_USE_TLS", True) and not app.config.get("SMTP_USE_SSL"):
+                smtp.starttls(context=ssl.create_default_context())
                 smtp.ehlo()
             smtp.login(username, password)
             smtp.send_message(mail)

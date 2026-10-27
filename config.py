@@ -57,6 +57,14 @@ class Config:
     SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip().lower() not in {
         "0", "false", "off", "no"
     }
+    SMTP_USE_SSL = os.environ.get("SMTP_USE_SSL", "0").strip().lower() in {
+        "1", "true", "on", "yes"
+    }
+    # Новые письма по заказам отправляет отдельная очередь. Включать после
+    # настройки SMTP на сервере; старые заказы автоматически не рассылаются.
+    ORDER_EMAIL_ENABLED = os.environ.get("ORDER_EMAIL_ENABLED", "0").strip().lower() in {
+        "1", "true", "on", "yes"
+    }
     # Только ответы на новые заявки с явным запросом ответа. Нужен рабочий SMTP.
     INQUIRY_AUTO_REPLY_ENABLED = os.environ.get(
         "INQUIRY_AUTO_REPLY_ENABLED", "1"

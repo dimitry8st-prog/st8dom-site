@@ -55,6 +55,7 @@
           {% if payment_enabled %}
           <form method="post" action="{{ url_for('robokassa_checkout', slug=product.slug) }}" class="product-buy-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="checkout_key" value="{{ checkout_keys[product.slug] }}">
             <div class="product-buy-fields">
               <div class="field">
                 <label for="buy-name-{{ product.slug }}">Имя (необязательно)</label>
@@ -63,6 +64,14 @@
               <div class="field">
                 <label for="buy-email-{{ product.slug }}">Email для заказа и чека <span class="req">*</span></label>
                 <input id="buy-email-{{ product.slug }}" type="email" name="email" maxlength="255" required autocomplete="email" placeholder="you@example.ru">
+              </div>
+              <div class="field">
+                <label for="buy-contact-{{ product.slug }}">Телефон или никнейм (необязательно)</label>
+                <input id="buy-contact-{{ product.slug }}" type="text" name="contact" maxlength="120" placeholder="Как с вами связаться">
+              </div>
+              <div class="field">
+                <label for="buy-comment-{{ product.slug }}">Комментарий к заказу</label>
+                <textarea id="buy-comment-{{ product.slug }}" name="comment" maxlength="3000" rows="2" placeholder="Кратко опишите задачу"></textarea>
               </div>
             </div>
             <p class="pricing-note">Нажимая кнопку оплаты, вы принимаете <a href="{{ url_for('offer') }}">Публичную оферту</a> и подтверждаете ознакомление с <a href="{{ url_for('privacy') }}">Политикой обработки персональных данных</a>.</p>
