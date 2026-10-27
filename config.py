@@ -65,6 +65,8 @@ class Config:
     ORDER_EMAIL_ENABLED = os.environ.get("ORDER_EMAIL_ENABLED", "0").strip().lower() in {
         "1", "true", "on", "yes"
     }
+    # Отдельный ограниченный API для учебного n8n: пустой токен выключает маршруты.
+    N8N_ORDERS_API_TOKEN = os.environ.get("N8N_ORDERS_API_TOKEN", "")
     # Только ответы на новые заявки с явным запросом ответа. Нужен рабочий SMTP.
     INQUIRY_AUTO_REPLY_ENABLED = os.environ.get(
         "INQUIRY_AUTO_REPLY_ENABLED", "1"
