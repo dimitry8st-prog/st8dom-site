@@ -1,0 +1,79 @@
+name: portal-network-diagnostics
+
+on:
+  push:
+    branches:
+      - diagnostics/portal-network-2026-10-29
+
+permissions: {}
+
+jobs:
+  external-connectivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Read-only DNS, TCP and verified HTTPS checks
+        shell: bash
+        run: |
+          python3 -u - <<'PY'
+          import concurrent.futures
+          import datetime
+          import signal
+          import socket
+          import ssl
+          import time
+
+          HOST = "st8dom.ru"
+          IPV4 = "72.56.76.107"
+
+          print("SOURCE: GitHub-hosted runner; this is not the user's Wi-Fi")
+          print("UTC:", datetime.datetime.now(datetime.timezone.utc).isoformat())
+
+          def alarm_handler(signum, frame):
+              raise TimeoutError("DNS query exceeded 8 seconds")
+
+          signal.signal(signal.SIGALRM, alarm_handler)
+          for family, label in ((socket.AF_INET, "A"), (socket.AF_INET6, "AAAA")):
+              try:
+                  signal.alarm(8)
+                  addresses = sorted({item[4][0] for item in socket.getaddrinfo(
+                      HOST, 443, family, socket.SOCK_STREAM)})
+                  print("DNS", label, HOST, addresses)
+                  if family == socket.AF_INET:
+                      print("DNS_A_CONTAINS_EXPECTED_IP:", IPV4 in addresses)
+              except Exception as exc:
+                  print("DNS", label, type(exc).__name__, str(exc))
+              finally:
+                  signal.alarm(0)
+
+          def check_tcp(port):
+              started = time.monotonic()
+              try:
+                  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connection:
+                      connection.settimeout(5)
+                      connection.connect((IPV4, port))
+                  return f"TCP {IPV4}:{port} OPEN {time.monotonic() - started:.2f}s"
+              except OSError as exc:
+                  return (f"TCP {IPV4}:{port} FAILED {type(exc).__name__} "
+                          f"errno={exc.errno} {time.monotonic() - started:.2f}s")
+
+          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+              for result in executor.map(check_tcp, (22, 80, 443)):
+                  print(result)
+
+          try:
+              context = ssl.create_default_context()
+              with socket.create_connection((IPV4, 443), timeout=6) as connection:
+                  with context.wrap_socket(connection, server_hostname=HOST) as secure:
+                      print("TLS:", secure.version(), "certificate verified for", HOST)
+                      secure.sendall((f"HEAD / HTTP/1.1\r\nHost: {HOST}\r\n"
+                                      "User-Agent: PortalNetworkDiagnostic/1.0\r\n"
+                                      "Connection: close\r\n\r\n").encode("ascii"))
+                      response = secure.recv(256)
+                      print("HTTP_STATUS_LINE:", response.split(b"\r\n", 1)[0][:120].decode(
+                          "ascii", errors="replace"))
+          except (OSError, ssl.SSLError) as exc:
+              print("HTTPS_FAILED:", type(exc).__name__, str(exc))
+
+          print("CHECKS_COMPLETE: inspect individual results; completion is not a health verdict")
+          PY
