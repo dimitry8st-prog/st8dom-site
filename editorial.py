@@ -656,6 +656,11 @@ def ensure_editorial_seed() -> None:
         update_published=True,
     )
 
+    ensure_published_content_package(
+        "dna-sam-2026-10-29.json",
+        datetime(2026, 10, 29, 9, 31, 11, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
