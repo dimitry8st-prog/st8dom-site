@@ -57,8 +57,8 @@ jobs:
                   return (f"TCP {IPV4}:{port} FAILED {type(exc).__name__} "
                           f"errno={exc.errno} {time.monotonic() - started:.2f}s")
 
-          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-              for result in executor.map(check_tcp, (22, 80, 443)):
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+              for result in executor.map(check_tcp, (22, 80, 443, 88)):
                   print(result)
 
           try:
@@ -143,4 +143,35 @@ jobs:
               print(label + "_CONTAINS_ARTICLE:", present)
               assert present, "Published article missing from " + label
           print("ARTICLE_PUBLICATION_VERIFIED: public page, title, four sources, sitemap, homepage")
+          PY
+      - name: Verify public KnightCat HTTPS ingress on port 88
+        shell: bash
+        run: |
+          python3 -u - <<'PY'
+          import http.client
+          import ssl
+
+          host = "st8dom.ru"
+          for path, expected in (("/healthz", 200), ("/", 404)):
+              connection = http.client.HTTPSConnection(
+                  host, 88, timeout=8, context=ssl.create_default_context())
+              try:
+                  connection.connect()
+                  print("KNIGHTCAT_TLS:", connection.sock.version(),
+                        "certificate verified for", host)
+                  connection.request("GET", path, headers={
+                      "User-Agent": "KnightCatIngressDiagnostic/1.0",
+                      "Connection": "close",
+                  })
+                  response = connection.getresponse()
+                  body = response.read(513)
+                  print("KNIGHTCAT_PUBLIC_GET", host + ":88" + path,
+                        "HTTP", response.status)
+                  assert response.status == expected, "Unexpected ingress HTTP status"
+                  assert len(body) <= 512, "Unexpected ingress response size"
+                  if path == "/healthz":
+                      assert body == b"knightcat ingress ready", "Unexpected health response"
+              finally:
+                  connection.close()
+          print("KNIGHTCAT_INGRESS_VERIFIED: trusted TLS, health 200, root 404")
           PY
