@@ -77,3 +77,70 @@ jobs:
 
           print("CHECKS_COMPLETE: inspect individual results; completion is not a health verdict")
           PY
+      - name: Verify published DNA-SaM article without authentication
+        shell: bash
+        run: |
+          python3 -u - <<'PY'
+          import html
+          import http.client
+          import ssl
+          from html.parser import HTMLParser
+
+          HOST = "st8dom.ru"
+          PATH = "/materials/hranenie-tsifrovyh-dannyh-dnk-bakteriy-dna-sam/"
+          TITLE = "Хранение цифровых данных в ДНК бактерий с помощью системы DNA-SaM"
+
+          def public_get(path):
+              connection = http.client.HTTPSConnection(
+                  HOST, timeout=10, context=ssl.create_default_context())
+              try:
+                  connection.request("GET", path, headers={
+                      "User-Agent": "PortalPublicationVerificationBot/1.0",
+                      "Accept": "text/html,application/xml",
+                      "Cache-Control": "no-cache",
+                  })
+                  response = connection.getresponse()
+                  body = response.read(2_000_001)
+                  print("PUBLIC_GET", path, "HTTP", response.status, "BYTES", len(body))
+                  assert response.status == 200, "Expected public HTTP 200"
+                  assert len(body) <= 2_000_000, "Response exceeds verification limit"
+                  return body.decode("utf-8")
+              finally:
+                  connection.close()
+
+          class HeadingParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.in_h1 = False
+                  self.parts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == "h1":
+                      self.in_h1 = True
+              def handle_endtag(self, tag):
+                  if tag == "h1":
+                      self.in_h1 = False
+              def handle_data(self, data):
+                  if self.in_h1:
+                      self.parts.append(data)
+
+          article = public_get(PATH)
+          parser = HeadingParser()
+          parser.feed(article)
+          heading = " ".join("".join(parser.parts).split())
+          print("ARTICLE_H1:", heading)
+          assert heading == TITLE, "Published title differs from approved title"
+          for marker in (
+              "s41467-026-78759-4",
+              "41467_2026_78759_MOESM1_ESM.pdf",
+              "nature23017",
+              "PMC7904632",
+          ):
+              present = marker in html.unescape(article)
+              print("PRIMARY_SOURCE_PRESENT", marker, present)
+              assert present, "Approved primary source link missing"
+          for path, label in (("/sitemap.xml", "SITEMAP"), ("/", "HOMEPAGE")):
+              present = PATH in html.unescape(public_get(path))
+              print(label + "_CONTAINS_ARTICLE:", present)
+              assert present, "Published article missing from " + label
+          print("ARTICLE_PUBLICATION_VERIFIED: public page, title, four sources, sitemap, homepage")
+          PY
