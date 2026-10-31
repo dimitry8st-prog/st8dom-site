@@ -11,7 +11,7 @@ codes: "Tinnitus"
 specialties: "Otorhinolaryngology / Audiology / Neurology"
 official_url: "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/"
 source_status: "active"
-tags: [клинические-рекомендации, оториноларингология, аудиология, неврология, на-проверку]
+tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
 ---
 
 # Clinical Practice Guideline: Tinnitus Update
@@ -21,19 +21,15 @@ tags: [клинические-рекомендации, оториноларин
 - Источник: [American Academy of Otolaryngology–Head and Neck Surgery Foundation](https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/)
 - Организация: American Academy of Otolaryngology–Head and Neck Surgery Foundation
 - Версия: 2026 update
-- DOI: [10.1002/ohn.70417](https://pubmed.ncbi.nlm.nih.gov/42861423/)
-- Официальная дата публикации: 12.10.2026
+- Коды МКБ: Tinnitus
 
 ## Рабочие заметки
 
-16 октября 2026 года был распространён пресс-релиз производителя Lenire о включении бимодальной нейромодуляции в обновлённое руководство. Источником клинической карточки является не пресс-релиз, а опубликованное AAO-HNSF руководство от 12 октября 2026 года.
-
-> Практические выводы заполняются после изучения оригинала. AI не формирует медицинские выводы автоматически.
+> Заполняются после изучения оригинала. AI не формирует медицинские выводы автоматически.
 
 ## Проверка Степановым Д.А.
 
-- [x] Открыта официальная страница документа
-- [x] Проверены дата, версия и DOI
-- [ ] Проверены все 16 ключевых положений по полному тексту
+- [ ] Открыт официальный документ
+- [ ] Проверены актуальность и версия
 - [ ] Подготовлены практические выводы с точными ссылками
 - [ ] Материал допущен в RAG
