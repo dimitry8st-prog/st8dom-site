@@ -71,6 +71,7 @@ from editorial_workshop import EDITORIAL_SOURCES, EDITORIAL_STEPS
 from extensions import csrf, db, login_manager
 from forms import TOPIC_CHOICES, ArticleForm, InquiryForm, LoginForm
 from inquiry_autoreply import send_price_auto_reply
+from inquiry_spam import content_spam_reason
 from payments_robokassa import (
     create_refund,
     enabled as robokassa_enabled,
@@ -1138,8 +1139,23 @@ def create_app() -> Flask:
                 message=message,
                 ip_hash=client_ip,
             )
+            # Карантин обратим: подозрительные обращения остаются в админке,
+            # но не вызывают рассылку владельцу и автоматический ответ отправителю.
+            spam_reason = content_spam_reason(form.message.data)
+            if not spam_reason and Inquiry.query.filter(
+                func.lower(Inquiry.email) == email,
+                Inquiry.spam_flag.has(),
+            ).first() is not None:
+                spam_reason = "previously_flagged_sender"
+            if spam_reason:
+                inquiry.spam_flag = InquirySpam()
+                inquiry.mark_read()
             db.session.add(inquiry)
             db.session.commit()
+            if spam_reason:
+                logger.info("Заявка #%s помещена в спам: %s", inquiry.id, spam_reason)
+                flash("Заявка сохранена для проверки.", "info")
+                return redirect(url_for("contact", sent=1))
             logger.info("Новая заявка #%s сохранена", inquiry.id)
             email_sent = notify_email(inquiry, app)
             notify_telegram(inquiry, app)
