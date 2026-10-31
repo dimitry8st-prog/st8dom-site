@@ -337,7 +337,8 @@ def ensure_editorial_seed() -> None:
     )
     ensure_published_content_package(
         "anthropic-history-2026-09.json",
-        datetime(2026, 9, 29, 14, 22, tzinfo=timezone.utc),
+        datetime(2026, 10, 31, 17, 33, tzinfo=timezone.utc),
+        update_published=True,
     )
 
     ensure_published_content_package(
