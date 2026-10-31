@@ -666,6 +666,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 31, 8, 59, 30, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "tmd-biopsychosocial-2026-10-31.json",
+        datetime(2026, 10, 31, 15, 15, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
