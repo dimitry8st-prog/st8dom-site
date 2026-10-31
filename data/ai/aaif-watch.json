@@ -27,11 +27,75 @@
   },
   "items": [
     {
+      "title": "We added TOON to our MCP server, then removed it",
+      "url": "https://aaif.io/blog/we-added-toon-to-our-mcp-server-then-removed-it",
+      "published_date": "2026-10-30",
+      "summary": "Apify tested TOON token-saving encoding on their MCP server for 30 days. Two A/B tests showed no benefit and higher token costs on key tools, so they removed it.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Where voice agents fail in production: Part 2 - tools, recovery, and observability",
+      "url": "https://aaif.io/blog/where-voice-agents-fail-in-production-part-2-tools-recovery-and-observability",
+      "published_date": "2026-10-29",
+      "summary": "Voice agent tool calls can produce duplicates, handoffs can silently fail, and transcripts can hide errors. Learn how to handle recovery, observability, and evaluation in production.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Agents are applying for jobs: building an open protocol for hiring",
+      "url": "https://aaif.io/blog/agents-are-applying-for-jobs-building-an-open-protocol-for-hiring",
+      "published_date": "2026-10-28",
+      "summary": "OJCP is an open standard built on MCP that gives AI agents a documented way to discover, evaluate, and apply to jobs while giving employers signal, consent, and an audit trail.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Agentic AI Foundation Surpasses 300 Members in Less Than One Year",
+      "url": "https://aaif.io/news/agentic-ai-foundation-surpasses-300-members",
+      "published_date": "2026-10-22",
+      "summary": "Ant Group, Gates Foundation, MongoDB, Nutanix, Royal Bank of Canada, Vercel, and Vultr join as Gold Members, reflecting growing demand for open, trusted standards for agentic AI.",
+      "review_status": "pending"
+    },
+    {
       "title": "Agentic AI Foundation Announces Four New Projects: Agent Skills, Open Responses, OpenEnv, and OpenSandbox",
       "url": "https://aaif.io/news/agentic-ai-foundation-announces-four-new-projects",
       "published_date": "2026-10-22",
       "summary": "AAIF принял Agent Skills, Open Responses, OpenEnv и OpenSandbox. Теперь под управлением фонда десять открытых проектов.",
       "review_status": "pending"
+    },
+    {
+      "title": "What Open Responses changes for AI developers",
+      "url": "https://aaif.io/blog/what-open-responses-changes-for-ai-developers",
+      "published_date": "2026-10-22",
+      "summary": "Open Responses defines a shared API format for AI model requests, responses, and tool calls, reducing provider-specific integration work across multiple LLM providers.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Training agents for real-world tasks with OpenEnv",
+      "url": "https://aaif.io/blog/training-agents-for-real-world-tasks-with-openenv",
+      "published_date": "2026-10-22",
+      "summary": "Learn how OpenEnv provides a common interface for defining tasks, rewards, and environments to train AI agents on real-world challenges like calendar scheduling and more.",
+      "review_status": "pending"
+    },
+    {
+      "title": "The Sandbox as an Agent Primitive",
+      "url": "https://aaif.io/blog/the-sandbox-as-an-agent-primitive",
+      "published_date": "2026-10-22",
+      "summary": "OpenSandbox is now an Agentic AI Foundation project, providing open source isolated sandbox environments for AI agents with unified APIs, Docker and Kubernetes support.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Agent Skills: Sharing Team Expertise Across AI Agents",
+      "url": "https://aaif.io/blog/agent-skills-sharing-team-expertise-across-ai-agents",
+      "published_date": "2026-10-22",
+      "summary": "Agent Skills joins the Agentic AI Foundation as an open standard for packaging reusable instructions that teach AI agents team-specific tasks. Over 1 million skills published.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Agentic AI Foundation Launches MCPA Certification to Validate MCP Expertise",
+      "url": "https://aaif.io/news/agentic-ai-foundation-launches-mcpa-certification",
+      "published_date": "2026-09-13",
+      "summary": "The first official certification for MCP validates builders’ understanding of MCP architecture, security, and implementation as adoption of the protocol grows.",
+      "review_status": "pending"
     }
-  ]
+  ],
+  "last_changed_at": "2026-10-31T08:21:31+00:00"
 }

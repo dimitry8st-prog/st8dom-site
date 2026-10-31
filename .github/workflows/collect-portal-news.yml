@@ -1,0 +1,35 @@
+name: Collect portal news
+
+on:
+  schedule:
+    # 07:20 Moscow. Weekly Notion delivery remains independent.
+    - cron: "20 4 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: [deploy]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: collect-portal-news
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Collect private source cards on portal
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -eu
+            cd /srv/st8dom
+            docker compose exec -T app python -m scripts.collect_portal_news
