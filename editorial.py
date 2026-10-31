@@ -661,6 +661,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 29, 9, 31, 11, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "readme-agent-attack-2026-10-31.json",
+        datetime(2026, 10, 31, 8, 59, 30, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
