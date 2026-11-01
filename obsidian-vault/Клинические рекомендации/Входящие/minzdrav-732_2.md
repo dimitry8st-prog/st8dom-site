@@ -9,10 +9,10 @@ version: "2"
 published_on: "2026-01-22"
 codes: "S06.1, S06.2, S06.3, S06.4, S06.5, S06.6, S06.7"
 specialties: "Неврология / нейрохирургия"
-specialty_tags: "neurology,neurosurgery"
+specialty_tags: "neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/732_2"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, нейрохирургия, на-проверку]
 ---
 
 # Очаговая травма головного мозга

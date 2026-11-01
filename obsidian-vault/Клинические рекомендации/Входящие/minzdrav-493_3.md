@@ -9,10 +9,10 @@ version: "3"
 published_on: "2026-01-12"
 codes: "S06"
 specialties: "Неврология / нейрохирургия"
-specialty_tags: "neurology,neurosurgery"
+specialty_tags: "neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/493_3"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, нейрохирургия, на-проверку]
 ---
 
 # Черепно-мозговая травма у детей

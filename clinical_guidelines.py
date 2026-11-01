@@ -210,6 +210,7 @@ NEUROSURGERY_TITLE_TERMS = (
     "нейрохир",
     "черепно-мозг",
     "травма головного мозга",
+    "сотрясен",
     "раны головы",
     "внутричереп",
     "гидроцеф",
@@ -345,15 +346,16 @@ def classify_guideline_specialties(item: dict) -> tuple[str, ...]:
             for row in item.get("Mkbs") or []
         ]
 
-    result: set[str] = {
-        slug
-        for slug in item.get("specialty_tags") or []
-        if slug in GUIDELINE_SPECIALTIES
-    }
+    result: set[str] = set()
     if "невролог" in official_specialties:
         result.add("neurology")
     if "нейрохир" in official_specialties:
         result.add("neurosurgery")
+    # Явный профиль официальной карточки приоритетнее эвристик по МКБ и названию.
+    if result:
+        if title.strip() == "остеопороз":
+            result.clear()
+        return tuple(slug for slug in GUIDELINE_SPECIALTIES if slug in result)
     # Для старого российского реестра общая строка была техническим fallback,
     # поэтому разделяем профили по разработчикам, названию и МКБ.
     combined_fallback = specialties.strip() in {
@@ -370,11 +372,15 @@ def classify_guideline_specialties(item: dict) -> tuple[str, ...]:
         result.add("neurology")
     if "нейрохирург" in organization:
         result.add("neurosurgery")
-    if any(term in title for term in NEUROSURGERY_TITLE_TERMS):
+    has_neurosurgery_title = any(term in title for term in NEUROSURGERY_TITLE_TERMS)
+    if has_neurosurgery_title:
         result.add("neurosurgery")
-    if any(term in title for term in NEURO_TITLE_TERMS):
+    if not has_neurosurgery_title and any(term in title for term in NEURO_TITLE_TERMS):
         result.add("neurology")
-    if any(code.startswith(NEURO_CODE_PREFIXES) for code in codes):
+    if any(
+        code.startswith(NEURO_CODE_PREFIXES) and not code.startswith("S06")
+        for code in codes
+    ):
         result.add("neurology")
     if any(
         code.startswith(("S01", "S06", "C70", "C71", "C72", "D32", "D33", "Q03"))
