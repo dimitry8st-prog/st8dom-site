@@ -9,9 +9,10 @@ version: "1"
 published_on: "2026-05-04"
 codes: "A84, A87.8"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/1031_1"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Клещевой вирусный энцефалит у детей

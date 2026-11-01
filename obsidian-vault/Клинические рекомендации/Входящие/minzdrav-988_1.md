@@ -9,6 +9,7 @@ version: "1"
 published_on: "2025-12-22"
 codes: "G54.0, G54.1, G54.2, G54.3, G54.4, G54.5, G54.8, G54.9, G56.0, G56.1, G56.2, G56.3, G56.8, G56.9, G57.0, G57.2, G57.3, G57.4, G57.6, G58.8, G58.9, G59.8"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurology,neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/988_1"
 source_status: "active"
 tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]

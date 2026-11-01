@@ -12,8 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from clinical_guidelines import (
+    GUIDELINE_SPECIALTIES,
     OFFICIAL_SOURCES,
     _minzdrav_payload,
+    classify_guideline_specialties,
     fetch_aao_hnsf_guidelines,
     fetch_minzdrav_page,
     is_neurology_or_neurosurgery,
@@ -45,13 +47,20 @@ def render_obsidian_note(item: dict) -> str:
         "published_on": item.get("published_on"),
         "codes": item.get("codes"),
         "specialties": item.get("specialties"),
+        "specialty_tags": ",".join(item.get("specialty_tags") or []),
         "official_url": item["url"],
         "source_status": item.get("status", "active"),
     }
     frontmatter = "\n".join(f"{key}: {_yaml_string(value)}" for key, value in fields.items())
+    specialty_tags = item.get("specialty_tags") or []
+    profile_tags = ", ".join(
+        GUIDELINE_SPECIALTIES[slug].casefold()
+        for slug in specialty_tags
+        if slug in GUIDELINE_SPECIALTIES
+    )
     return (
         f"---\n{frontmatter}\n"
-        "tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]\n"
+        f"tags: [клинические-рекомендации, {profile_tags or 'другой-профиль'}, на-проверку]\n"
         "---\n\n"
         f"# {item['title']}\n\n"
         "## Официальная карточка\n\n"
@@ -79,8 +88,35 @@ def load_registry() -> dict[tuple[str, str], dict]:
     }
 
 
-def sync(pages: int, full: bool = False) -> dict[str, int]:
+def write_registry_and_notes(registry: dict[tuple[str, str], dict]) -> int:
+    """Нормализует профили и сохраняет текущий реестр без сетевых запросов."""
+    for item in registry.values():
+        item["specialty_tags"] = list(classify_guideline_specialties(item))
+    items = sorted(
+        registry.values(), key=lambda row: (row["source_key"], row["title"].casefold())
+    )
+    REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REGISTRY_PATH.write_text(
+        json.dumps({"schema_version": 1, "items": items}, ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
+    VAULT_DIR.mkdir(parents=True, exist_ok=True)
+    for item in items:
+        note = VAULT_DIR / _safe_filename(item["source_key"], item["external_id"])
+        note.write_text(render_obsidian_note(item), encoding="utf-8")
+    return len(items)
+
+
+def sync(pages: int, full: bool = False, registry_only: bool = False) -> dict[str, int]:
     registry = load_registry()
+    if registry_only:
+        return {
+            "scanned": 0,
+            "matched": 0,
+            "international": 0,
+            "stored": write_registry_and_notes(registry),
+        }
     scanned = matched = 0
     current_page = 1
     while True:
@@ -104,21 +140,11 @@ def sync(pages: int, full: bool = False) -> dict[str, int]:
     for item in international:
         registry[(item["source_key"], item["external_id"])] = item
 
-    items = sorted(registry.values(), key=lambda row: (row["source_key"], row["title"].casefold()))
-    REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REGISTRY_PATH.write_text(
-        json.dumps({"schema_version": 1, "items": items}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    VAULT_DIR.mkdir(parents=True, exist_ok=True)
-    for item in items:
-        note = VAULT_DIR / _safe_filename(item["source_key"], item["external_id"])
-        note.write_text(render_obsidian_note(item), encoding="utf-8")
     return {
         "scanned": scanned,
         "matched": matched,
         "international": len(international),
-        "stored": len(items),
+        "stored": write_registry_and_notes(registry),
     }
 
 
@@ -126,8 +152,18 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pages", type=int, default=5)
     parser.add_argument("--full", action="store_true")
+    parser.add_argument(
+        "--registry-only",
+        action="store_true",
+        help="Обновить профили и Obsidian-заметки из локального JSON без сети.",
+    )
     args = parser.parse_args()
-    print(json.dumps(sync(max(1, args.pages), args.full), ensure_ascii=False))
+    print(
+        json.dumps(
+            sync(max(1, args.pages), args.full, args.registry_only),
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":

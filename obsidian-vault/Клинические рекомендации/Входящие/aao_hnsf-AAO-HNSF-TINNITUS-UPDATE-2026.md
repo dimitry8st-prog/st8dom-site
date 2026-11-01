@@ -9,9 +9,10 @@ version: "2026 update"
 published_on: "2026-10-12"
 codes: "Tinnitus"
 specialties: "Otorhinolaryngology / Audiology / Neurology"
+specialty_tags: "neurology"
 official_url: "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Clinical Practice Guideline: Tinnitus Update

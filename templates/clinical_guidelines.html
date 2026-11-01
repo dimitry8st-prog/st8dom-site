@@ -22,6 +22,14 @@
         <option value="international"{% if selected.kind == 'international' %} selected{% endif %}>Международные</option>
       </select>
     </label>
+    <label>Профиль
+      <select name="specialty">
+        <option value="">Все профили</option>
+        {% for slug, label in guideline_specialties.items() %}
+        <option value="{{ slug }}"{% if selected.specialty == slug %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
     <label>Источник
       <select name="source">
         <option value="">Все источники</option>
@@ -44,6 +52,9 @@
     <article class="guideline-card">
       <div class="guideline-card__meta">
         <span>{{ "Россия" if item.is_russian else "Международные" }}</span>
+        {% for slug in item.specialty_slugs %}
+        <span>{{ guideline_specialties[slug] }}</span>
+        {% endfor %}
         {% if item.published_on %}<time datetime="{{ item.published_on.isoformat() }}">{{ item.published_on.strftime('%d.%m.%Y') }}</time>{% endif %}
       </div>
       <h2>{{ item.title }}</h2>

@@ -9,9 +9,10 @@ version: "2024"
 published_on: "2024-09-01"
 codes: "Migraine prevention"
 specialties: "Neurology / Headache medicine"
+specialty_tags: "neurology"
 official_url: "https://journals.sagepub.com/doi/10.1177/03331024241269735"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # International Headache Society Global Practice Recommendations for Preventive Pharmacological Treatment of Migraine

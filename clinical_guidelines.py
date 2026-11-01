@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 import requests
 
 from extensions import db
-from models import ClinicalGuideline
+from models import ClinicalGuideline, ClinicalGuidelineSpecialty
 
 
 MINZDRAV_API_URL = (
@@ -201,6 +201,26 @@ NEURO_DEVELOPER_TERMS = (
     "головной боли",
 )
 
+GUIDELINE_SPECIALTIES = {
+    "neurology": "Неврология",
+    "neurosurgery": "Нейрохирургия",
+}
+
+NEUROSURGERY_TITLE_TERMS = (
+    "нейрохир",
+    "черепно-мозг",
+    "травма головного мозга",
+    "сотрясен",
+    "раны головы",
+    "внутричереп",
+    "гидроцеф",
+    "аневризм",
+    "нейроонк",
+    "глиом",
+    "менингиом",
+    "шванном",
+)
+
 
 class GuidelineValidationError(ValueError):
     pass
@@ -268,6 +288,13 @@ def is_neurology_or_neurosurgery(item: dict) -> bool:
     title = str(item.get("Name") or "").casefold()
     if title.strip() == "остеопороз":
         return True
+    official_specialties = " ".join(
+        str(row.get("ReferenceName") or "")
+        for row in item.get("Specialities") or []
+        if isinstance(row, dict)
+    ).casefold()
+    if "невролог" in official_specialties or "нейрохир" in official_specialties:
+        return True
     if any(term in title for term in NEURO_TITLE_TERMS):
         return True
 
@@ -294,6 +321,78 @@ def is_neurology_or_neurosurgery(item: dict) -> bool:
     has_neuro_developer = any(term in developers for term in NEURO_DEVELOPER_TERMS)
     neuro_share = len(neuro_codes) / len(codes)
     return has_neuro_developer and neuro_share >= 0.5
+
+
+def classify_guideline_specialties(item: dict) -> tuple[str, ...]:
+    """Возвращает проверяемые профили без общей метки «неврология / нейрохирургия»."""
+    title = str(item.get("title") or item.get("Name") or "").casefold()
+    organization = str(item.get("organization") or "").casefold()
+    if not organization:
+        organization = " ".join(
+            str(row.get("NkoName") or "") for row in item.get("Developers") or []
+        ).casefold()
+    specialties = str(item.get("specialties") or "").casefold()
+    official_specialties = " ".join(
+        str(row.get("ReferenceName") or "")
+        for row in item.get("Specialities") or []
+        if isinstance(row, dict)
+    ).casefold()
+    codes_value = item.get("codes")
+    if isinstance(codes_value, str):
+        codes = [part.strip().upper() for part in codes_value.split(",")]
+    else:
+        codes = [
+            str(row.get("MkbCode") or "").strip().upper()
+            for row in item.get("Mkbs") or []
+        ]
+
+    result: set[str] = set()
+    if "невролог" in official_specialties:
+        result.add("neurology")
+    if "нейрохир" in official_specialties:
+        result.add("neurosurgery")
+    # Явный профиль официальной карточки приоритетнее эвристик по МКБ и названию.
+    if result:
+        if title.strip() == "остеопороз":
+            result.clear()
+        return tuple(slug for slug in GUIDELINE_SPECIALTIES if slug in result)
+    # Для старого российского реестра общая строка была техническим fallback,
+    # поэтому разделяем профили по разработчикам, названию и МКБ.
+    combined_fallback = specialties.strip() in {
+        "неврология / нейрохирургия",
+        "нейрохирургия / неврология",
+    }
+    if not combined_fallback:
+        if "невролог" in specialties or "neurolog" in specialties:
+            result.add("neurology")
+        if "нейрохир" in specialties or "neurosurg" in specialties:
+            result.add("neurosurgery")
+
+    if any(term in organization for term in ("общество невролог", "ассоциация невролог")):
+        result.add("neurology")
+    if "нейрохирург" in organization:
+        result.add("neurosurgery")
+    has_neurosurgery_title = any(term in title for term in NEUROSURGERY_TITLE_TERMS)
+    if has_neurosurgery_title:
+        result.add("neurosurgery")
+    if not has_neurosurgery_title and any(term in title for term in NEURO_TITLE_TERMS):
+        result.add("neurology")
+    if any(
+        code.startswith(NEURO_CODE_PREFIXES) and not code.startswith("S06")
+        for code in codes
+    ):
+        result.add("neurology")
+    if any(
+        code.startswith(("S01", "S06", "C70", "C71", "C72", "D32", "D33", "Q03"))
+        for code in codes
+    ):
+        result.add("neurosurgery")
+
+    # Остеопороз хранится в каталоге по отдельному решению владельца, но не
+    # должен попадать в нейрологический RAG.
+    if title.strip() == "остеопороз":
+        result.clear()
+    return tuple(slug for slug in GUIDELINE_SPECIALTIES if slug in result)
 
 
 def fetch_minzdrav_page(
@@ -430,26 +529,47 @@ def _minzdrav_payload(item: dict) -> dict:
         for row in item.get("Mkbs") or []
         if row.get("MkbCode")
     )
-    return {
+    official_specialties = " / ".join(
+        row.get("ReferenceName", "").strip()
+        for row in item.get("Specialities") or []
+        if row.get("ReferenceName")
+    )
+    payload = {
         "source_key": "minzdrav",
         "external_id": code_version,
         "title": str(item.get("Name") or "").strip(),
         "organization": developers,
         "version": str(item.get("Version") or ""),
         "codes": codes,
-        "specialties": (
-            " / ".join(
-                row.get("ReferenceName", "").strip()
-                for row in item.get("Specialities") or []
-                if row.get("ReferenceName")
-            ) or "Гериатрия / Ревматология / Травматология и ортопедия / Эндокринология"
-            if str(item.get("Name") or "").strip().casefold() == "остеопороз"
-            else "Неврология / нейрохирургия"
-        ),
+        "specialties": official_specialties or None,
         "url": MINZDRAV_VIEW_URL.format(code_version=code_version),
         "published_on": str(item.get("PublishDateStr") or "")[:10] or None,
         "status": "active" if int(item.get("Status") or 0) == 0 else "inactive",
     }
+    specialty_tags = classify_guideline_specialties({**item, **payload})
+    payload["specialty_tags"] = list(specialty_tags)
+    if not payload["specialties"]:
+        payload["specialties"] = " / ".join(
+            GUIDELINE_SPECIALTIES[slug] for slug in specialty_tags
+        ) or None
+    return payload
+
+
+def _sync_specialty_links(
+    record: ClinicalGuideline, specialty_slugs: tuple[str, ...]
+) -> bool:
+    desired = set(specialty_slugs)
+    existing = {link.specialty_slug for link in record.specialty_links}
+    if desired == existing:
+        return False
+    for link in list(record.specialty_links):
+        if link.specialty_slug not in desired:
+            record.specialty_links.remove(link)
+    for slug in sorted(desired - existing):
+        record.specialty_links.append(
+            ClinicalGuidelineSpecialty(specialty_slug=slug)
+        )
+    return True
 
 
 def upsert_guideline(payload: dict) -> tuple[ClinicalGuideline, str]:
@@ -477,7 +597,12 @@ def upsert_guideline(payload: dict) -> tuple[ClinicalGuideline, str]:
     }
     if normalized["status"] not in {"active", "inactive", "replaced"}:
         raise GuidelineValidationError("status: допустимы active, inactive или replaced.")
-    hash_input = {**normalized, "published_on": str(normalized["published_on"] or "")}
+    specialty_slugs = classify_guideline_specialties({**payload, **normalized})
+    hash_input = {
+        **normalized,
+        "published_on": str(normalized["published_on"] or ""),
+        "specialty_tags": list(specialty_slugs),
+    }
     content_hash = _canonical_hash(hash_input)
     record = ClinicalGuideline.query.filter_by(
         source_key=source_key, external_id=external_id
@@ -493,10 +618,12 @@ def upsert_guideline(payload: dict) -> tuple[ClinicalGuideline, str]:
             last_seen_at=now,
             **{key: value for key, value in normalized.items() if key != "source_key"},
         )
+        _sync_specialty_links(record, specialty_slugs)
         db.session.add(record)
         return record, "created"
     record.last_seen_at = now
-    if record.content_hash == content_hash:
+    links_changed = _sync_specialty_links(record, specialty_slugs)
+    if record.content_hash == content_hash and not links_changed:
         return record, "unchanged"
     for key, value in normalized.items():
         if key != "source_key":

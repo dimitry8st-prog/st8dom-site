@@ -9,9 +9,10 @@ version: "1"
 published_on: "2026-09-28"
 codes: "E85.1"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/1077_1"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Транстиретиновая семейная амилоидная полинейропатия

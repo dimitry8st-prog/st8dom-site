@@ -5,6 +5,7 @@ import json
 from app import app
 from clinical_guidelines import (
     GuidelineValidationError,
+    classify_guideline_specialties,
     is_neurology_or_neurosurgery,
     parse_aao_hnsf_guidelines,
     sync_guidelines_registry,
@@ -37,6 +38,7 @@ def minzdrav_item(code_version="test-neuro-1"):
         "Status": 0,
         "Developers": [{"NkoName": "Профильная медицинская организация"}],
         "Mkbs": [{"MkbName": "Инфаркт мозга", "MkbCode": "I63"}],
+        "Specialities": [{"ReferenceName": "Неврология"}],
     }
 
 
@@ -48,7 +50,8 @@ def test_minzdrav_sync_is_idempotent_and_public(client):
         second = sync_minzdrav([minzdrav_item(external_id)])
         assert first["created"] == 1
         assert second["unchanged"] == 1
-        assert ClinicalGuideline.query.filter_by(external_id=external_id).count() == 1
+        record = ClinicalGuideline.query.filter_by(external_id=external_id).one()
+        assert record.specialty_slugs == ("neurology",)
 
     page = client.get("/clinical-guidelines/?kind=russian&q=инсульт")
     assert page.status_code == 200
@@ -158,6 +161,68 @@ def test_filter_accepts_neurosurgical_condition():
         "Mkbs": [{"MkbName": "Травматическое повреждение мозга", "MkbCode": "S06.3"}],
     }
     assert is_neurology_or_neurosurgery(item) is True
+    assert classify_guideline_specialties(item) == ("neurosurgery",)
+
+
+def test_filter_and_classifier_trust_explicit_official_specialties():
+    item = {
+        "Name": "Редкое профильное состояние",
+        "Specialities": [
+            {"ReferenceName": "Неврология"},
+            {"ReferenceName": "Нейрохирургия"},
+        ],
+        "Mkbs": [{"MkbCode": "R69"}],
+    }
+    assert is_neurology_or_neurosurgery(item) is True
+    assert classify_guideline_specialties(item) == (
+        "neurology",
+        "neurosurgery",
+    )
+
+
+def test_specialty_classifier_separates_neurology_and_neurosurgery():
+    migraine = {
+        "title": "Мигрень",
+        "organization": "Всероссийское общество неврологов",
+        "codes": "G43.0, G43.1",
+        "specialties": "Неврология / нейрохирургия",
+    }
+    hemorrhagic_stroke = {
+        "title": "Геморрагический инсульт",
+        "organization": "Ассоциация нейрохирургов России, Всероссийское общество неврологов",
+        "codes": "I60, I61",
+        "specialties": "Неврология / нейрохирургия",
+    }
+    assert classify_guideline_specialties(migraine) == ("neurology",)
+    assert classify_guideline_specialties(hemorrhagic_stroke) == (
+        "neurology",
+        "neurosurgery",
+    )
+
+
+def test_catalog_filters_normalized_specialty(client):
+    external_id = "test-neurosurgery-filter"
+    cleanup("minzdrav", external_id)
+    item = {
+        **minzdrav_item(external_id),
+        "Name": "Очаговая травма головного мозга",
+        "Developers": [{"NkoName": "Ассоциация нейрохирургов России"}],
+        "Mkbs": [{"MkbCode": "S06.3"}],
+        "Specialities": [{"ReferenceName": "Нейрохирургия"}],
+    }
+    try:
+        with app.app_context():
+            sync_minzdrav([item])
+        neurosurgery = client.get(
+            "/clinical-guidelines/", query_string={"specialty": "neurosurgery"}
+        )
+        neurology = client.get(
+            "/clinical-guidelines/", query_string={"specialty": "neurology"}
+        )
+        assert f"view-cr/{external_id}".encode() in neurosurgery.data
+        assert f"view-cr/{external_id}".encode() not in neurology.data
+    finally:
+        cleanup("minzdrav", external_id)
 
 
 def test_aao_hnsf_parser_reads_tinnitus_update_from_official_catalog():

@@ -9,9 +9,10 @@ version: "2026"
 published_on: "2026-08-31"
 codes: "Migraine prevention"
 specialties: "Neurology / Headache medicine"
+specialty_tags: "neurology"
 official_url: "https://www.neurology.org/doi/10.1212/WNL.0000000000214881"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Pharmacologic Treatment for Migraine Prevention in Adults Practice Guideline Recommendations

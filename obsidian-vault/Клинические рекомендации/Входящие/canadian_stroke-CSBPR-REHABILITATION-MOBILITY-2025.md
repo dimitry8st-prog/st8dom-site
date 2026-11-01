@@ -9,9 +9,10 @@ version: "2025"
 published_on: ""
 codes: "Stroke rehabilitation / mobility / aerobic training"
 specialties: "Неврология / медицинская реабилитация / ЛФК"
+specialty_tags: "neurology"
 official_url: "https://www.strokebestpractices.ca/recommendations/stroke-rehabilitation-delivery/4-lower-extremity-balance-mobility-and-aerobic-training"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Восстановление движений, равновесия, ходьбы и аэробная нагрузка после инсульта — Canadian Stroke Best Practices

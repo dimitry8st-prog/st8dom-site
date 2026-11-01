@@ -9,6 +9,7 @@ version: "3"
 published_on: "2025-12-26"
 codes: "I60, I61, I62, Q28.2"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurology,neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/523_3"
 source_status: "active"
 tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]

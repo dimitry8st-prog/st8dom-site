@@ -9,9 +9,10 @@ version: "2"
 published_on: "2026-01-15"
 codes: "S06.0"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/734_2"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, нейрохирургия, на-проверку]
 ---
 
 # Сотрясение головного мозга
