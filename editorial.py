@@ -672,6 +672,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 10, 31, 15, 15, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "claude-code-game-clones-2026-11-01.json",
+        datetime(2026, 11, 1, 15, 41, 5, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
