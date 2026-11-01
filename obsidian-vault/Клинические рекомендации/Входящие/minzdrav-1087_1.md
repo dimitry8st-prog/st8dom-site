@@ -9,9 +9,10 @@ version: "1"
 published_on: "2026-10-21"
 codes: "G80.0, G80.1, G80.2, G80.3, G80.4, G80.8, G81.1"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/1087_1"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Детский церебральный паралич (Церебральный паралич)

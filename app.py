@@ -47,6 +47,7 @@ from assistant.rate_limit import SlidingWindowLimiter, limiter
 from cases import FILTERS, get_all_cases, get_case
 from project_demos import all_demos, catalog_with_demos, get_demo
 from clinical_guidelines import (
+    GUIDELINE_SPECIALTIES,
     GuidelineValidationError,
     OFFICIAL_SOURCES,
     fetch_minzdrav_page,
@@ -682,6 +683,7 @@ def create_app() -> Flask:
     def clinical_guidelines_catalog():
         kind = request.args.get("kind", "").strip().lower()
         source_key = request.args.get("source", "").strip().lower()
+        specialty = request.args.get("specialty", "").strip().lower()
         search = request.args.get("q", "").strip()
         query = public_guidelines_query()
         if kind in {"russian", "international"}:
@@ -692,6 +694,12 @@ def create_app() -> Flask:
             query = query.filter(ClinicalGuideline.source_key == source_key)
         else:
             source_key = ""
+        if specialty in GUIDELINE_SPECIALTIES:
+            query = query.filter(
+                ClinicalGuideline.specialty_links.any(specialty_slug=specialty)
+            )
+        else:
+            specialty = ""
         guidelines = query.order_by(
             ClinicalGuideline.published_on.desc(), ClinicalGuideline.id.desc()
         ).all()
@@ -710,7 +718,13 @@ def create_app() -> Flask:
             "clinical_guidelines.html",
             guidelines=guidelines,
             official_sources=OFFICIAL_SOURCES,
-            selected={"kind": kind, "source": source_key, "q": search},
+            guideline_specialties=GUIDELINE_SPECIALTIES,
+            selected={
+                "kind": kind,
+                "source": source_key,
+                "specialty": specialty,
+                "q": search,
+            },
             medical_context=True,
             page_id="clinical-guidelines",
         )

@@ -9,9 +9,10 @@ version: "2022"
 published_on: "2022-06-11"
 codes: "Migraine prevention / CGRP"
 specialties: "Neurology / Headache medicine"
+specialty_tags: "neurology"
 official_url: "https://pubmed.ncbi.nlm.nih.gov/35690723/"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # European Headache Federation guideline on monoclonal antibodies targeting the CGRP pathway for migraine prevention — 2022 update

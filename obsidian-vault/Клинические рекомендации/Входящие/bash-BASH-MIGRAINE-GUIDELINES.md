@@ -9,9 +9,10 @@ version: "current"
 published_on: ""
 codes: "Migraine / headache disorders"
 specialties: "Neurology / Headache medicine"
+specialty_tags: "neurology"
 official_url: "https://bash.org.uk/guidelines/"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # BASH Guidelines for Headache Disorders

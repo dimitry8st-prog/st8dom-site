@@ -9,9 +9,10 @@ version: "4"
 published_on: "2024-10-25"
 codes: "G43, G43.0, G43.1, G43.2, G43.3, G43.8, G43.9, G44.0, G44.1, G44.4"
 specialties: "Неврология"
+specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/295_4"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Мигрень

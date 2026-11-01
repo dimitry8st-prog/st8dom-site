@@ -9,9 +9,10 @@ version: "2026"
 published_on: "2026-08-27"
 codes: "Stroke rehabilitation"
 specialties: "Неврология / медицинская реабилитация"
+specialty_tags: "neurology"
 official_url: "https://professional.heart.org/en/science-news/2026-guideline-for-adult-stroke-rehabilitation-and-recovery"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Реабилитация и восстановление взрослых после инсульта — AHA/ASA 2026

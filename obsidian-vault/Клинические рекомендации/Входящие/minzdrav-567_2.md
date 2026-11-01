@@ -9,9 +9,10 @@ version: "2"
 published_on: "2025-10-23"
 codes: "A84, A84.0, A84.1, A84.8, A84.9"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/567_2"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, неврология, на-проверку]
 ---
 
 # Клещевой вирусный энцефалит у взрослых

@@ -399,10 +399,36 @@ class ClinicalGuideline(db.Model):
     updated_at = db.Column(
         db.DateTime, default=utcnow, onupdate=utcnow, nullable=False
     )
+    specialty_links = db.relationship(
+        "ClinicalGuidelineSpecialty",
+        back_populates="guideline",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
 
     @property
     def is_russian(self) -> bool:
         return self.kind == "russian"
+
+    @property
+    def specialty_slugs(self) -> tuple[str, ...]:
+        return tuple(sorted(link.specialty_slug for link in self.specialty_links))
+
+
+class ClinicalGuidelineSpecialty(db.Model):
+    """Нормализованная связь рекомендации с профилем портала."""
+
+    __tablename__ = "clinical_guideline_specialties"
+
+    guideline_id = db.Column(
+        db.Integer,
+        db.ForeignKey("clinical_guidelines.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    specialty_slug = db.Column(db.String(40), primary_key=True, index=True)
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+
+    guideline = db.relationship("ClinicalGuideline", back_populates="specialty_links")
 
 
 class Order(db.Model):

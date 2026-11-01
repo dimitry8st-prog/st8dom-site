@@ -11,7 +11,10 @@
       "specialties": "Otorhinolaryngology / Audiology / Neurology",
       "url": "https://www.entnet.org/quality-practice/quality-products/clinical-practice-guidelines/cpg-tinnitus-update/",
       "published_on": "2026-10-12",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "aha_asa",
@@ -23,7 +26,10 @@
       "specialties": "Неврология / медицинская реабилитация",
       "url": "https://professional.heart.org/en/science-news/2026-guideline-for-adult-stroke-rehabilitation-and-recovery",
       "published_on": "2026-08-27",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "ahs",
@@ -35,7 +41,10 @@
       "specialties": "Neurology / Headache medicine",
       "url": "https://www.neurology.org/doi/10.1212/WNL.0000000000214881",
       "published_on": "2026-08-31",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "bash",
@@ -47,7 +56,10 @@
       "specialties": "Neurology / Headache medicine",
       "url": "https://bash.org.uk/guidelines/",
       "published_on": null,
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "canadian_stroke",
@@ -59,7 +71,10 @@
       "specialties": "Неврология / медицинская реабилитация / ЛФК",
       "url": "https://www.strokebestpractices.ca/recommendations/stroke-rehabilitation-delivery/4-lower-extremity-balance-mobility-and-aerobic-training",
       "published_on": null,
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "ehf",
@@ -71,7 +86,10 @@
       "specialties": "Neurology / Headache medicine",
       "url": "https://pubmed.ncbi.nlm.nih.gov/35690723/",
       "published_on": "2022-06-11",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "ihs",
@@ -83,7 +101,10 @@
       "specialties": "Neurology / Headache medicine",
       "url": "https://journals.sagepub.com/doi/10.1177/03331024241269735",
       "published_on": "2024-09-01",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -95,7 +116,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/995_1",
       "published_on": "2025-12-24",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -107,7 +131,11 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/523_3",
       "published_on": "2025-12-26",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology",
+        "neurosurgery"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -119,7 +147,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/1087_1",
       "published_on": "2026-10-21",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -131,7 +162,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/567_2",
       "published_on": "2025-10-23",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -143,7 +177,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/1031_1",
       "published_on": "2026-05-04",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -155,7 +192,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/165_2",
       "published_on": "2025-12-15",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -167,7 +207,10 @@
       "specialties": "Неврология",
       "url": "https://cr.minzdrav.gov.ru/view-cr/295_4",
       "published_on": "2024-10-25",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -179,7 +222,11 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/988_1",
       "published_on": "2025-12-22",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology",
+        "neurosurgery"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -191,7 +238,8 @@
       "specialties": "Гериатрия / Ревматология / Травматология и ортопедия / Эндокринология",
       "url": "https://cr.minzdrav.gov.ru/view-cr/87_5",
       "published_on": "2025-12-30",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": []
     },
     {
       "source_key": "minzdrav",
@@ -203,7 +251,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/733_2",
       "published_on": "2025-11-13",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurosurgery"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -215,7 +266,11 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/732_2",
       "published_on": "2026-01-22",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology",
+        "neurosurgery"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -227,7 +282,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/773_2",
       "published_on": "2026-06-25",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -239,7 +297,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/593_4",
       "published_on": "2026-07-14",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -251,7 +312,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/1046_1",
       "published_on": "2026-06-09",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -263,7 +327,11 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/734_2",
       "published_on": "2026-01-15",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology",
+        "neurosurgery"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -275,7 +343,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/998_1",
       "published_on": "2025-12-26",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -287,7 +358,10 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/1077_1",
       "published_on": "2026-09-28",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     },
     {
       "source_key": "minzdrav",
@@ -299,7 +373,11 @@
       "specialties": "Неврология / нейрохирургия",
       "url": "https://cr.minzdrav.gov.ru/view-cr/493_3",
       "published_on": "2026-01-12",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology",
+        "neurosurgery"
+      ]
     },
     {
       "source_key": "nice",
@@ -311,7 +389,10 @@
       "specialties": "Neurology / Primary care",
       "url": "https://www.nice.org.uk/guidance/cg150",
       "published_on": "2025-06-03",
-      "status": "active"
+      "status": "active",
+      "specialty_tags": [
+        "neurology"
+      ]
     }
   ]
 }

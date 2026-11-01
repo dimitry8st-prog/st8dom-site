@@ -9,9 +9,10 @@ version: "2"
 published_on: "2025-11-13"
 codes: "S00.0, S00.7, S00.8, S00.9, S01.0, S01.7"
 specialties: "Неврология / нейрохирургия"
+specialty_tags: "neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/733_2"
 source_status: "active"
-tags: [клинические-рекомендации, неврология, нейрохирургия, на-проверку]
+tags: [клинические-рекомендации, нейрохирургия, на-проверку]
 ---
 
 # Открытые раны головы
