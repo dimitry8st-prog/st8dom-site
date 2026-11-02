@@ -8,7 +8,7 @@ organization: "Всероссийское общество неврологов,
 version: "4"
 published_on: "2026-07-14"
 codes: "G12.0, G12.1"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/593_4"
 source_status: "active"

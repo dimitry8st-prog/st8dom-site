@@ -8,7 +8,7 @@ organization: "Всероссийское общество неврологов,
 version: "2"
 published_on: "2025-12-15"
 codes: "G70.0, G70.2, G70.8, G70.9"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/165_2"
 source_status: "active"

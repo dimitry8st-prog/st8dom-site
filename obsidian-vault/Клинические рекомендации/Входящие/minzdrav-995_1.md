@@ -8,7 +8,7 @@ organization: "Межрегиональная общественная орга�
 version: "1"
 published_on: "2025-12-24"
 codes: "A87.0, A87.1, A87.2, A87.8, A87.9, B00.3, B01.0, B02.1, B05.1, B26.1, G02.0, G03.9"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/995_1"
 source_status: "active"

@@ -8,7 +8,7 @@ organization: "Автономная некоммерческая организ�
 version: "1"
 published_on: "2026-09-28"
 codes: "E85.1"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/1077_1"
 source_status: "active"

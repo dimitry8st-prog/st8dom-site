@@ -8,7 +8,7 @@ organization: "Ассоциация нейрохирургов России, В�
 version: "3"
 published_on: "2026-01-12"
 codes: "S06"
-specialties: "Неврология / нейрохирургия"
+specialties: "Нейрохирургия"
 specialty_tags: "neurosurgery"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/493_3"
 source_status: "active"

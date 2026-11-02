@@ -8,7 +8,7 @@ organization: "Российская ассоциация эндокриноло�
 version: "1"
 published_on: "2025-12-26"
 codes: "E51.2, G31.2, G62.0, G62.1, G62.2, G63.2, G63.3, G63.8, G92"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/998_1"
 source_status: "active"

@@ -8,7 +8,7 @@ organization: "Союз педиатров России, Ассоциация п
 version: "2"
 published_on: "2026-06-25"
 codes: "G71.0"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/773_2"
 source_status: "active"

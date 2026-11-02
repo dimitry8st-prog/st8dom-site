@@ -8,7 +8,7 @@ organization: "Национальная ассоциация специалис�
 version: "2"
 published_on: "2025-10-23"
 codes: "A84, A84.0, A84.1, A84.8, A84.9"
-specialties: "Неврология / нейрохирургия"
+specialties: "Неврология"
 specialty_tags: "neurology"
 official_url: "https://cr.minzdrav.gov.ru/view-cr/567_2"
 source_status: "active"
