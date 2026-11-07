@@ -341,7 +341,7 @@ def ensure_editorial_seed() -> None:
     )
     ensure_published_content_package(
         "anthropic-ipo-retail-2026-11-07.json",
-        datetime(2026, 11, 7, 19, 12, tzinfo=timezone.utc),
+        datetime(2026, 11, 7, 16, 16, tzinfo=timezone.utc),
     )
 
     ensure_published_content_package(
