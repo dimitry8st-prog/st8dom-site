@@ -90,6 +90,22 @@ jobs:
             for i in $(seq 1 20); do
               st=$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q app)" 2>/dev/null || echo starting)
               if [ "$st" = "healthy" ]; then
+                # Keep the reviewed Life-OS export on the VPS only. The command
+                # prints counts, never article bodies or database credentials.
+                private_dir=/srv/st8dom/private
+                container_export=/tmp/lifeos-vitalis.json
+                mkdir -p -m 700 "$private_dir"
+                docker compose exec -T app python -m scripts.export_vitalis_lifeos \
+                  --output "$container_export"
+                app_id=$(docker compose ps -q app)
+                [ -n "$app_id" ]
+                host_export=$(mktemp "$private_dir/.lifeos-vitalis.XXXXXX")
+                trap 'rm -f "$host_export"' EXIT
+                docker cp "$app_id:$container_export" "$host_export"
+                chmod 600 "$host_export"
+                mv -f "$host_export" "$private_dir/lifeos-vitalis.json"
+                docker compose exec -T app rm -f "$container_export"
+                trap - EXIT
                 docker image prune -f
                 exit 0
               fi
