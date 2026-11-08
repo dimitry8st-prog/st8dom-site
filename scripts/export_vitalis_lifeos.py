@@ -1,11 +1,12 @@
-"""Read-only Life-OS export for the Vitalis offline review pipeline.
+"""Read-only Life-OS inventory for the Vitalis boundary audit.
 
 Run from the portal repository root:
     python -m scripts.export_vitalis_lifeos --output /private/path/lifeos-vitalis.json
 
-The command never changes the portal database. Only published medical articles with a
-recorded medical reviewer and review date enter ``approved_records``. Raw Life-OS
-materials are listed as candidates without their body and are never approved implicitly.
+The command never changes the portal database. Portal articles and raw Life-OS notes are
+never RAG sources for Vitalis. ``approved_records`` therefore stays empty; only verified
+full clinical guidelines may be indexed through the separate guideline pipeline. Raw
+Life-OS materials remain inventory candidates without their body or a review decision.
 """
 
 from __future__ import annotations
@@ -17,8 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-SCHEMA_VERSION = 1
-NEURO_RUBRIC_PREFIX = "neurology-neurosurgery-"
+SCHEMA_VERSION = 2
 
 
 def _iso(value: datetime | None) -> str | None:
@@ -35,58 +35,7 @@ def build_export(
     *,
     site_url: str,
 ) -> dict[str, Any]:
-    approved_records: list[dict[str, Any]] = []
-    for article in articles:
-        rubric_slug = str(getattr(getattr(article, "rubric", None), "slug", ""))
-        if (
-            getattr(article, "section", None) != "medicine"
-            or getattr(article, "status", None) != "published"
-            or getattr(article, "published_at", None) is None
-            or not str(getattr(article, "medical_reviewer", "") or "").strip()
-            or getattr(article, "reviewed_at", None) is None
-            or not rubric_slug.startswith(NEURO_RUBRIC_PREFIX)
-        ):
-            continue
-        body = str(getattr(article, "body", "") or "").strip()
-        sources = [
-            {
-                "title": str(getattr(source, "title", "") or "").strip(),
-                "url": str(getattr(source, "url", "") or "").strip(),
-                "accessed_at": _iso(getattr(source, "accessed_at", None)),
-            }
-            for source in getattr(article, "sources", [])
-            if str(getattr(source, "url", "") or "").startswith("https://")
-        ]
-        if len(body) < 100 or not sources:
-            continue
-        slug = str(getattr(article, "slug", "") or "").strip()
-        approved_records.append(
-            {
-                "source_id": f"portal-article-{slug}",
-                "title": str(getattr(article, "title", "") or "").strip(),
-                "summary": str(getattr(article, "summary", "") or "").strip(),
-                "body": body,
-                "body_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
-                "portal_url": f"{site_url.rstrip('/')}/materials/{slug}/",
-                "source_version": _iso(getattr(article, "updated_at", None)),
-                "published_at": _iso(getattr(article, "published_at", None)),
-                "reviewed_at": _iso(getattr(article, "reviewed_at", None)),
-                "reviewed_by": str(
-                    getattr(article, "medical_reviewer", "") or ""
-                ).strip(),
-                "author": str(getattr(article, "author", "") or "").strip(),
-                "rubric": rubric_slug,
-                "specialty_tags": ["neurology", "neurosurgery"],
-                "tags": sorted(
-                    str(getattr(tag, "name", "") or "").strip()
-                    for tag in getattr(article, "tags", [])
-                    if str(getattr(tag, "name", "") or "").strip()
-                ),
-                "content_scope": "reviewed_excerpt",
-                "review_status": "approved",
-                "sources": sources,
-            }
-        )
+    portal_article_count = sum(1 for _ in articles)
 
     candidates = [
         {
@@ -109,9 +58,9 @@ def build_export(
         "source_system": "st8dom-lifeos",
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "automatic_ingestion": False,
-        "approved_records": sorted(
-            approved_records, key=lambda record: record["source_id"]
-        ),
+        "eligibility_policy": "verified_full_clinical_guidelines_only",
+        "approved_records": [],
+        "portal_articles_excluded": portal_article_count,
         "candidates": sorted(candidates, key=lambda record: record["source_id"]),
     }
 
@@ -151,6 +100,7 @@ def main() -> int:
             {
                 "output": str(args.output),
                 "approved": len(payload["approved_records"]),
+                "portal_articles_excluded": payload["portal_articles_excluded"],
                 "candidates": len(payload["candidates"]),
             },
             ensure_ascii=False,

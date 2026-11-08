@@ -34,7 +34,7 @@ def article(**overrides):
     return SimpleNamespace(**values)
 
 
-def test_only_published_medically_reviewed_neuro_articles_are_approved():
+def test_portal_articles_never_enter_vitalis_export():
     draft = article(slug="draft", status="draft")
     unreviewed = article(slug="unreviewed", reviewed_at=None)
     unrelated = article(
@@ -43,12 +43,10 @@ def test_only_published_medically_reviewed_neuro_articles_are_approved():
     payload = build_export(
         [article(), draft, unreviewed, unrelated], [], site_url="https://st8dom.ru"
     )
-    assert len(payload["approved_records"]) == 1
-    record = payload["approved_records"][0]
-    assert record["source_id"] == "portal-article-migraine-review"
-    assert record["reviewed_by"] == "Степанов Д.А."
-    assert record["content_scope"] == "reviewed_excerpt"
-    assert record["portal_url"] == "https://st8dom.ru/materials/migraine-review/"
+    assert payload["schema_version"] == 2
+    assert payload["eligibility_policy"] == "verified_full_clinical_guidelines_only"
+    assert payload["approved_records"] == []
+    assert payload["portal_articles_excluded"] == 4
 
 
 def test_raw_lifeos_neuro_material_is_candidate_not_approved():
