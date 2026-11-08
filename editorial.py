@@ -686,6 +686,12 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 11, 1, 15, 41, 5, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "brain-options-decision-2026-11.json",
+        datetime(2026, 11, 8, 13, 45, tzinfo=timezone.utc),
+        update_published=True,
+    )
+
     db.session.commit()
 
 

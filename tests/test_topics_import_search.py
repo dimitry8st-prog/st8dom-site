@@ -136,7 +136,7 @@ def test_lifeos_import_rejects_unsafe_source(client):
         assert Article.query.filter_by(slug=slug).first() is None
 
 
-def test_brain_decision_article_stays_a_portal_draft_and_is_not_for_vitalis(client):
+def test_brain_decision_article_is_public_but_never_for_vitalis(client):
     package_path = (
         Path(__file__).resolve().parents[1]
         / "data"
@@ -146,10 +146,9 @@ def test_brain_decision_article_stays_a_portal_draft_and_is_not_for_vitalis(clie
     package = json.loads(package_path.read_text(encoding="utf-8"))
     package_id = package["package_id"]
     slug = package["article"]["slug"]
-    cleanup_import(package_id, slug)
-
-    assert package["workflow_status"] == "review"
+    assert package["workflow_status"] == "approved"
     assert package["quality_control"]["human_approval_required"] is True
+    assert package["quality_control"]["human_approval_status"] == "approved"
     assert package["quality_control"]["clinical_guideline"] is False
     assert package["quality_control"]["vitalis_ingest_allowed"] is False
     assert package["routing"] == {
@@ -159,24 +158,32 @@ def test_brain_decision_article_stays_a_portal_draft_and_is_not_for_vitalis(clie
     }
     assert "два примата" in package["article"]["body"]
     assert "не клиническая рекомендация" in package["article"]["body"]
+    assert "Почему это важно для искусственного интеллекта" in package["article"]["body"]
+    assert "катастрофического забывания" in package["article"]["body"]
+    assert len(package["sources"]) == 8
 
-    login_as_admin(client)
-    response = client.post(
-        "/admin/imports/life-os/",
-        data={"package": json.dumps(package, ensure_ascii=False)},
-        follow_redirects=True,
-    )
-    assert response.status_code == 200
-    assert "Создан только черновик".encode("utf-8") in response.data
+    page = client.get(f"/materials/{slug}/")
+    assert page.status_code == 200
+    assert "чему это может научить ИИ".encode("utf-8") in page.data
+    assert "Что показывают аналогичные исследования".encode("utf-8") in page.data
+    assert "Почему это важно для искусственного интеллекта".encode("utf-8") in page.data
+
+    search = client.get("/search/?q=нейронные+подпространства")
+    assert search.status_code == 200
+    assert slug.encode() in search.data
+
+    sitemap = client.get("/sitemap.xml")
+    assert f"/materials/{slug}/".encode() in sitemap.data
 
     with app.app_context():
         article = Article.query.filter_by(slug=slug).one()
-        assert article.status == "draft"
+        record = ImportPackage.query.filter_by(package_id=package_id).one()
+        assert article.status == "published"
+        assert article.is_public is True
         assert article.content_type == "article"
-        assert len(article.sources) == 3
-
-    assert client.get(f"/materials/{slug}/").status_code == 404
-    cleanup_import(package_id, slug)
+        assert article.medical_reviewer == "Степанов Д.А."
+        assert len(article.sources) == 8
+        assert record.status == "published"
 
 
 def test_nighteagle_content_package_imports_as_private_draft(client):
