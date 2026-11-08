@@ -90,8 +90,9 @@ jobs:
             for i in $(seq 1 20); do
               st=$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q app)" 2>/dev/null || echo starting)
               if [ "$st" = "healthy" ]; then
-                # Keep the reviewed Life-OS export on the VPS only. The command
-                # prints counts, never article bodies or database credentials.
+                # Keep the Life-OS boundary inventory on the VPS only. Portal
+                # articles are excluded from Vitalis; the command prints counts,
+                # never article bodies or database credentials.
                 private_dir=/srv/st8dom/private
                 container_export=/tmp/lifeos-vitalis.json
                 mkdir -p -m 700 "$private_dir"
