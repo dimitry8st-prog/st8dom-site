@@ -27,6 +27,27 @@
   },
   "items": [
     {
+      "title": "Give goose sandbox powers with OpenSandbox and MCP",
+      "url": "https://aaif.io/blog/give-goose-sandbox-powers-with-opensandbox-and-mcp",
+      "published_date": "2026-11-06",
+      "summary": "Learn how to give the Goose AI coding agent local sandbox powers using OpenSandbox and MCP. Create, manage, and run code in isolated Docker containers from prompts.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Let the model suggest, let code decide: notes from AAIF Chennai Connect #2",
+      "url": "https://aaif.io/blog/let-the-model-suggest-let-code-decide-notes-from-aaif-chennai-connect-2",
+      "published_date": "2026-11-05",
+      "summary": "Five talks from AAIF Chennai Connect #2 covered MCP, multi-agent consistency, agentic resource discovery, and CI failure triage. Key takeaway: let the model suggest, let code decide.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Most agentic work will become workflows",
+      "url": "https://aaif.io/blog/most-agentic-work-will-become-workflows",
+      "published_date": "2026-11-04",
+      "summary": "Discover how to identify repeated agentic tasks, formalize them into reusable workflows, and optimize them for smaller models and code — saving powerful AI for work that matters.",
+      "review_status": "pending"
+    },
+    {
       "title": "We added TOON to our MCP server, then removed it",
       "url": "https://aaif.io/blog/we-added-toon-to-our-mcp-server-then-removed-it",
       "published_date": "2026-10-30",
@@ -97,5 +118,5 @@
       "review_status": "pending"
     }
   ],
-  "last_changed_at": "2026-10-31T08:21:31+00:00"
+  "last_changed_at": "2026-11-09T11:26:51+00:00"
 }
