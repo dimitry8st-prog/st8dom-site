@@ -341,6 +341,11 @@ def ensure_editorial_seed() -> None:
     )
 
     ensure_published_content_package(
+        "anthropic-energy-infrastructure-2026-11-09.json",
+        datetime(2026, 11, 9, 7, 39, 34, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "anthropic-financial-web-2026-11.json",
         datetime(2026, 11, 2, 7, 6, tzinfo=timezone.utc),
     )
