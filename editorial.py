@@ -336,6 +336,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 9, 29, 6, 35, tzinfo=timezone.utc),
     )
     ensure_published_content_package(
+        "ndph-new-daily-persistent-headache-2026-11-10.json",
+        datetime(2026, 11, 10, 17, 29, 12, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "bipolyarnoe-rasstroystvo-depressiya-2026-11-09.json",
         datetime(2026, 11, 9, 7, 27, 52, tzinfo=timezone.utc),
     )
