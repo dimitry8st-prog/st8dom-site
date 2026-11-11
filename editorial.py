@@ -271,6 +271,11 @@ def ensure_editorial_seed() -> None:
         )
 
     ensure_published_content_package(
+        "tinnitus-aao-hnsf-2026-11-11.json",
+        datetime(2026, 11, 11, 17, 21, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "nighteagle-2026-09.json",
         datetime(2026, 9, 18, tzinfo=timezone.utc),
     )
