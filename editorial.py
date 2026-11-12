@@ -712,6 +712,11 @@ def ensure_editorial_seed() -> None:
         update_published=True,
     )
 
+    ensure_published_content_package(
+        "gref-five-theses-2026-11-12.json",
+        datetime(2026, 11, 12, 15, 0, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
