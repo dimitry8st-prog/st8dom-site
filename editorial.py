@@ -271,6 +271,11 @@ def ensure_editorial_seed() -> None:
         )
 
     ensure_published_content_package(
+        "migraine-botulinum-research-2026-11-15.json",
+        datetime(2026, 11, 15, 19, 40, tzinfo=timezone.utc),
+    )
+
+    ensure_published_content_package(
         "depression-response-remission-recovery-2026-11-12.json",
         datetime(2026, 11, 12, 18, 42, tzinfo=timezone.utc),
     )
