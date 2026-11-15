@@ -9,6 +9,8 @@ import json
 import tempfile
 from pathlib import Path
 
+import requests
+
 from scripts import sync_clinical_guidelines_vault as collector
 
 
@@ -16,13 +18,22 @@ def export_snapshot(pages=5, full=False):
     with tempfile.TemporaryDirectory(prefix="medical-source-export-") as temporary:
         root = Path(temporary)
         original_registry, original_vault = collector.REGISTRY_PATH, collector.VAULT_DIR
+        original_fetch = collector.fetch_minzdrav_page
         try:
             collector.REGISTRY_PATH = root / "registry.json"
             collector.VAULT_DIR = root / "vault"
-            result = collector.sync(pages, full)
+            # requests.post открывает отдельное TCP/TLS-соединение для каждой
+            # страницы. На нестабильном API первая страница проходила, а новое
+            # соединение второй истекало. Одна Session сохраняет keep-alive.
+            with requests.Session() as session:
+                def fetch_page(**kwargs):
+                    return original_fetch(**kwargs, request_post=session.post)
+                collector.fetch_minzdrav_page = fetch_page
+                result = collector.sync(pages, full)
             items = json.loads(collector.REGISTRY_PATH.read_text())["items"]
         finally:
             collector.REGISTRY_PATH, collector.VAULT_DIR = original_registry, original_vault
+            collector.fetch_minzdrav_page = original_fetch
     return {"schema_version": 1, "result": result, "items": items, "collection_location": "portal-vps"}
 
 

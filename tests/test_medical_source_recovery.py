@@ -221,6 +221,20 @@ def test_remote_snapshot_does_not_change_original_registry_or_notes(monkeypatch,
     }
 
 
+def test_remote_export_reuses_one_session_across_pages_and_restores_fetch(monkeypatch, registry):
+    calls = []
+    def page(**kwargs):
+        calls.append(kwargs)
+        return {"Data": [russian_item()], "TotalRecords": 100 if len(calls) == 1 else 2}
+    monkeypatch.setattr(collector, "fetch_minzdrav_page", page)
+    monkeypatch.setattr(collector, "fetch_aao_hnsf_guidelines", lambda: [international_item()])
+    snapshot = export_snapshot(pages=2)
+    assert snapshot["result"]["ok"] is True
+    assert len(calls) == 2
+    assert calls[0]["request_post"].__self__ is calls[1]["request_post"].__self__
+    assert collector.fetch_minzdrav_page is page
+
+
 def test_snapshot_merge_preserves_existing_cards_after_partial_remote_failure(monkeypatch, registry, tmp_path):
     monkeypatch.setattr(collector, "fetch_minzdrav_page", fail_minzdrav)
     monkeypatch.setattr(collector, "fetch_aao_hnsf_guidelines", lambda: [international_item()])

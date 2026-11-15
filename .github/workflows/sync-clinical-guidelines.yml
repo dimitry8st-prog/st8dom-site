@@ -3,7 +3,11 @@ name: Синхронизация клинических рекомендаций
 on:
   push:
     branches: [main]
-    paths: [".github/workflows/sync-clinical-guidelines.yml"]
+    paths:
+      - ".github/workflows/sync-clinical-guidelines.yml"
+      - "clinical_guidelines.py"
+      - "scripts/sync_clinical_guidelines_vault.py"
+      - "scripts/export_remote_clinical_guidelines.py"
   schedule:
     # 06:30 по Москве (UTC+3), каждый понедельник.
     - cron: "30 3 * * 1"
