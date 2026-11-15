@@ -61,8 +61,11 @@ def main():
     from app import app
     errors = []
     with app.app_context():
-        created, failures = collect_securitylab()
-        print(json.dumps({"source": "SecurityLab", "created": created, "errors": failures}))
+        warnings = []
+        created, failures = collect_securitylab(warnings=warnings)
+        print(json.dumps({"source": "SecurityLab", "created": created, "errors": failures, "warnings": warnings}))
+        for warning in warnings:
+            print(f"::warning title=SecurityLab RSS::{warning}")
         errors.extend(failures)
         try:
             print(json.dumps({"source": "MIT", **collect_mit()}))

@@ -1,5 +1,7 @@
 """Хранилище Life-OS и сбор официальных RSS SecurityLab."""
+import logging
 import re
+import time
 import xml.etree.ElementTree as ET
 from html import unescape
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
@@ -22,6 +24,10 @@ SCIENCE_STREAMS = {
 }
 ALL_STREAMS = {**STREAMS, **SCIENCE_STREAMS}
 FEEDS = {name: f"https://www.securitylab.ru/_Services/Export/RSS/{name}/" for name in ("news", "vulnerabilities", "analytics", "software")}
+# SecurityLab still advertises the specialized feed, but it returns HTTP 404.
+# The documented main RSS is a fallback, not a claim of identical coverage.
+FEED_FALLBACKS = {"vulnerabilities": "https://www.securitylab.ru/_Services/Export/RSS/"}
+logger = logging.getLogger(__name__)
 
 
 def normalize_url(value):
@@ -73,22 +79,60 @@ def parse_feed(data):
     return results
 
 
-def collect_securitylab():
+def _read_securitylab_feed(url):
+    with requests.get(url, timeout=(5, 15), stream=True) as response:
+        response.raise_for_status()
+        parts = urlsplit(response.url)
+        if parts.scheme != "https" or parts.netloc not in ("securitylab.ru", "www.securitylab.ru"):
+            raise ValueError("SecurityLab RSS redirected outside official source")
+        data = bytearray()
+        for chunk in response.iter_content(65536):
+            data.extend(chunk)
+            if len(data) > 4 * 1024 * 1024:
+                raise ValueError("RSS превышает лимит размера.")
+    return parse_feed(bytes(data))
+
+
+def _fetch_securitylab_feed(url):
+    for attempt in range(3):
+        try:
+            return _read_securitylab_feed(url)
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 2:
+                raise
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code not in (500, 502, 503, 504) or attempt == 2:
+                raise
+        time.sleep(0.5 * (attempt + 1))
+
+
+def _feed_error(exc):
+    response = getattr(exc, "response", None)
+    if isinstance(exc, requests.HTTPError) and response is not None:
+        return f"HTTP {response.status_code}"
+    return type(exc).__name__
+
+
+def collect_securitylab(*, warnings=None):
     created = 0
     errors = []
     for name, url in FEEDS.items():
         try:
-            response = requests.get(url, timeout=(5, 15), stream=True)
-            with response:
-                response.raise_for_status()
-                data = bytearray()
-                for chunk in response.iter_content(65536):
-                    data.extend(chunk)
-                    if len(data) > 4 * 1024 * 1024:
-                        raise ValueError("RSS превышает лимит размера.")
-            for fields in parse_feed(bytes(data)):
+            try:
+                rows = _fetch_securitylab_feed(url)
+            except requests.HTTPError as exc:
+                response = exc.response
+                if name not in FEED_FALLBACKS or response is None or response.status_code not in (404, 410):
+                    raise
+                rows = _fetch_securitylab_feed(FEED_FALLBACKS[name])
+                warning = (f"{name}: {_feed_error(exc)}; collected official main RSS instead; "
+                           "specialized vulnerability-feed coverage is unavailable")
+                logger.warning("%s", warning)
+                if warnings is not None:
+                    warnings.append(warning)
+            for fields in rows:
                 _, added = save_material("security", **fields)
                 created += added
         except (requests.RequestException, ET.ParseError, ValueError) as exc:
-            errors.append(f"{name}: {type(exc).__name__}")
+            errors.append(f"{name}: {_feed_error(exc)}")
     return created, errors
