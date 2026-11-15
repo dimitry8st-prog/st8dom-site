@@ -40,17 +40,40 @@ jobs:
       - name: Установить зависимости
         run: pip install -r requirements.txt
 
+      - name: Проверить тесты
+        run: python -m pytest -q
+
       - name: Обновить российские и международные рекомендации
+        id: collect
+        continue-on-error: true
         shell: bash
         run: |
           if [[ "${{ inputs.full_sync }}" == "true" ]]; then
-            python scripts/sync_clinical_guidelines_vault.py --full
+            python scripts/sync_clinical_guidelines_vault.py --full --report-file "$RUNNER_TEMP/clinical-guidelines-report.json"
           else
-            python scripts/sync_clinical_guidelines_vault.py --pages 5
+            python scripts/sync_clinical_guidelines_vault.py --pages 5 --report-file "$RUNNER_TEMP/clinical-guidelines-report.json"
           fi
 
-      - name: Проверить тесты
-        run: python -m pytest -q
+      - name: Отчёт по каждому источнику
+        if: always() && steps.collect.outcome != 'skipped'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = Path(os.environ["RUNNER_TEMP"]) / "clinical-guidelines-report.json"
+          if not report.exists():
+              raise SystemExit("Сбор не сформировал отчёт; проверьте журнал ошибки.")
+          data = json.loads(report.read_text())
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write("## Медицинские источники\n\n| Источник | Результат |\n| --- | --- |\n")
+              for source, result in data["sources"].items():
+                  status = "Проверен" if result["ok"] else "Ошибка: " + result["error"]
+                  summary.write(f"| {source} | {status} |\n")
+              summary.write(f"\nКарточек в сохранённом реестре: {data['stored']}.\n")
+              if data["errors"]:
+                  summary.write("\nСохранены результаты доступных источников; прежние карточки сохранены.\n")
+          PY
 
       - name: Сохранить изменения
         id: persist
@@ -90,3 +113,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy.yml --ref main
+
+      - name: Сообщить о неполном сборе
+        if: steps.collect.outcome == 'failure'
+        run: |
+          echo "::error::Не все медицинские источники проверены. Подробности — в отчёте по источникам."
+          exit 1

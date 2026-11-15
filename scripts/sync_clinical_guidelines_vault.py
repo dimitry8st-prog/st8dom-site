@@ -6,7 +6,10 @@ import argparse
 import json
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
+
+import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -108,43 +111,77 @@ def write_registry_and_notes(registry: dict[tuple[str, str], dict]) -> int:
     return len(items)
 
 
-def sync(pages: int, full: bool = False, registry_only: bool = False) -> dict[str, int]:
+def _source_error(exc: Exception) -> str:
+    """В отчёт попадает причина, но не тело ответа или данные окружения."""
+    response = getattr(exc, "response", None)
+    if isinstance(exc, requests.HTTPError) and response is not None:
+        return f"HTTP {response.status_code}"
+    return type(exc).__name__
+
+
+def sync(pages: int, full: bool = False, registry_only: bool = False) -> dict:
     registry = load_registry()
     if registry_only:
         return {
+            "ok": True,
             "scanned": 0,
             "matched": 0,
             "international": 0,
             "stored": write_registry_and_notes(registry),
+            "sources": {},
+            "errors": [],
         }
     scanned = matched = 0
-    current_page = 1
-    while True:
-        source_data = fetch_minzdrav_page(current_page=current_page, page_size=50)
-        rows = source_data["Data"]
-        scanned += len(rows)
-        for source_item in rows:
-            if not source_item.get("NPC_approved") or not is_neurology_or_neurosurgery(source_item):
-                continue
-            item = _minzdrav_payload(source_item)
-            registry[(item["source_key"], item["external_id"])] = item
-            matched += 1
-        total = int(source_data.get("TotalRecords") or scanned)
-        if not rows or scanned >= total or (not full and current_page >= pages):
-            break
-        current_page += 1
-        if current_page > 40:
-            raise RuntimeError("Остановлено после 40 страниц: проверьте API Минздрава.")
+    sources, errors = {}, []
+    # Изменения источника сливаются только после успешного прохода всех его
+    # запрошенных страниц. Другой источник проверяется даже при первом сбое.
+    russian = {}
+    try:
+        current_page = 1
+        while True:
+            source_data = fetch_minzdrav_page(current_page=current_page, page_size=50)
+            rows = source_data["Data"]
+            scanned += len(rows)
+            for source_item in rows:
+                if not source_item.get("NPC_approved") or not is_neurology_or_neurosurgery(source_item):
+                    continue
+                item = _minzdrav_payload(source_item)
+                russian[(item["source_key"], item["external_id"])] = item
+                matched += 1
+            total = int(source_data["TotalRecords"])
+            if not rows or scanned >= total or (not full and current_page >= pages):
+                break
+            current_page += 1
+            if current_page > 40:
+                raise RuntimeError("Остановлено после 40 страниц: проверьте API Минздрава.")
+        registry.update(russian)
+        sources["minzdrav"] = {"ok": True, "scanned": scanned, "matched": matched}
+    except (requests.RequestException, ValueError, RuntimeError) as exc:
+        error = _source_error(exc)
+        sources["minzdrav"] = {"ok": False, "scanned": scanned, "matched": matched, "error": error}
+        errors.append(f"minzdrav: {error}")
 
-    international = fetch_aao_hnsf_guidelines()
-    for item in international:
-        registry[(item["source_key"], item["external_id"])] = item
+    international = []
+    try:
+        international = fetch_aao_hnsf_guidelines()
+        additions = {
+            (item["source_key"], item["external_id"]): item for item in international
+        }
+        registry.update(additions)
+        sources["aao_hnsf"] = {"ok": True, "matched": len(international)}
+    except (requests.RequestException, ValueError, RuntimeError) as exc:
+        error = _source_error(exc)
+        sources["aao_hnsf"] = {"ok": False, "error": error}
+        errors.append(f"aao_hnsf: {error}")
 
     return {
+        "ok": not errors,
         "scanned": scanned,
         "matched": matched,
         "international": len(international),
         "stored": write_registry_and_notes(registry),
+        "sources": sources,
+        "errors": errors,
     }
 
 
@@ -152,18 +189,21 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pages", type=int, default=5)
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--report-file", type=Path, help="JSON-отчёт о результате каждого источника.")
     parser.add_argument(
         "--registry-only",
         action="store_true",
         help="Обновить профили и Obsidian-заметки из локального JSON без сети.",
     )
     args = parser.parse_args()
-    print(
-        json.dumps(
-            sync(max(1, args.pages), args.full, args.registry_only),
-            ensure_ascii=False,
-        )
-    )
+    result = sync(max(1, args.pages), args.full, args.registry_only)
+    result["checked_at"] = datetime.now(timezone.utc).isoformat()
+    report = json.dumps(result, ensure_ascii=False)
+    print(report)
+    if args.report_file:
+        args.report_file.write_text(report + "\n", encoding="utf-8")
+    if not result["ok"]:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

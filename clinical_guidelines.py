@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 from datetime import date, datetime, timezone
 from html import unescape
 from pathlib import Path
@@ -226,6 +227,20 @@ class GuidelineValidationError(ValueError):
     pass
 
 
+def _retry_source_error(exc: Exception, attempt: int) -> bool:
+    """Повторяем только временные сетевые/серверные сбои, максимум три запроса."""
+    if attempt >= 2:
+        return False
+    if isinstance(exc, (requests.Timeout, requests.ConnectionError)):
+        time.sleep(attempt + 1)
+        return True
+    response = getattr(exc, "response", None)
+    if isinstance(exc, requests.HTTPError) and response is not None and response.status_code in (429, 500, 502, 503, 504):
+        time.sleep(attempt + 1)
+        return True
+    return False
+
+
 def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -400,6 +415,8 @@ def fetch_minzdrav_page(
     request_post=requests.post,
 ) -> dict:
     """Получает одну небольшую страницу, чтобы медленный источник не блокировал сайт."""
+    if not 1 <= current_page or not 1 <= page_size <= 100:
+        raise ValueError("Минздрав: некорректная страница или размер страницы.")
     payload = {
             "filters": [
                 {
@@ -418,21 +435,33 @@ def fetch_minzdrav_page(
             "columns": [],
         }
     last_error = None
-    for _attempt in range(2):
+    for attempt in range(3):
         try:
             response = request_post(
                 MINZDRAV_API_URL,
                 json=payload,
                 headers={"Accept": "application/json", "User-Agent": "DIS-ClinicalGuidelines/1.0"},
                 timeout=timeout,
+                allow_redirects=False,
             )
             response.raise_for_status()
             data = response.json()
-            if not isinstance(data.get("Data"), list):
+            if 300 <= response.status_code < 400:
+                raise GuidelineValidationError("Минздрав: неожидаемое перенаправление API.")
+            if not isinstance(data, dict) or not isinstance(data.get("Data"), list):
                 raise RuntimeError("Минздрав вернул ответ без списка Data.")
+            if any(not isinstance(row, dict) for row in data["Data"]):
+                raise RuntimeError("Минздрав вернул некорректные записи Data.")
+            total = data.get("TotalRecords")
+            if isinstance(total, bool) or not isinstance(total, int) or total < 0:
+                raise RuntimeError("Минздрав вернул некорректное число TotalRecords.")
+            if not data["Data"] and (current_page - 1) * page_size < total:
+                raise RuntimeError("Минздрав вернул пустую страницу до конца реестра.")
             return data
         except requests.RequestException as exc:
             last_error = exc
+            if not _retry_source_error(exc, attempt):
+                raise
     raise last_error or RuntimeError("Официальный источник Минздрава недоступен.")
 
 
@@ -498,7 +527,7 @@ def parse_aao_hnsf_guidelines(html: str) -> list[dict]:
 def fetch_aao_hnsf_guidelines(*, timeout: int = 35, request_get=requests.get) -> list[dict]:
     """Читает официальный каталог AAO-HNSF и возвращает проверенные метаданные."""
     last_error = None
-    for _attempt in range(2):
+    for attempt in range(3):
         try:
             response = request_get(
                 AAO_HNSF_GUIDELINES_URL,
@@ -509,9 +538,16 @@ def fetch_aao_hnsf_guidelines(*, timeout: int = 35, request_get=requests.get) ->
             final_host = urlparse(getattr(response, "url", AAO_HNSF_GUIDELINES_URL)).hostname
             if final_host not in OFFICIAL_SOURCES["aao_hnsf"]["domains"]:
                 raise GuidelineValidationError("AAO-HNSF: перенаправление на неофициальный домен.")
-            return parse_aao_hnsf_guidelines(response.text)
+            items = parse_aao_hnsf_guidelines(response.text)
+            if len(items) != len(AAO_HNSF_WATCHED_GUIDELINES):
+                raise GuidelineValidationError(
+                    "AAO-HNSF: каталог изменился, не распознаны отслеживаемые документы и даты."
+                )
+            return items
         except (requests.RequestException, GuidelineValidationError) as exc:
             last_error = exc
+            if not _retry_source_error(exc, attempt):
+                raise
     raise last_error or RuntimeError("Официальный источник AAO-HNSF недоступен.")
 
 
