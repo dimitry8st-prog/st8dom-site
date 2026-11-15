@@ -47,12 +47,29 @@ jobs:
         id: collect
         continue-on-error: true
         shell: bash
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
         run: |
+          # Минздрав отвечает с VPS, но соединения с GitHub runners истекают.
+          # Ключ остаётся во временном файле, сетевой сбор не меняет БД портала.
+          umask 077
+          key_file="$RUNNER_TEMP/medical-sync-key"
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$key_file"
+          remote_args="--pages 5"
           if [[ "${{ inputs.full_sync }}" == "true" ]]; then
-            python scripts/sync_clinical_guidelines_vault.py --full --report-file "$RUNNER_TEMP/clinical-guidelines-report.json"
-          else
-            python scripts/sync_clinical_guidelines_vault.py --pages 5 --report-file "$RUNNER_TEMP/clinical-guidelines-report.json"
+            remote_args="--full"
           fi
+          ssh -i "$key_file" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=20 \
+            -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile="$RUNNER_TEMP/medical-known-hosts" \
+            "$SSH_USER@$SSH_HOST" \
+            "cd /srv/st8dom && docker compose exec -T app python - $remote_args" \
+            < scripts/export_remote_clinical_guidelines.py > "$RUNNER_TEMP/medical-snapshot.json"
+          python scripts/sync_clinical_guidelines_vault.py \
+            --snapshot "$RUNNER_TEMP/medical-snapshot.json" \
+            --report-file "$RUNNER_TEMP/clinical-guidelines-report.json"
 
       - name: Отчёт по каждому источнику
         if: always() && steps.collect.outcome != 'skipped'

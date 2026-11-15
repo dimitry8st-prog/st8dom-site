@@ -17,6 +17,8 @@ sys.path.insert(0, str(ROOT))
 from clinical_guidelines import (
     GUIDELINE_SPECIALTIES,
     OFFICIAL_SOURCES,
+    _official_url,
+    _parse_date,
     _minzdrav_payload,
     classify_guideline_specialties,
     fetch_aao_hnsf_guidelines,
@@ -119,6 +121,48 @@ def _source_error(exc: Exception) -> str:
     return type(exc).__name__
 
 
+def apply_snapshot(path: Path) -> dict:
+    """Сливает только успешно собранные на VPS источники; старое не удаляет."""
+    if path.stat().st_size > 8 * 1024 * 1024:
+        raise ValueError("Снимок рекомендаций превышает лимит размера.")
+    snapshot = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(snapshot, dict) or snapshot.get("schema_version") != 1:
+        raise ValueError("Неизвестный формат снимка рекомендаций.")
+    result, items = snapshot.get("result"), snapshot.get("items")
+    if not isinstance(result, dict) or not isinstance(items, list):
+        raise ValueError("Снимок рекомендаций не содержит результата и карточек.")
+    sources = result.get("sources")
+    if not isinstance(sources, dict) or set(sources) != {"minzdrav", "aao_hnsf"}:
+        raise ValueError("В снимке отсутствует отчёт по ожидаемым источникам.")
+    if any(not isinstance(row, dict) or type(row.get("ok")) is not bool for row in sources.values()):
+        raise ValueError("Некорректный статус источника в снимке.")
+    if type(result.get("ok")) is not bool or result["ok"] != all(row["ok"] for row in sources.values()):
+        raise ValueError("Итог снимка противоречит статусам источников.")
+    if not isinstance(result.get("errors"), list) or bool(result["errors"]) == result["ok"]:
+        raise ValueError("Некорректный список ошибок в снимке.")
+
+    # Проверяем весь пакет до первой записи; посторонний URL/источник не попадёт
+    # ни в GitHub, ни на портал. Снимок не заменяет существующий реестр целиком.
+    additions = {}
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError("Некорректная карточка в снимке.")
+        source = item.get("source_key")
+        if source not in sources or not sources[source]["ok"]:
+            raise ValueError("Снимок содержит карточку непроверенного источника.")
+        external_id, title = item.get("external_id"), item.get("title")
+        if not isinstance(external_id, str) or not 1 <= len(external_id) <= 160:
+            raise ValueError("Некорректный идентификатор карточки в снимке.")
+        if not isinstance(title, str) or not 2 <= len(title) <= 500:
+            raise ValueError("Некорректное название карточки в снимке.")
+        _official_url(source, item.get("url"))
+        _parse_date(item.get("published_on"))
+        additions[(source, external_id)] = item
+    registry = load_registry()
+    registry.update(additions)
+    return {**result, "stored": write_registry_and_notes(registry), "collection_location": "portal-vps"}
+
+
 def sync(pages: int, full: bool = False, registry_only: bool = False) -> dict:
     registry = load_registry()
     if registry_only:
@@ -189,6 +233,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pages", type=int, default=5)
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--snapshot", type=Path, help="Слить снимок официальных источников с VPS без сетевых запросов.")
     parser.add_argument("--report-file", type=Path, help="JSON-отчёт о результате каждого источника.")
     parser.add_argument(
         "--registry-only",
@@ -196,7 +241,9 @@ def main() -> None:
         help="Обновить профили и Obsidian-заметки из локального JSON без сети.",
     )
     args = parser.parse_args()
-    result = sync(max(1, args.pages), args.full, args.registry_only)
+    if args.snapshot and args.registry_only:
+        parser.error("--snapshot несовместим с --registry-only")
+    result = apply_snapshot(args.snapshot) if args.snapshot else sync(max(1, args.pages), args.full, args.registry_only)
     result["checked_at"] = datetime.now(timezone.utc).isoformat()
     report = json.dumps(result, ensure_ascii=False)
     print(report)

@@ -7,6 +7,7 @@ import requests
 
 import clinical_guidelines as guidelines
 from scripts import sync_clinical_guidelines_vault as collector
+from scripts.export_remote_clinical_guidelines import export_snapshot
 
 
 def response(status=200, payload=None, text=None, url=guidelines.MINZDRAV_API_URL):
@@ -198,3 +199,63 @@ def test_successful_sources_produce_ok_report(monkeypatch, registry):
     result = collector.sync(5)
     assert result["ok"] is True and result["errors"] == []
     assert result["stored"] == 3
+
+
+def test_remote_snapshot_does_not_change_original_registry_or_notes(monkeypatch, registry):
+    original = registry.read_text()
+    vault = collector.VAULT_DIR
+    vault.mkdir()
+    note = vault / "my-note.md"
+    note.write_text("Reviewed personal notes")
+    monkeypatch.setattr(collector, "fetch_minzdrav_page", lambda **kw: {
+        "Data": [russian_item()], "TotalRecords": 1,
+    })
+    monkeypatch.setattr(collector, "fetch_aao_hnsf_guidelines", lambda: [international_item()])
+    snapshot = export_snapshot()
+    assert registry.read_text() == original
+    assert note.read_text() == "Reviewed personal notes"
+    assert collector.REGISTRY_PATH == registry and collector.VAULT_DIR == vault
+    assert snapshot["result"]["ok"] is True
+    assert {row["external_id"] for row in snapshot["items"]} == {
+        "recovery-1", international_item()["external_id"],
+    }
+
+
+def test_snapshot_merge_preserves_existing_cards_after_partial_remote_failure(monkeypatch, registry, tmp_path):
+    monkeypatch.setattr(collector, "fetch_minzdrav_page", fail_minzdrav)
+    monkeypatch.setattr(collector, "fetch_aao_hnsf_guidelines", lambda: [international_item()])
+    snapshot = export_snapshot()
+    path = tmp_path / "snapshot.json"
+    path.write_text(json.dumps(snapshot))
+    result = collector.apply_snapshot(path)
+    assert result["stored"] == 2 and result["ok"] is False
+    assert result["collection_location"] == "portal-vps"
+    assert collector.apply_snapshot(path)["stored"] == 2
+    assert {row["external_id"] for row in json.loads(registry.read_text())["items"]} == {
+        "old-1", international_item()["external_id"],
+    }
+
+
+@pytest.mark.parametrize("change", ["url", "source", "status", "shape"])
+def test_snapshot_rejects_untrusted_or_inconsistent_data_before_writing(registry, tmp_path, change):
+    original = registry.read_text()
+    snapshot = {
+        "schema_version": 1,
+        "result": {"ok": True, "errors": [], "sources": {
+            "minzdrav": {"ok": True}, "aao_hnsf": {"ok": True},
+        }},
+        "items": [international_item()],
+    }
+    if change == "url":
+        snapshot["items"][0]["url"] = "https://example.org/untrusted"
+    elif change == "source":
+        snapshot["items"][0]["source_key"] = "unknown"
+    elif change == "status":
+        snapshot["result"]["sources"]["aao_hnsf"]["ok"] = False
+    else:
+        snapshot["items"] = None
+    path = tmp_path / "snapshot.json"
+    path.write_text(json.dumps(snapshot))
+    with pytest.raises(ValueError):
+        collector.apply_snapshot(path)
+    assert registry.read_text() == original
