@@ -1,0 +1,38 @@
+name: Check medical source connectivity
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/check-medical-source-connectivity.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read-only Minzdrav check from portal VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -eu
+            cd /srv/st8dom
+            docker compose exec -T app python - <<'PY'
+            import json
+            from clinical_guidelines import fetch_minzdrav_page
+            try:
+                data = fetch_minzdrav_page(page_size=5, timeout=10)
+                print(json.dumps({"source": "minzdrav", "location": "portal-vps", "ok": True,
+                                  "rows": len(data["Data"]), "total_records": data["TotalRecords"]}))
+            except Exception as exc:
+                response = getattr(exc, "response", None)
+                print(json.dumps({"source": "minzdrav", "location": "portal-vps", "ok": False,
+                                  "error": type(exc).__name__, "http_status": getattr(response, "status_code", None)}))
+                raise SystemExit(1)
+            PY
