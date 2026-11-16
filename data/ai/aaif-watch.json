@@ -27,6 +27,27 @@
   },
   "items": [
     {
+      "title": "Kids build games and make robots sing at AGNTCon Kids Day",
+      "url": "https://aaif.io/blog/kids-build-games-and-make-robots-sing-at-agntcon-kids-day",
+      "published_date": "2026-11-13",
+      "summary": "At AGNTCon + MCPCon Kids Day, children aged 9-18 used goose AI to make VEX AIM robots dance and build games in Godot, learning debugging and open source AI tools.",
+      "review_status": "pending"
+    },
+    {
+      "title": "How to give an agent 8,000 tools without loading 8,000 tools",
+      "url": "https://aaif.io/blog/how-to-give-an-agent-8-000-tools-without-loading-8-000-tools",
+      "published_date": "2026-11-12",
+      "summary": "Learn why static tool lists break at scale for AI agents and how tool retrieval solves it. Covers evaluation methods, cost tradeoffs, and when dynamic selection beats a fixed list.",
+      "review_status": "pending"
+    },
+    {
+      "title": "DevEx for your agents: How AGENTS.md cut token usage and cost",
+      "url": "https://aaif.io/blog/devex-for-your-agents-how-agents-md-cut-token-usage-and-cost",
+      "published_date": "2026-11-11",
+      "summary": "An experiment on todogroup.org shows how adding an AGENTS.md file reduced token usage by 36%, cut costs 26%, and improved agent task accuracy from 7/9 to 9/9 runs.",
+      "review_status": "pending"
+    },
+    {
       "title": "Give goose sandbox powers with OpenSandbox and MCP",
       "url": "https://aaif.io/blog/give-goose-sandbox-powers-with-opensandbox-and-mcp",
       "published_date": "2026-11-06",
@@ -118,5 +139,5 @@
       "review_status": "pending"
     }
   ],
-  "last_changed_at": "2026-11-09T11:26:51+00:00"
+  "last_changed_at": "2026-11-16T11:11:07+00:00"
 }
