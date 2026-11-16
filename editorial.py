@@ -737,6 +737,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 11, 12, 15, 0, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        'post-stroke-dose-timing-technologies-2026-11-16.json',
+        datetime(2026, 11, 16, 19, 10, 15, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
