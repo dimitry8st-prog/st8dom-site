@@ -742,6 +742,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 11, 16, 19, 10, 15, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "tmd-jaw-ear-temple-pain-2026-11-18.json",
+        datetime(2026, 11, 18, 14, 35, 54, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
