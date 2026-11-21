@@ -90,6 +90,15 @@ jobs:
             for i in $(seq 1 20); do
               st=$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q app)" 2>/dev/null || echo starting)
               if [ "$st" = "healthy" ]; then
+                # Deployment is not complete until the newest approved article
+                # is present in the persistent DB and its public route serves 200.
+                if ! docker compose exec -T app python -c 'from app import app; from models import Article; slug="anthropic-ipo-pervye-torgi-pochemu-chetverg-2026"; ctx=app.app_context(); ctx.push(); article=Article.query.filter_by(slug=slug).first(); response=app.test_client().get("/materials/"+slug+"/"); print("IPO_ARTICLE:", "published" if article and article.is_public else "missing", "HTTP:", response.status_code); raise SystemExit(0 if article and article.is_public and response.status_code==200 else 1)'; then
+                  echo "Новая публикация отсутствует в БД или маршрут возвращает не 200 — откат на $PREV"
+                  docker compose logs --tail=60 app
+                  set_tag "$PREV"
+                  docker compose up -d --no-deps app
+                  exit 1
+                fi
                 # Keep the Life-OS boundary inventory on the VPS only. Portal
                 # articles are excluded from Vitalis; the command prints counts,
                 # never article bodies or database credentials.
