@@ -366,6 +366,11 @@ def ensure_editorial_seed() -> None:
     )
 
     ensure_published_content_package(
+        "anthropic-south-sea-bubble-forecast-2026-11-22.json",
+        datetime.now(timezone.utc),
+    )
+
+    ensure_published_content_package(
         "anthropic-ipo-first-two-days-2026-11-21.json",
         datetime(2026, 11, 21, 7, 15, tzinfo=timezone.utc),
     )

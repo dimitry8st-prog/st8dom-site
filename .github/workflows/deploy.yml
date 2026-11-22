@@ -92,7 +92,7 @@ jobs:
               if [ "$st" = "healthy" ]; then
                 # Deployment is not complete until the newest approved article
                 # is present in the persistent DB and its public route serves 200.
-                if ! docker compose exec -T app python -c 'from app import app; from models import Article; slug="anthropic-ipo-pervye-torgi-pochemu-chetverg-2026"; ctx=app.app_context(); ctx.push(); article=Article.query.filter_by(slug=slug).first(); response=app.test_client().get("/materials/"+slug+"/"); print("IPO_ARTICLE:", "published" if article and article.is_public else "missing", "HTTP:", response.status_code); raise SystemExit(0 if article and article.is_public and response.status_code==200 else 1)'; then
+                if ! docker compose exec -T app python -c 'from app import app; from models import Article; slugs=["anthropic-ipo-pervye-torgi-pochemu-chetverg-2026","anthropic-prizrak-yuzhnyh-morey-1720-ai-2026"]; ctx=app.app_context(); ctx.push(); checks=[(s,Article.query.filter_by(slug=s).first(),app.test_client().get("/materials/"+s+"/").status_code) for s in slugs]; print("ARTICLE_PUBLICATION_CHECK:",[(s,bool(a and a.is_public),code) for s,a,code in checks]); raise SystemExit(0 if all(a and a.is_public and code==200 for s,a,code in checks) else 1)'; then
                   echo "Новая публикация отсутствует в БД или маршрут возвращает не 200 — откат на $PREV"
                   docker compose logs --tail=60 app
                   set_tag "$PREV"
@@ -132,21 +132,28 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Verify new Anthropic article is live, not a 404
+      - name: Verify both Anthropic articles are live
         shell: bash
         run: |
-          url="https://st8dom.ru/materials/anthropic-ipo-pervye-torgi-pochemu-chetverg-2026/"
-          for attempt in 1 2 3 4 5 6; do
-            status=$(curl --location --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' "$url" || true)
-            echo "Public article check ${attempt}/6: HTTP ${status}"
-            if [ "$status" = "200" ]; then
-              echo "PUBLIC_ARTICLE_HTTP_200"
-              exit 0
+          set -e
+          for slug in anthropic-ipo-pervye-torgi-pochemu-chetverg-2026 anthropic-prizrak-yuzhnyh-morey-1720-ai-2026; do
+            url="https://st8dom.ru/materials/${slug}/"
+            ok=0
+            for attempt in 1 2 3 4 5 6; do
+              status=$(curl --location --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' "$url" || true)
+              echo "$slug check ${attempt}/6: HTTP ${status}"
+              if [ "$status" = "200" ]; then
+                ok=1
+                break
+              fi
+              sleep 10
+            done
+            if [ "$ok" != "1" ]; then
+              echo "Publication $slug not publicly accessible"
+              exit 1
             fi
-            sleep 10
           done
-          echo "Publication is not publicly accessible — failing deployment verification"
-          exit 1
+          echo "PUBLIC_ARTICLES_HTTP_200"
 
   notify:
     needs: [test, build, deploy, verify-publication]
