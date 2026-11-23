@@ -66,11 +66,10 @@ NEWS_SOURCES: tuple[NewsSource, ...] = (
     NewsSource(
         key="openai-news",
         provider="OpenAI",
-        url="https://openai.com/news/product-releases/",
+        url="https://openai.com/news/product-releases/?display=list",
         stream="science-ai",
-        adapter="html",
-        enabled=False,
-        status="adapter_required",
+        adapter="openai_html",
+        status="active",
     ),
     NewsSource(
         key="anthropic-news",

@@ -3,7 +3,8 @@ import json
 import re
 import xml.etree.ElementTree as ET
 from html import unescape
-from urllib.parse import urlsplit
+from html.parser import HTMLParser
+from urllib.parse import urljoin, urlsplit
 
 import requests
 
@@ -12,11 +13,77 @@ from lifeos_workspace import collect_securitylab, save_material
 from news_sources import source_by_key
 
 MIT_FEED = source_by_key("mit-news").url
+OPENAI_SOURCE = source_by_key("openai-news")
+OPENAI_PAGE_LIMIT = 2 * 1024 * 1024
 PATTERNS = [
     ("science-longevity", re.compile(r"\b(aging|ageing|longevity|geroscience|senescence|healthspan)\b", re.I)),
     ("science-neuro", re.compile(r"\b(neural|brain|health|medical|medicine|biomedical|neuroscience|neurology)\b", re.I)),
     ("science-ai", re.compile(r"\b(ai|artificial intelligence|machine learning|robot(?:s|ics)?|engineering)\b", re.I)),
 ]
+
+
+class OpenAIProductParser(HTMLParser):
+    """Extract official product cards without executing page scripts."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.rows = []
+        self.current = None
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == "a":
+            href = attributes.get("href", "")
+            label = attributes.get("aria-label", "")
+            if href.startswith("/index/") and " - Product - " in label:
+                self.current = {
+                    "title": label.rsplit(" - Product - ", 1)[0].strip(),
+                    "href": href,
+                    "published_date": "",
+                }
+        elif tag == "time" and self.current is not None:
+            self.current["published_date"] = attributes.get("datetime", "")[:10]
+
+    def handle_endtag(self, tag):
+        if tag == "a" and self.current is not None:
+            self.rows.append(self.current)
+            self.current = None
+
+
+def parse_openai_product_page(data):
+    if len(data) > OPENAI_PAGE_LIMIT:
+        raise ValueError("OpenAI page exceeds size limit")
+    try:
+        page = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("OpenAI page is not UTF-8") from exc
+    parser = OpenAIProductParser()
+    parser.feed(page)
+    rows, seen = [], set()
+    for item in parser.rows:
+        url = urljoin("https://openai.com", item["href"])
+        parts = urlsplit(url)
+        title = item["title"]
+        published_date = item["published_date"]
+        if (parts.scheme != "https" or parts.netloc != "openai.com"
+                or not parts.path.startswith("/index/") or not title
+                or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", published_date)
+                or url in seen):
+            continue
+        seen.add(url)
+        rows.append({
+            "title": title[:500],
+            "source_url": url,
+            "summary": "Official OpenAI product announcement; manual review required.",
+            "stream": OPENAI_SOURCE.stream,
+            "evidence": "Официальный источник; ручная проверка",
+            "published_date": published_date,
+        })
+    if not rows:
+        raise ValueError("OpenAI product page format changed or returned no cards")
+    if len(rows) > 100:
+        raise ValueError("OpenAI batch exceeds 100 records")
+    return rows
 
 
 def parse_mit_feed(data):
@@ -58,6 +125,29 @@ def collect_mit():
     return {"matched": len(rows), "created": created, "existing": len(rows) - created}
 
 
+def collect_openai():
+    with requests.get(
+        OPENAI_SOURCE.url,
+        headers={"User-Agent": "st8dom-source-monitor/1.0"},
+        timeout=(5, 20),
+        stream=True,
+    ) as response:
+        response.raise_for_status()
+        parts = urlsplit(response.url)
+        if parts.scheme != "https" or parts.netloc != "openai.com":
+            raise ValueError("OpenAI page redirected outside official source")
+        if "text/html" not in response.headers.get("Content-Type", "").lower():
+            raise ValueError("OpenAI source did not return HTML")
+        data = bytearray()
+        for chunk in response.iter_content(65536):
+            data.extend(chunk)
+            if len(data) > OPENAI_PAGE_LIMIT:
+                raise ValueError("OpenAI page exceeds size limit")
+    rows = parse_openai_product_page(bytes(data))
+    created = sum(save_material(**row)[1] for row in rows)
+    return {"matched": len(rows), "created": created, "existing": len(rows) - created}
+
+
 def main():
     from app import app
     errors = []
@@ -72,6 +162,11 @@ def main():
             print(json.dumps({"source": "MIT", **collect_mit()}))
         except (requests.RequestException, ET.ParseError, ValueError) as exc:
             errors.append("MIT: " + type(exc).__name__)
+        try:
+            print(json.dumps({"source": "OpenAI", **collect_openai()}))
+        except (requests.RequestException, ValueError) as exc:
+            warning = "OpenAI: " + type(exc).__name__
+            print(f"::warning title=OpenAI official source::{warning}")
         if errors:
             raise SystemExit("News collection incomplete: " + ", ".join(errors))
 
