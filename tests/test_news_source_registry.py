@@ -14,12 +14,13 @@ def test_enabled_sources_have_supported_adapters():
     assert {source.adapter for source in enabled} <= {
         "securitylab_rss",
         "mit_rss",
+        "mcp_rss",
         "openai_html",
     }
 
 
 def test_official_ai_coverage_gaps_are_explicit():
-    expected = {"anthropic-news", "google-ai", "mcp-blog"}
+    expected = {"anthropic-news", "google-ai"}
     registered = {source.key for source in NEWS_SOURCES}
     assert expected <= registered
     for key in expected:
@@ -38,4 +39,11 @@ def test_openai_adapter_is_enabled_for_private_cards():
     source = source_by_key("openai-news")
     assert source.enabled is True
     assert source.adapter == "openai_html"
+    assert source.stream == "science-ai"
+
+
+def test_mcp_adapter_is_enabled_for_private_cards():
+    source = source_by_key("mcp-blog")
+    assert source.enabled is True
+    assert source.adapter == "mcp_rss"
     assert source.stream == "science-ai"
