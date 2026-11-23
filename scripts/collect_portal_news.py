@@ -2,6 +2,7 @@
 import json
 import re
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
@@ -15,6 +16,8 @@ from news_sources import source_by_key
 MIT_FEED = source_by_key("mit-news").url
 OPENAI_SOURCE = source_by_key("openai-news")
 OPENAI_PAGE_LIMIT = 2 * 1024 * 1024
+ANTHROPIC_SOURCE = source_by_key("anthropic-news")
+ANTHROPIC_PAGE_LIMIT = 2 * 1024 * 1024
 MCP_SOURCE = source_by_key("mcp-blog")
 MCP_FEED_LIMIT = 2 * 1024 * 1024
 PATTERNS = [
@@ -52,6 +55,64 @@ class OpenAIProductParser(HTMLParser):
             self.current = None
 
 
+class AnthropicNewsParser(HTMLParser):
+    """Extract official newsroom rows without executing page scripts."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.rows = []
+        self.current = None
+        self.li_depth = 0
+        self.field = None
+        self.content_tag = None
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == "li" and self.current is None and attributes.get("data-listing-row"):
+            self.current = {"title": [], "summary": [], "date": [], "href": ""}
+            self.li_depth = 1
+            return
+        if self.current is None:
+            return
+        if tag == "li":
+            self.li_depth += 1
+        if tag == "a":
+            classes = attributes.get("class", "").split()
+            if any(name.endswith("_title-link") for name in classes):
+                self.field = "title"
+                self.current["href"] = attributes.get("href", "")
+            elif any(name.endswith("_above-link") for name in classes):
+                self.field = "summary"
+        elif tag == "h3" and self.field == "title":
+            self.content_tag = "h3"
+        elif tag == "p" and self.field == "summary":
+            self.content_tag = "p"
+
+    def handle_data(self, data):
+        if self.current is None:
+            return
+        text = " ".join(data.split())
+        if not text:
+            return
+        if self.field and self.content_tag:
+            self.current[self.field].append(text)
+        if re.fullmatch(r"[A-Z][a-z]{2} \d{1,2}, \d{4}", text):
+            self.current["date"].append(text)
+
+    def handle_endtag(self, tag):
+        if self.current is None:
+            return
+        if tag == "a":
+            self.field = None
+        if tag == self.content_tag:
+            self.content_tag = None
+        if tag == "li":
+            self.li_depth -= 1
+            if self.li_depth == 0:
+                self.rows.append(self.current)
+                self.current = None
+
+
 def parse_openai_product_page(data):
     if len(data) > OPENAI_PAGE_LIMIT:
         raise ValueError("OpenAI page exceeds size limit")
@@ -85,6 +146,45 @@ def parse_openai_product_page(data):
         raise ValueError("OpenAI product page format changed or returned no cards")
     if len(rows) > 100:
         raise ValueError("OpenAI batch exceeds 100 records")
+    return rows
+
+
+def parse_anthropic_news_page(data):
+    if len(data) > ANTHROPIC_PAGE_LIMIT:
+        raise ValueError("Anthropic page exceeds size limit")
+    try:
+        page = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("Anthropic page is not UTF-8") from exc
+    parser = AnthropicNewsParser()
+    parser.feed(page)
+    rows, seen = [], set()
+    for item in parser.rows:
+        url = urljoin("https://www.anthropic.com", item["href"])
+        parts = urlsplit(url)
+        title = " ".join(item["title"]).strip()
+        summary = " ".join(item["summary"]).strip()
+        try:
+            published_date = datetime.strptime(item["date"][0], "%b %d, %Y").date().isoformat()
+        except (IndexError, ValueError):
+            continue
+        if (parts.scheme != "https" or parts.netloc != "www.anthropic.com"
+                or not parts.path.startswith("/news/") or not title
+                or url in seen):
+            continue
+        seen.add(url)
+        rows.append({
+            "title": title[:500],
+            "source_url": url,
+            "summary": summary[:2000] or "Official Anthropic newsroom item; manual review required.",
+            "stream": ANTHROPIC_SOURCE.stream,
+            "evidence": "Официальный источник; ручная проверка",
+            "published_date": published_date,
+        })
+    if not rows:
+        raise ValueError("Anthropic page format changed or returned no cards")
+    if len(rows) > 100:
+        raise ValueError("Anthropic batch exceeds 100 records")
     return rows
 
 
@@ -187,6 +287,29 @@ def collect_openai():
     return {"matched": len(rows), "created": created, "existing": len(rows) - created}
 
 
+def collect_anthropic():
+    with requests.get(
+        ANTHROPIC_SOURCE.url,
+        headers={"User-Agent": "st8dom-source-monitor/1.0"},
+        timeout=(5, 20),
+        stream=True,
+    ) as response:
+        response.raise_for_status()
+        parts = urlsplit(response.url)
+        if parts.scheme != "https" or parts.netloc != "www.anthropic.com":
+            raise ValueError("Anthropic page redirected outside official source")
+        if "text/html" not in response.headers.get("Content-Type", "").lower():
+            raise ValueError("Anthropic source did not return HTML")
+        data = bytearray()
+        for chunk in response.iter_content(65536):
+            data.extend(chunk)
+            if len(data) > ANTHROPIC_PAGE_LIMIT:
+                raise ValueError("Anthropic page exceeds size limit")
+    rows = parse_anthropic_news_page(bytes(data))
+    created = sum(save_material(**row)[1] for row in rows)
+    return {"matched": len(rows), "created": created, "existing": len(rows) - created}
+
+
 def collect_mcp():
     with requests.get(
         MCP_SOURCE.url,
@@ -230,6 +353,11 @@ def main():
         except (requests.RequestException, ValueError) as exc:
             warning = "OpenAI: " + type(exc).__name__
             print(f"::warning title=OpenAI official source::{warning}")
+        try:
+            print(json.dumps({"source": "Anthropic", **collect_anthropic()}))
+        except (requests.RequestException, ValueError) as exc:
+            warning = "Anthropic: " + type(exc).__name__
+            print(f"::warning title=Anthropic official source::{warning}")
         try:
             print(json.dumps({"source": "MCP", **collect_mcp()}))
         except (requests.RequestException, ET.ParseError, ValueError) as exc:
