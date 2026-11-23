@@ -9,8 +9,9 @@ import requests
 
 from lifeos_ingest import validate_mit_batch
 from lifeos_workspace import collect_securitylab, save_material
+from news_sources import source_by_key
 
-MIT_FEED = "https://news.mit.edu/rss/feed"
+MIT_FEED = source_by_key("mit-news").url
 PATTERNS = [
     ("science-longevity", re.compile(r"\b(aging|ageing|longevity|geroscience|senescence|healthspan)\b", re.I)),
     ("science-neuro", re.compile(r"\b(neural|brain|health|medical|medicine|biomedical|neuroscience|neurology)\b", re.I)),
