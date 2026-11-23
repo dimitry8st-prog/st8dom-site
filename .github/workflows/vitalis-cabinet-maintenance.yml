@@ -8,39 +8,154 @@ concurrency:
   group: vitalis-cabinet-maintenance
   cancel-in-progress: false
 jobs:
-  inspect:
+  deploy-cabinet:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 9
     steps:
-      - name: Read the exact checkout and Node image for the cabinet
+      - name: Replace only the Vitalis cabinet page
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           timeout: 25s
-          command_timeout: 2m
+          command_timeout: 7m
           script: |
             set -eu
             cd /opt/vitalis-ru
-            repo_git() { git -c safe.directory=/opt/vitalis-ru -c core.hooksPath=/dev/null "$@"; }
-            head=$(repo_git rev-parse --verify HEAD)
-            branch=$(repo_git symbolic-ref --quiet --short HEAD || printf 'detached')
-            changes=$(repo_git status --porcelain --untracked-files=no)
-            printf 'VITALIS_CHECKOUT=%s\nVITALIS_BRANCH=%s\n' "$head" "$branch"
-            if [ -z "$changes" ]; then echo VITALIS_CHECKOUT_CLEAN=yes; else echo VITALIS_CHECKOUT_CLEAN=no; fi
-            owner=$(stat -c '%u' .git)
-            if [ "$owner" = "$(id -u)" ]; then
-              echo VITALIS_CHECKOUT_ACCESS=owner
-            elif sudo -n -u "#$owner" -- test -w /opt/vitalis-ru/.git 2>/dev/null; then
-              echo VITALIS_CHECKOUT_ACCESS=owner_sudo
-            elif [ -w .git ] && [ -w web ]; then
-              echo VITALIS_CHECKOUT_ACCESS=shared
-            else
-              echo VITALIS_CHECKOUT_ACCESS=read_only
-            fi
+            
+            release_sha=d86c1ac2f078a554ffc62a527536d1bf3143299d
+            before_hash=a2fe7364465e350466127d19017e8eb433cfbf18253076dd9ed2e7dfa2b48672
+            release_hash=40e2b9b627d8433437953cfc515ce2ab244c8bd896cbef82bd92e1c39d770cd7
+            active_image=vitalis-ru-node
+            release_part=d86c1ac2f078
+            backup_image="$active_image:before-cabinet-$release_part"
+            candidate_image="$active_image:cabinet-$release_part"
+            backup_container="vitalis-cabinet-rollback-$release_part"
+            runtime_root="$HOME/.local/state/vitalis-cabinet"
+            umask 077
+            mkdir -p "$runtime_root"
+            exec 9>"$runtime_root/release.lock"
+            flock -n 9
+            
             node_id=$(docker compose ps -q node)
+            python_id=$(docker compose ps -q python)
             test -n "$node_id"
-            printf 'VITALIS_NODE_IMAGE_REF=%s\n' "$(docker inspect -f '{{.Config.Image}}' "$node_id")"
-            printf 'VITALIS_COMPOSE_NODE_IMAGE=%s\n' "$(docker compose config --images node)"
-            printf 'VITALIS_APP_SHA256=%s\n' "$(docker exec "$node_id" sha256sum /app/web/app.html | cut -d ' ' -f 1)"
+            test -n "$python_id"
+            test "$(docker inspect -f '{{.State.Health.Status}}' "$node_id")" = healthy
+            test "$(docker inspect -f '{{.State.Health.Status}}' "$python_id")" = healthy
+            node_ref=$(docker inspect -f '{{.Config.Image}}' "$node_id")
+            case "$node_ref" in vitalis-ru-node|vitalis-ru-node:latest) ;; *) echo VITALIS_UNEXPECTED_NODE_IMAGE; exit 1 ;; esac
+            mounts=$(docker inspect -f '{{range .Mounts}}{{println .Destination}}{{end}}' "$node_id")
+            if printf '%s\n' "$mounts" | grep -Eq '^(/app|/app/web|/app/web/app.html)$'; then
+              echo VITALIS_CABINET_MOUNT_UNEXPECTED
+              exit 1
+            fi
+            
+            work=$(mktemp -d "$runtime_root/$release_part.XXXXXX")
+            stage_path="/app/web/.cabinet-$release_part.html"
+            tag_changed=0
+            page_changed=0
+            
+            put_page() {
+              docker cp "$1" "$node_id:$stage_path" || return 1
+              docker exec --user 0 "$node_id" sh -ec '
+                observed=$(sha256sum "$1" | cut -d " " -f 1)
+                test "$observed" = "$3"
+                chmod 0644 "$1"
+                mv -f "$1" "$2"
+              ' sh "$stage_path" /app/web/app.html "$2"
+            }
+            
+            finish() {
+              result=$?
+              trap - EXIT
+              if [ "$result" -ne 0 ]; then
+                restored=yes
+                if [ "$tag_changed" = 1 ] && ! docker image tag "$backup_image" "$active_image"; then restored=no; fi
+                if [ "$page_changed" = 1 ] && ! put_page "$work/app-before.html" "$before_hash"; then restored=no; fi
+                if [ "$tag_changed" = 1 ] || [ "$page_changed" = 1 ]; then printf 'VITALIS_ROLLBACK=%s\n' "$restored"; fi
+                docker exec --user 0 "$node_id" rm -f "$stage_path" 2>/dev/null || true
+              fi
+              rm -rf "$work"
+              exit "$result"
+            }
+            trap finish EXIT
+            
+            check_live() {
+              curl --fail --silent --show-error --max-time 10 http://127.0.0.1:3080/app -o "$work/served.html"
+              test "$(sha256sum "$work/served.html" | cut -d ' ' -f 1)" = "$release_hash"
+              grep -Fq 'id="workspaceMigraine"' "$work/served.html"
+              grep -Fq 'id="workspaceMedical"' "$work/served.html"
+              grep -Fq 'id="workspaceInsurance"' "$work/served.html"
+              for endpoint in /api/health /api/ai/health; do
+                curl --fail --silent --show-error --max-time 10 "http://127.0.0.1:3080$endpoint" -o /dev/null
+              done
+              test "$(docker compose ps -q node)" = "$node_id"
+              test "$(docker compose ps -q python)" = "$python_id"
+              test "$(docker inspect -f '{{.State.Health.Status}}' "$node_id")" = healthy
+              test "$(docker inspect -f '{{.State.Health.Status}}' "$python_id")" = healthy
+              printf 'VITALIS_RELEASE=%s\nVITALIS_LIVE_APP_SHA256=%s\nVITALIS_APP_HTTP=200\nVITALIS_PYTHON_RETAINED=yes\n' "$release_sha" "$release_hash"
+            }
+            
+            actual_hash=$(docker exec "$node_id" sha256sum /app/web/app.html | cut -d ' ' -f 1)
+            if [ "$actual_hash" = "$release_hash" ]; then
+              test "$(docker run --rm --network none --entrypoint sha256sum "$active_image" /app/web/app.html | cut -d ' ' -f 1)" = "$release_hash"
+              check_live
+              exit 0
+            fi
+            test "$actual_hash" = "$before_hash"
+            old_image_id=$(docker inspect -f '{{.Image}}' "$node_id")
+            test "$(docker image inspect -f '{{.Id}}' "$active_image")" = "$old_image_id"
+            
+            docker cp "$node_id:/app/web/app.html" "$work/app-before.html"
+            test "$(sha256sum "$work/app-before.html" | cut -d ' ' -f 1)" = "$before_hash"
+            mkdir "$work/build"
+            curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+              --max-time 25 --retry 2 --retry-all-errors --retry-delay 2 \
+              "https://raw.githubusercontent.com/dimitry8st-prog/Vitalis-Medical-AI/$release_sha/web/app.html" -o "$work/build/app.html"
+            test "$(sha256sum "$work/build/app.html" | cut -d ' ' -f 1)" = "$release_hash"
+            chmod 0644 "$work/build/app.html"
+            
+            docker image tag "$old_image_id" "$backup_image"
+            if docker container inspect "$backup_container" >/dev/null 2>&1; then
+              test "$(docker inspect -f '{{.Image}}' "$backup_container")" = "$old_image_id"
+            else
+              docker create --name "$backup_container" --network none --entrypoint /bin/true "$backup_image" >/dev/null
+            fi
+            
+            cat > "$work/build/Dockerfile" <<'NODE_CABINET_IMAGE'
+            ARG NODE_CABINET_BASE
+            FROM $NODE_CABINET_BASE
+            ARG NODE_CABINET_REVISION
+            LABEL org.opencontainers.image.revision=$NODE_CABINET_REVISION
+            COPY app.html /app/web/app.html
+            NODE_CABINET_IMAGE
+            
+            docker build --pull=false --network none --tag "$candidate_image" \
+              --build-arg "NODE_CABINET_BASE=$backup_image" \
+              --build-arg "NODE_CABINET_REVISION=$release_sha" "$work/build"
+            test "$(docker run --rm --network none --entrypoint sha256sum "$candidate_image" /app/web/app.html | cut -d ' ' -f 1)" = "$release_hash"
+            test "$(docker compose ps -q node)" = "$node_id"
+            test "$(docker image inspect -f '{{.Id}}' "$active_image")" = "$old_image_id"
+            test "$(docker exec "$node_id" sha256sum /app/web/app.html | cut -d ' ' -f 1)" = "$before_hash"
+            
+            tag_changed=1
+            docker image tag "$candidate_image" "$active_image"
+            page_changed=1
+            put_page "$work/build/app.html" "$release_hash"
+            test "$(docker image inspect -f '{{.Id}}' "$active_image")" = "$(docker image inspect -f '{{.Id}}' "$candidate_image")"
+            check_live
+            printf 'VITALIS_ROLLBACK_IMAGE=%s\n' "$backup_image"
+  verify-access:
+    needs: deploy-cabinet
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify the cabinet still requires sign-in over HTTPS
+        shell: bash
+        run: |
+          set -eu
+          status=$(curl --silent --show-error --max-time 15 --retry 1 -o /dev/null -w '%{http_code}' https://vitalis.st8dom.ru/app)
+          printf 'VITALIS_PUBLIC_HTTP=%s\n' "$status"
+          test "$status" = 401
