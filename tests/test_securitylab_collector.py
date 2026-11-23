@@ -133,3 +133,19 @@ def test_command_exposes_fallback_warning_and_preserves_mit_failure(monkeypatch,
     monkeypatch.setattr(collector, "collect_mit", fail_mit)
     with pytest.raises(SystemExit, match="News collection incomplete: MIT: Timeout"):
         collector.main()
+
+
+def test_removed_optional_feed_is_warning_and_does_not_fail_batch(monkeypatch):
+    url = workspace.FEEDS["software"]
+    monkeypatch.setattr(workspace, "FEEDS", {"software": url})
+    monkeypatch.setattr(
+        workspace.requests,
+        "get",
+        lambda *args, **kwargs: response(url, 404),
+    )
+    warnings = []
+
+    assert workspace.collect_securitylab(warnings=warnings) == (0, [])
+    assert len(warnings) == 1
+    assert "software: HTTP 404" in warnings[0]
+    assert "optional feed is unavailable" in warnings[0]
