@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from extensions import db
 from models import LifeOSMaterial
+from news_sources import sources_for
 
 STREAMS = {
     "time": {"title": "Время, реальность и прогнозирование", "description": "Квантовая физика, относительность, время, теория игр и прогнозирование. Научные результаты, модели и гипотезы отмечаются отдельно."},
@@ -23,10 +24,17 @@ SCIENCE_STREAMS = {
     "science-longevity": {"title": "Долголетие", "description": "Старение, geroscience и продление здоровой жизни. Результаты на людях, животных и клетках рассматриваются раздельно."},
 }
 ALL_STREAMS = {**STREAMS, **SCIENCE_STREAMS}
-FEEDS = {name: f"https://www.securitylab.ru/_Services/Export/RSS/{name}/" for name in ("news", "vulnerabilities", "analytics", "software")}
-# SecurityLab still advertises the specialized feed, but it returns HTTP 404.
-# The documented main RSS is a fallback, not a claim of identical coverage.
-FEED_FALLBACKS = {"vulnerabilities": "https://www.securitylab.ru/_Services/Export/RSS/"}
+SECURITYLAB_SOURCES = sources_for(provider="SecurityLab", enabled=True)
+FEEDS = {source.key: source.url for source in SECURITYLAB_SOURCES}
+FEED_FALLBACKS = {
+    source.key: source.fallback_url
+    for source in SECURITYLAB_SOURCES
+    if source.fallback_url
+}
+FEED_REQUIRED = {source.key: source.required for source in SECURITYLAB_SOURCES}
+FEED_UNAVAILABLE_STATUSES = {
+    source.key: source.unavailable_statuses for source in SECURITYLAB_SOURCES
+}
 logger = logging.getLogger(__name__)
 
 
@@ -122,11 +130,18 @@ def collect_securitylab(*, warnings=None):
                 rows = _fetch_securitylab_feed(url)
             except requests.HTTPError as exc:
                 response = exc.response
-                if name not in FEED_FALLBACKS or response is None or response.status_code not in (404, 410):
+                status = response.status_code if response is not None else None
+                unavailable = status in FEED_UNAVAILABLE_STATUSES.get(name, (404, 410))
+                if name in FEED_FALLBACKS and unavailable:
+                    rows = _fetch_securitylab_feed(FEED_FALLBACKS[name])
+                    warning = (f"{name}: {_feed_error(exc)}; collected official main RSS instead; "
+                               "specialized vulnerability-feed coverage is unavailable")
+                elif not FEED_REQUIRED.get(name, True) and unavailable:
+                    rows = []
+                    warning = (f"{name}: {_feed_error(exc)}; optional feed is unavailable; "
+                               "other registered sources continue")
+                else:
                     raise
-                rows = _fetch_securitylab_feed(FEED_FALLBACKS[name])
-                warning = (f"{name}: {_feed_error(exc)}; collected official main RSS instead; "
-                           "specialized vulnerability-feed coverage is unavailable")
                 logger.warning("%s", warning)
                 if warnings is not None:
                     warnings.append(warning)
