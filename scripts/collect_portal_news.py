@@ -18,6 +18,8 @@ OPENAI_SOURCE = source_by_key("openai-news")
 OPENAI_PAGE_LIMIT = 2 * 1024 * 1024
 ANTHROPIC_SOURCE = source_by_key("anthropic-news")
 ANTHROPIC_PAGE_LIMIT = 2 * 1024 * 1024
+NVIDIA_SOURCE = source_by_key("nvidia-blog")
+NVIDIA_FEED_LIMIT = 2 * 1024 * 1024
 MCP_SOURCE = source_by_key("mcp-blog")
 MCP_FEED_LIMIT = 2 * 1024 * 1024
 PATTERNS = [
@@ -25,6 +27,12 @@ PATTERNS = [
     ("science-neuro", re.compile(r"\b(neural|brain|health|medical|medicine|biomedical|neuroscience|neurology)\b", re.I)),
     ("science-ai", re.compile(r"\b(ai|artificial intelligence|machine learning|robot(?:s|ics)?|engineering)\b", re.I)),
 ]
+NVIDIA_AI_PATTERN = re.compile(
+    r"\b(ai|artificial intelligence|machine learning|agent(?:s|ic)?|gpu|cuda|dgx|"
+    r"accelerated computing|data cent(?:er|re)|model(?:s|ing)?|robot(?:s|ics)?|"
+    r"omniverse|quantum|inference|training)\b",
+    re.I,
+)
 
 
 class OpenAIProductParser(HTMLParser):
@@ -249,6 +257,43 @@ def parse_mcp_feed(data):
     return rows
 
 
+def parse_nvidia_feed(data):
+    if len(data) > NVIDIA_FEED_LIMIT:
+        raise ValueError("NVIDIA RSS exceeds size limit")
+    root = ET.fromstring(data)
+    if root.tag != "rss":
+        raise ValueError("NVIDIA source did not return RSS")
+    rows, seen = [], set()
+    for item in root.findall("./channel/item"):
+        title = item.findtext("title", "").strip()
+        url = item.findtext("link", "").strip()
+        parts = urlsplit(url)
+        description = unescape(re.sub(
+            r"<[^>]*>",
+            " ",
+            item.findtext("description", ""),
+        ))
+        summary = " ".join(description.split())
+        if (parts.scheme != "https" or parts.netloc != "blogs.nvidia.com"
+                or not parts.path.startswith("/blog/") or not title
+                or url in seen or not NVIDIA_AI_PATTERN.search(title + " " + summary)):
+            continue
+        seen.add(url)
+        rows.append({
+            "title": title[:500],
+            "source_url": url,
+            "summary": summary[:2000],
+            "stream": NVIDIA_SOURCE.stream,
+            "evidence": "Официальный источник; ручная проверка",
+            "published_date": item.findtext("pubDate", "")[:100],
+        })
+    if not rows:
+        raise ValueError("NVIDIA RSS format changed or returned no AI posts")
+    if len(rows) > 100:
+        raise ValueError("NVIDIA batch exceeds 100 records")
+    return rows
+
+
 def collect_mit():
     with requests.get(MIT_FEED, timeout=(5, 20), stream=True) as response:
         response.raise_for_status()
@@ -310,6 +355,30 @@ def collect_anthropic():
     return {"matched": len(rows), "created": created, "existing": len(rows) - created}
 
 
+def collect_nvidia():
+    with requests.get(
+        NVIDIA_SOURCE.url,
+        headers={"User-Agent": "st8dom-source-monitor/1.0"},
+        timeout=(10, 30),
+        stream=True,
+    ) as response:
+        response.raise_for_status()
+        parts = urlsplit(response.url)
+        if parts.scheme != "https" or parts.netloc != "blogs.nvidia.com":
+            raise ValueError("NVIDIA feed redirected outside official source")
+        content_type = response.headers.get("Content-Type", "").lower()
+        if "xml" not in content_type and "rss" not in content_type:
+            raise ValueError("NVIDIA source did not return RSS/XML")
+        data = bytearray()
+        for chunk in response.iter_content(65536):
+            data.extend(chunk)
+            if len(data) > NVIDIA_FEED_LIMIT:
+                raise ValueError("NVIDIA RSS exceeds size limit")
+    rows = parse_nvidia_feed(bytes(data))
+    created = sum(save_material(**row)[1] for row in rows)
+    return {"matched": len(rows), "created": created, "existing": len(rows) - created}
+
+
 def collect_mcp():
     with requests.get(
         MCP_SOURCE.url,
@@ -358,6 +427,11 @@ def main():
         except (requests.RequestException, ValueError) as exc:
             warning = "Anthropic: " + type(exc).__name__
             print(f"::warning title=Anthropic official source::{warning}")
+        try:
+            print(json.dumps({"source": "NVIDIA", **collect_nvidia()}))
+        except (requests.RequestException, ET.ParseError, ValueError) as exc:
+            warning = "NVIDIA: " + type(exc).__name__
+            print(f"::warning title=NVIDIA official source::{warning}")
         try:
             print(json.dumps({"source": "MCP", **collect_mcp()}))
         except (requests.RequestException, ET.ParseError, ValueError) as exc:

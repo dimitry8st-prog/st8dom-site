@@ -16,6 +16,7 @@ def test_enabled_sources_have_supported_adapters():
         "mit_rss",
         "mcp_rss",
         "anthropic_html",
+        "nvidia_rss",
         "openai_html",
     }
 
@@ -47,6 +48,13 @@ def test_anthropic_adapter_is_enabled_for_private_cards():
     source = source_by_key("anthropic-news")
     assert source.enabled is True
     assert source.adapter == "anthropic_html"
+    assert source.stream == "science-ai"
+
+
+def test_nvidia_adapter_is_enabled_for_private_cards():
+    source = source_by_key("nvidia-blog")
+    assert source.enabled is True
+    assert source.adapter == "nvidia_rss"
     assert source.stream == "science-ai"
 
 

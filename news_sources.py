@@ -80,6 +80,14 @@ NEWS_SOURCES: tuple[NewsSource, ...] = (
         status="active",
     ),
     NewsSource(
+        key="nvidia-blog",
+        provider="NVIDIA",
+        url="https://blogs.nvidia.com/feed/",
+        stream="science-ai",
+        adapter="nvidia_rss",
+        status="active",
+    ),
+    NewsSource(
         key="google-ai",
         provider="Google",
         url="https://blog.google/innovation-and-ai/technology/ai/",
