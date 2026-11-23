@@ -1,0 +1,104 @@
+name: Vitalis cabinet source checkout
+on:
+  push:
+    branches: [codex/vitalis-cabinet-ops-20261123]
+    paths: [".github/workflows/vitalis-cabinet-maintenance.yml"]
+permissions: {}
+concurrency:
+  group: vitalis-cabinet-maintenance
+  cancel-in-progress: false
+jobs:
+  sync-checkout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify and synchronize the source of the running cabinet
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          timeout: 25s
+          command_timeout: 3m
+          script: |
+            set -eu
+            vitalis_dir=/opt/vitalis-ru
+            release_branch=release/vitalis-cabinet-20261123
+            release_sha=1060516bc16707a95c7bb31c18d8815862d1efd3
+            base_sha=01f5064b2fb959e5546b51f01998eafa5713d550
+            expected_app=40e2b9b627d8433437953cfc515ce2ab244c8bd896cbef82bd92e1c39d770cd7
+            cd "$vitalis_dir"
+            
+            state="$HOME/.local/state/vitalis-cabinet"
+            umask 077
+            mkdir -p "$state"
+            exec 9>"$state/release.lock"
+            flock -n 9
+            
+            repo_read() { git -c safe.directory="$vitalis_dir" -c core.hooksPath=/dev/null -C "$vitalis_dir" "$@"; }
+            verify_live() {
+              served_app=$(curl --fail --silent --show-error --max-time 10 http://127.0.0.1:3080/app | sha256sum | cut -d ' ' -f 1)
+              test "$served_app" = "$expected_app"
+              curl --fail --silent --show-error --max-time 10 http://127.0.0.1:3080/api/health -o /dev/null
+              curl --fail --silent --show-error --max-time 10 http://127.0.0.1:3080/api/ai/health -o /dev/null
+              printf 'VITALIS_APP_HTTP=200\nVITALIS_LIVE_APP_SHA256=%s\n' "$served_app"
+            }
+            verify_live
+            
+            head=$(repo_read rev-parse --verify HEAD)
+            head_ref=$(repo_read symbolic-ref --quiet --short HEAD || printf 'detached')
+            committed_app=$(repo_read show HEAD:web/app.html | sha256sum | cut -d ' ' -f 1)
+            checked_out_app=$(sha256sum web/app.html | cut -d ' ' -f 1)
+            printf 'VITALIS_CHECKOUT=%s\nVITALIS_BRANCH=%s\n' "$head" "$head_ref"
+            if [ "$committed_app" = "$expected_app" ] && [ "$checked_out_app" = "$expected_app" ]; then
+              echo VITALIS_CHECKOUT_SYNC=already_current
+              exit 0
+            fi
+            if [ "$head" != "$base_sha" ]; then
+              echo VITALIS_CHECKOUT_SYNC=base_changed
+              exit 0
+            fi
+            if [ -n "$(repo_read status --porcelain --untracked-files=no)" ]; then
+              echo VITALIS_CHECKOUT_SYNC=dirty
+              exit 0
+            fi
+            
+            owner=$(stat -c '%u' .git)
+            if [ "$(id -u)" = "$owner" ] || { [ -w .git ] && [ -w web ] && [ -w server/tests ]; }; then
+              writer=current_user
+            elif command -v sudo >/dev/null && sudo -n -u "#$owner" -- test -w "$vitalis_dir/.git" 2>/dev/null; then
+              writer=owner_sudo
+            else
+              echo VITALIS_CHECKOUT_SYNC=read_only
+              exit 0
+            fi
+            
+            repo_write() {
+              if [ "$writer" = owner_sudo ]; then
+                sudo -n -u "#$owner" -- git -c core.hooksPath=/dev/null -C "$vitalis_dir" "$@"
+              else
+                repo_read "$@"
+              fi
+            }
+            
+            export GIT_TERMINAL_PROMPT=0
+            repo_write fetch --no-tags https://github.com/dimitry8st-prog/Vitalis-Medical-AI.git "refs/heads/$release_branch"
+            test "$(repo_read rev-parse --verify FETCH_HEAD)" = "$release_sha"
+            test "$(repo_read rev-parse --verify HEAD)" = "$base_sha"
+            test -z "$(repo_read status --porcelain --untracked-files=no)"
+            expected_changes=$(printf 'server/tests/integration.test.js\nweb/app.html')
+            actual_changes=$(repo_read diff --name-only "$base_sha" "$release_sha")
+            test "$actual_changes" = "$expected_changes"
+            
+            if repo_read show-ref --verify --quiet "refs/heads/$release_branch"; then
+              test "$(repo_read rev-parse "refs/heads/$release_branch")" = "$release_sha"
+              repo_write switch "$release_branch"
+            else
+              repo_write switch --create "$release_branch" "$release_sha"
+            fi
+            
+            test "$(repo_read rev-parse --verify HEAD)" = "$release_sha"
+            test "$(sha256sum web/app.html | cut -d ' ' -f 1)" = "$expected_app"
+            test -z "$(repo_read status --porcelain --untracked-files=no)"
+            verify_live
+            printf 'VITALIS_CHECKOUT_SYNC=applied\nVITALIS_CHECKOUT=%s\n' "$release_sha"
