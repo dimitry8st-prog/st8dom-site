@@ -76,9 +76,8 @@ NEWS_SOURCES: tuple[NewsSource, ...] = (
         provider="Anthropic",
         url="https://www.anthropic.com/news",
         stream="science-ai",
-        adapter="html",
-        enabled=False,
-        status="adapter_required",
+        adapter="anthropic_html",
+        status="active",
     ),
     NewsSource(
         key="google-ai",
