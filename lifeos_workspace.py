@@ -135,7 +135,7 @@ def collect_securitylab(*, warnings=None):
                 if name in FEED_FALLBACKS and unavailable:
                     rows = _fetch_securitylab_feed(FEED_FALLBACKS[name])
                     warning = (f"{name}: {_feed_error(exc)}; collected official main RSS instead; "
-                               "specialized feed coverage is unavailable")
+                               "specialized vulnerability-feed coverage is unavailable")
                 elif not FEED_REQUIRED.get(name, True) and unavailable:
                     rows = []
                     warning = (f"{name}: {_feed_error(exc)}; optional feed is unavailable; "
