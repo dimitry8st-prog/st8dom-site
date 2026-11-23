@@ -92,11 +92,10 @@ NEWS_SOURCES: tuple[NewsSource, ...] = (
     NewsSource(
         key="mcp-blog",
         provider="Model Context Protocol",
-        url="https://blog.modelcontextprotocol.io/",
+        url="https://blog.modelcontextprotocol.io/index.xml",
         stream="science-ai",
-        adapter="html",
-        enabled=False,
-        status="adapter_required",
+        adapter="mcp_rss",
+        status="active",
     ),
     NewsSource(
         key="aaif",
