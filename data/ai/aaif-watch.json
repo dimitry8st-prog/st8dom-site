@@ -27,6 +27,27 @@
   },
   "items": [
     {
+      "title": "Why does MCP use OAuth instead of API keys?",
+      "url": "https://aaif.io/blog/why-does-mcp-use-oauth-instead-of-api-keys",
+      "published_date": "2026-11-20",
+      "summary": "Explore why MCP adopted OAuth 2.1 over API keys for its general-purpose vision, when OAuth is truly needed, and when custom clients can use simpler auth approaches.",
+      "review_status": "pending"
+    },
+    {
+      "title": "Designing secure authorization across A2A and MCP",
+      "url": "https://aaif.io/blog/designing-secure-authorization-across-a2a-and-mcp",
+      "published_date": "2026-11-19",
+      "summary": "Examine security vulnerabilities in systems combining A2A and MCP protocols, and learn how to apply an OAuth 2.1 security baseline to protect agent-to-agent communication.",
+      "review_status": "pending"
+    },
+    {
+      "title": "How to turn that tricky bug into a conference talk",
+      "url": "https://aaif.io/blog/how-to-turn-that-tricky-bug-into-a-conference-talk",
+      "published_date": "2026-11-18",
+      "summary": "Learn how to transform technical debugging experiences into compelling conference talk proposals. Practical advice for narrowing your topic, writing abstracts and submitting to CFPs.",
+      "review_status": "pending"
+    },
+    {
       "title": "Kids build games and make robots sing at AGNTCon Kids Day",
       "url": "https://aaif.io/blog/kids-build-games-and-make-robots-sing-at-agntcon-kids-day",
       "published_date": "2026-11-13",
@@ -139,5 +160,5 @@
       "review_status": "pending"
     }
   ],
-  "last_changed_at": "2026-11-16T11:11:07+00:00"
+  "last_changed_at": "2026-11-23T12:29:33+00:00"
 }
