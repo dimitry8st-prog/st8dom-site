@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Inspect the running Vitalis cabinet
+      - name: Read the exact checkout and Node image for the cabinet
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -23,17 +23,24 @@ jobs:
           script: |
             set -eu
             cd /opt/vitalis-ru
-            printf 'VITALIS_CHECKOUT=%s\n' "$(git rev-parse HEAD)"
-            printf 'VITALIS_BRANCH=%s\n' "$(git symbolic-ref --quiet --short HEAD || true)"
-            printf 'VITALIS_TRACKED_CHANGES=%s\n' "$(git status --porcelain --untracked-files=no | wc -l | tr -d ' ')"
-            printf 'VITALIS_CHECKOUT_APP_SHA256=%s\n' "$(sha256sum web/app.html | cut -d ' ' -f 1)"
+            repo_git() { git -c safe.directory=/opt/vitalis-ru -c core.hooksPath=/dev/null "$@"; }
+            head=$(repo_git rev-parse --verify HEAD)
+            branch=$(repo_git symbolic-ref --quiet --short HEAD || printf 'detached')
+            changes=$(repo_git status --porcelain --untracked-files=no)
+            printf 'VITALIS_CHECKOUT=%s\nVITALIS_BRANCH=%s\n' "$head" "$branch"
+            if [ -z "$changes" ]; then echo VITALIS_CHECKOUT_CLEAN=yes; else echo VITALIS_CHECKOUT_CLEAN=no; fi
+            owner=$(stat -c '%u' .git)
+            if [ "$owner" = "$(id -u)" ]; then
+              echo VITALIS_CHECKOUT_ACCESS=owner
+            elif sudo -n -u "#$owner" -- test -w /opt/vitalis-ru/.git 2>/dev/null; then
+              echo VITALIS_CHECKOUT_ACCESS=owner_sudo
+            elif [ -w .git ] && [ -w web ]; then
+              echo VITALIS_CHECKOUT_ACCESS=shared
+            else
+              echo VITALIS_CHECKOUT_ACCESS=read_only
+            fi
             node_id=$(docker compose ps -q node)
-            python_id=$(docker compose ps -q python)
             test -n "$node_id"
-            test -n "$python_id"
-            printf 'VITALIS_NODE_HEALTH=%s\n' "$(docker inspect -f '{{.State.Health.Status}}' "$node_id")"
-            printf 'VITALIS_PYTHON_HEALTH=%s\n' "$(docker inspect -f '{{.State.Health.Status}}' "$python_id")"
-            printf 'VITALIS_CONTAINER_APP_SHA256=%s\n' "$(docker exec "$node_id" sha256sum /app/web/app.html | cut -d ' ' -f 1)"
-            printf 'VITALIS_APP_HTTP=%s\n' "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:3080/app)"
-            printf 'VITALIS_NODE_API_HTTP=%s\n' "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:3080/api/health)"
-            printf 'VITALIS_PYTHON_API_HTTP=%s\n' "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:3080/api/ai/health)"
+            printf 'VITALIS_NODE_IMAGE_REF=%s\n' "$(docker inspect -f '{{.Config.Image}}' "$node_id")"
+            printf 'VITALIS_COMPOSE_NODE_IMAGE=%s\n' "$(docker compose config --images node)"
+            printf 'VITALIS_APP_SHA256=%s\n' "$(docker exec "$node_id" sha256sum /app/web/app.html | cut -d ' ' -f 1)"
