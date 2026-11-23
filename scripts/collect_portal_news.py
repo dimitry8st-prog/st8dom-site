@@ -15,6 +15,8 @@ from news_sources import source_by_key
 MIT_FEED = source_by_key("mit-news").url
 OPENAI_SOURCE = source_by_key("openai-news")
 OPENAI_PAGE_LIMIT = 2 * 1024 * 1024
+MCP_SOURCE = source_by_key("mcp-blog")
+MCP_FEED_LIMIT = 2 * 1024 * 1024
 PATTERNS = [
     ("science-longevity", re.compile(r"\b(aging|ageing|longevity|geroscience|senescence|healthspan)\b", re.I)),
     ("science-neuro", re.compile(r"\b(neural|brain|health|medical|medicine|biomedical|neuroscience|neurology)\b", re.I)),
@@ -110,6 +112,43 @@ def parse_mit_feed(data):
     return validate_mit_batch({"materials": rows})
 
 
+def parse_mcp_feed(data):
+    if len(data) > MCP_FEED_LIMIT:
+        raise ValueError("MCP RSS exceeds size limit")
+    root = ET.fromstring(data)
+    if root.tag != "rss":
+        raise ValueError("MCP source did not return RSS")
+    rows, seen = [], set()
+    for item in root.findall("./channel/item"):
+        title = item.findtext("title", "").strip()
+        url = item.findtext("link", "").strip()
+        parts = urlsplit(url)
+        if (parts.scheme != "https"
+                or parts.netloc != "blog.modelcontextprotocol.io"
+                or not parts.path.startswith("/posts/")
+                or not title or url in seen):
+            continue
+        seen.add(url)
+        description = unescape(re.sub(
+            r"<[^>]*>",
+            " ",
+            item.findtext("description", ""),
+        ))
+        rows.append({
+            "title": title[:500],
+            "source_url": url,
+            "summary": " ".join(description.split())[:2000],
+            "stream": MCP_SOURCE.stream,
+            "evidence": "Официальный источник; ручная проверка",
+            "published_date": item.findtext("pubDate", "")[:100],
+        })
+    if not rows:
+        raise ValueError("MCP RSS format changed or returned no posts")
+    if len(rows) > 100:
+        raise ValueError("MCP batch exceeds 100 records")
+    return rows
+
+
 def collect_mit():
     with requests.get(MIT_FEED, timeout=(5, 20), stream=True) as response:
         response.raise_for_status()
@@ -148,6 +187,30 @@ def collect_openai():
     return {"matched": len(rows), "created": created, "existing": len(rows) - created}
 
 
+def collect_mcp():
+    with requests.get(
+        MCP_SOURCE.url,
+        headers={"User-Agent": "st8dom-source-monitor/1.0"},
+        timeout=(10, 30),
+        stream=True,
+    ) as response:
+        response.raise_for_status()
+        parts = urlsplit(response.url)
+        if parts.scheme != "https" or parts.netloc != "blog.modelcontextprotocol.io":
+            raise ValueError("MCP feed redirected outside official source")
+        content_type = response.headers.get("Content-Type", "").lower()
+        if "xml" not in content_type:
+            raise ValueError("MCP source did not return XML")
+        data = bytearray()
+        for chunk in response.iter_content(65536):
+            data.extend(chunk)
+            if len(data) > MCP_FEED_LIMIT:
+                raise ValueError("MCP RSS exceeds size limit")
+    rows = parse_mcp_feed(bytes(data))
+    created = sum(save_material(**row)[1] for row in rows)
+    return {"matched": len(rows), "created": created, "existing": len(rows) - created}
+
+
 def main():
     from app import app
     errors = []
@@ -167,6 +230,11 @@ def main():
         except (requests.RequestException, ValueError) as exc:
             warning = "OpenAI: " + type(exc).__name__
             print(f"::warning title=OpenAI official source::{warning}")
+        try:
+            print(json.dumps({"source": "MCP", **collect_mcp()}))
+        except (requests.RequestException, ET.ParseError, ValueError) as exc:
+            warning = "MCP: " + type(exc).__name__
+            print(f"::warning title=MCP official source::{warning}")
         if errors:
             raise SystemExit("News collection incomplete: " + ", ".join(errors))
 
