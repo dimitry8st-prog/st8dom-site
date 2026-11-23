@@ -1,0 +1,39 @@
+name: Vitalis cabinet maintenance
+on:
+  push:
+    branches: [codex/vitalis-cabinet-ops-20261123]
+    paths: [".github/workflows/vitalis-cabinet-maintenance.yml"]
+permissions: {}
+concurrency:
+  group: vitalis-cabinet-maintenance
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect the running Vitalis cabinet
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          timeout: 25s
+          command_timeout: 2m
+          script: |
+            set -eu
+            cd /opt/vitalis-ru
+            printf 'VITALIS_CHECKOUT=%s\n' "$(git rev-parse HEAD)"
+            printf 'VITALIS_BRANCH=%s\n' "$(git symbolic-ref --quiet --short HEAD || true)"
+            printf 'VITALIS_TRACKED_CHANGES=%s\n' "$(git status --porcelain --untracked-files=no | wc -l | tr -d ' ')"
+            printf 'VITALIS_CHECKOUT_APP_SHA256=%s\n' "$(sha256sum web/app.html | cut -d ' ' -f 1)"
+            node_id=$(docker compose ps -q node)
+            python_id=$(docker compose ps -q python)
+            test -n "$node_id"
+            test -n "$python_id"
+            printf 'VITALIS_NODE_HEALTH=%s\n' "$(docker inspect -f '{{.State.Health.Status}}' "$node_id")"
+            printf 'VITALIS_PYTHON_HEALTH=%s\n' "$(docker inspect -f '{{.State.Health.Status}}' "$python_id")"
+            printf 'VITALIS_CONTAINER_APP_SHA256=%s\n' "$(docker exec "$node_id" sha256sum /app/web/app.html | cut -d ' ' -f 1)"
+            printf 'VITALIS_APP_HTTP=%s\n' "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:3080/app)"
+            printf 'VITALIS_NODE_API_HTTP=%s\n' "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:3080/api/health)"
+            printf 'VITALIS_PYTHON_API_HTTP=%s\n' "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:3080/api/ai/health)"
