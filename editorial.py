@@ -762,6 +762,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 11, 18, 14, 35, 54, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "gemini-tool-retrieval-2026-11-24.json",
+        datetime(2026, 11, 24, 17, 12, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
