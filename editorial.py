@@ -767,6 +767,11 @@ def ensure_editorial_seed() -> None:
         datetime(2026, 11, 24, 17, 12, tzinfo=timezone.utc),
     )
 
+    ensure_published_content_package(
+        "manage-pain-2026-11-25.json",
+        datetime(2026, 11, 25, 19, 16, tzinfo=timezone.utc),
+    )
+
     db.session.commit()
 
 
